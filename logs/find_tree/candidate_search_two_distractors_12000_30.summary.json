@@ -1,0 +1,48 @@
+{
+  "environment": "arena",
+  "episodes_per_mode": 30,
+  "base_seed": 12000,
+  "max_steps": 300,
+  "yaw_noise_degrees": 180.0,
+  "target_distance_range": [
+    3,
+    10
+  ],
+  "distractor_tree_count": 2,
+  "deployment_inputs": [
+    "pov",
+    "commanded_camera_delta",
+    "internal_memory"
+  ],
+  "oracle_used_for_actions_or_selection": false,
+  "candidate": {
+    "successes": 30,
+    "success_rate": 1.0,
+    "wilson_95_percent": [
+      0.8865,
+      1.0
+    ],
+    "mean_steps": 72.5,
+    "median_steps": 70.0,
+    "initial_selection_accuracy": 1.0,
+    "mean_candidate_recall": 1.0,
+    "successful_after_any_recovery": 2,
+    "successful_after_wrong_initial_selection": 0,
+    "total_replans": 0,
+    "total_recoveries": 2,
+    "total_stalls": 2,
+    "max_step_failures": 0
+  },
+  "provisional_multi_tree_gate": {
+    "at_least_18_of_20": true,
+    "no_max_step_failures": true,
+    "recovery_rescued_episode": true,
+    "oracle_isolation": true
+  },
+  "baseline_comparison": {
+    "old_visual_successes": 16,
+    "old_visual_episodes": 20,
+    "old_visual_mean_steps": 107.5
+  },
+  "elapsed_seconds": 860.5
+}

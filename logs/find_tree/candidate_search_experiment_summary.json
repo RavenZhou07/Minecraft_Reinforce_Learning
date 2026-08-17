@@ -1,0 +1,57 @@
+{
+  "date": "2026-08-17",
+  "deployment_inputs": ["pov", "commanded_camera_delta", "internal_memory"],
+  "oracle_used_for_actions_or_selection": false,
+  "quick_tests": {"passed": 48, "deselected_integration": 4},
+  "smoke": {
+    "seeds": [10000, 10002],
+    "successes": 3,
+    "episodes": 3,
+    "candidate_recall": 1.0,
+    "initial_selection_accuracy": 1.0,
+    "mean_steps": 73.66666666666667
+  },
+  "paired_20": {
+    "seeds": [11000, 11019],
+    "oracle_successes": 20,
+    "oracle_mean_steps": 36.75,
+    "candidate_successes": 20,
+    "candidate_wilson_95_percent": [0.8389, 1.0],
+    "candidate_mean_steps": 75.2,
+    "candidate_median_steps": 76.5,
+    "initial_selection_accuracy": 1.0,
+    "successful_after_any_recovery": 1,
+    "replans": 0,
+    "max_step_failures": 0
+  },
+  "unseen_30": {
+    "seeds": [12000, 12029],
+    "candidate_successes": 30,
+    "candidate_wilson_95_percent": [0.8865, 1.0],
+    "candidate_mean_steps": 72.5,
+    "candidate_median_steps": 70.0,
+    "initial_selection_accuracy": 1.0,
+    "successful_after_any_recovery": 2,
+    "replans": 0,
+    "max_step_failures": 0
+  },
+  "forced_wrong_initial_selection": {
+    "seeds": [13000, 13002],
+    "diagnostic_only": true,
+    "best_complete_run_successes": 2,
+    "episodes": 3,
+    "persistent_failure_seed": 13000,
+    "root_cause": "After walking to a distractor, the target is about 21 blocks away and no longer detected by the POV rescan; commanded-yaw-only memory cannot update old candidate bearings after translation."
+  },
+  "baseline_comparison": {
+    "old_successes": 16,
+    "old_episodes": 20,
+    "old_mean_steps": 107.5,
+    "new_successes": 20,
+    "new_episodes": 20,
+    "new_mean_steps": 75.2
+  },
+  "strict_natural_treechop_gate_passed": false,
+  "natural_treechop_run": false,
+  "next_step": "Add simple 2-D candidate position dead reckoning with calibrated visual range so stale bearings can be updated after translation."
+}

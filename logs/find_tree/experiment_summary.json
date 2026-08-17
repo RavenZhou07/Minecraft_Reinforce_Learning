@@ -1,0 +1,141 @@
+{
+  "date": "2026-08-15",
+  "teacher_collection": {
+    "seeds": [42, 57],
+    "episodes": 16,
+    "successes": 16,
+    "transitions": 422
+  },
+  "offline_validation": {
+    "training_episodes": 12,
+    "validation_episodes": 4,
+    "initial_loss": 1.0986120700836182,
+    "final_loss": 0.7285587787628174,
+    "relative_loss_improvement": 0.3368370887210761,
+    "tail_loss_std": 0.003934595326408354,
+    "forward_bias": 0.35,
+    "calibrated_balanced_accuracy": 0.9937106918238993
+  },
+  "real_minecraft_evaluation": {
+    "seeds": [1000, 1004],
+    "episodes_per_policy": 5,
+    "uniform_random": {
+      "successes": 2,
+      "mean_steps": 86.2,
+      "mean_final_distance": 2.832147216796875
+    },
+    "privileged_oracle": {
+      "successes": 5,
+      "mean_steps": 28.4,
+      "mean_final_distance": 1.6966493606567383
+    },
+    "visual_before_calibration": {
+      "successes": 1,
+      "mean_steps": 87.8,
+      "mean_final_distance": 2.595385694503784
+    },
+    "visual_after_calibration": {
+      "successes": 4,
+      "mean_steps": 47.6,
+      "mean_final_distance": 1.716915988922119
+    }
+  },
+  "stage_1_gate": {
+    "seeds": [2000, 2019],
+    "episodes_per_policy": 20,
+    "uniform_random_successes": 5,
+    "privileged_oracle_successes": 20,
+    "visual_successes": 20,
+    "visual_wilson_95_percent": [0.8389, 1.0]
+  },
+  "stage_2_yaw_90": {
+    "teacher_collection": {
+      "seeds": [3000, 3019],
+      "successes": 20,
+      "transitions": 710,
+      "mean_steps": 35.5,
+      "max_steps_observed": 59
+    },
+    "offline_validation": {
+      "frame_stack": 4,
+      "initial_loss": 1.0986121892929077,
+      "final_loss": 0.3270055055618286,
+      "relative_loss_improvement": 0.7023467345903954,
+      "tail_loss_std": 0.0007874096903239154,
+      "calibrated_accuracy": 0.8940397350993378
+    },
+    "real_minecraft_evaluation": {
+      "seeds": [4000, 4019],
+      "episodes_per_policy": 20,
+      "uniform_random_successes": 3,
+      "privileged_oracle_successes": 20,
+      "raw_visual_successes": 18,
+      "raw_visual_wilson_95_percent": [0.6990, 0.9721],
+      "clockwise_search_visual_successes": 20,
+      "clockwise_search_visual_wilson_95_percent": [0.8389, 1.0],
+      "clockwise_search_visual_mean_steps": 43.95,
+      "oracle_mean_steps": 27.2,
+      "clockwise_search_visual_mean_step_overhead": 16.75,
+      "failure_root_cause": "Raw visual turn predictions entered a left/right limit cycle on empty-background views; consistent clockwise search removed the unobservable direction choice."
+    }
+  },
+  "stage_3_yaw_180_zero_shot": {
+    "seeds": [5000, 5019],
+    "episodes_per_policy": 20,
+    "new_training_transitions": 0,
+    "privileged_oracle_successes": 20,
+    "visual_successes": 20,
+    "visual_wilson_95_percent": [0.8389, 1.0],
+    "oracle_mean_steps": 34.05,
+    "visual_mean_steps": 47.6,
+    "visual_mean_step_overhead": 13.55,
+    "visual_median_step_overhead": 7.0,
+    "visual_max_steps": 77
+  },
+  "stage_4_variable_distance": {
+    "range_blocks": [3, 10],
+    "zero_shot": {
+      "seeds": [6000, 6019],
+      "visual_successes": 17,
+      "visual_wilson_95_percent": [0.6396, 0.9476],
+      "visual_mean_steps": 85.0
+    },
+    "teacher_collection": {
+      "seeds": [7000, 7031],
+      "successes": 32,
+      "transitions": 1229
+    },
+    "offline_validation": {
+      "initial_loss": 1.0986121892929077,
+      "final_loss": 0.23105373978614807,
+      "relative_loss_improvement": 0.7896858035638039,
+      "calibrated_balanced_accuracy": 0.9125493830171193
+    },
+    "retrained_evaluation": {
+      "seeds": [8000, 8019],
+      "oracle_successes": 20,
+      "visual_successes": 20,
+      "visual_wilson_95_percent": [0.8389, 1.0],
+      "oracle_mean_steps": 38.5,
+      "visual_mean_steps": 45.5,
+      "visual_mean_step_overhead": 7.0
+    }
+  },
+  "stage_5_two_distractor_trees": {
+    "task": "The initial nearest identical tree is the locked target; two trees at least two nominal blocks farther are distractors.",
+    "seeds": [9000, 9019],
+    "episodes_per_policy": 20,
+    "oracle_successes": 20,
+    "visual_successes": 16,
+    "visual_wilson_95_percent": [0.5840, 0.9193],
+    "oracle_mean_steps": 37.35,
+    "visual_mean_steps": 107.5,
+    "visual_success_only_mean_steps": 59.375,
+    "failure_mode": "The policy commits to a distractor and has no episode-scale candidate memory or recovery/replanning state."
+  },
+  "natural_forest_evaluation": {
+    "run": false,
+    "reason": "Stage 5 did not pass the stability gate."
+  },
+  "conclusion": "Variable-distance stage 4 passed after targeted data collection and retraining. Multi-tree stage 5 was not stable, so natural MineRLTreechop forest deployment was intentionally withheld."
+}

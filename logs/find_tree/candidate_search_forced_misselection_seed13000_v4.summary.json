@@ -1,0 +1,49 @@
+{
+  "environment": "arena",
+  "episodes_per_mode": 1,
+  "base_seed": 13000,
+  "max_steps": 300,
+  "yaw_noise_degrees": 180.0,
+  "target_distance_range": [
+    3,
+    10
+  ],
+  "distractor_tree_count": 2,
+  "deployment_inputs": [
+    "pov",
+    "commanded_camera_delta",
+    "internal_memory"
+  ],
+  "oracle_used_for_actions_or_selection": false,
+  "diagnostic_forced_initial_rank": 1,
+  "candidate": {
+    "successes": 0,
+    "success_rate": 0.0,
+    "wilson_95_percent": [
+      0.0,
+      0.7935
+    ],
+    "mean_steps": 300.0,
+    "median_steps": 300.0,
+    "initial_selection_accuracy": 0.0,
+    "mean_candidate_recall": 1.0,
+    "successful_after_any_recovery": 0,
+    "successful_after_wrong_initial_selection": 0,
+    "total_replans": 2,
+    "total_recoveries": 1,
+    "total_stalls": 3,
+    "max_step_failures": 1
+  },
+  "provisional_multi_tree_gate": {
+    "at_least_18_of_20": false,
+    "no_max_step_failures": false,
+    "recovery_rescued_episode": false,
+    "oracle_isolation": true
+  },
+  "baseline_comparison": {
+    "old_visual_successes": 16,
+    "old_visual_episodes": 20,
+    "old_visual_mean_steps": 107.5
+  },
+  "elapsed_seconds": 344.483
+}
