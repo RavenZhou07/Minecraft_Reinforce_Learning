@@ -81,3 +81,23 @@ def test_remembered_world_point_updates_bearing_after_translation():
     )
     memory.refresh_world_bearings(pose(x=10.0))
     assert np.isclose(candidate.relative_yaw, 45.0)
+
+
+def test_selected_candidate_rejects_large_range_outlier():
+    memory = CandidateMap()
+    candidate, _ = memory.add_detection(
+        ResourceDetection("tree", 0.0, 0.9, 20.0),
+        0.0,
+        0,
+        telemetry=pose(),
+        range_estimate=VisualRangeEstimate(10.0, 1.0),
+    )
+    memory.update_candidate_position(
+        candidate,
+        ResourceDetection("tree", 0.0, 0.9, 3.0),
+        pose(),
+        VisualRangeEstimate(20.0, 1.0),
+        step=10,
+    )
+    assert np.isclose(candidate.estimated_world_z, 10.0)
+    assert candidate.position_observation_count == 1

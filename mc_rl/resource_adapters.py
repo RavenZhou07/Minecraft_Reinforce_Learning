@@ -60,6 +60,9 @@ class TreeResourceAdapter(ResourceAdapter):
         reward_is_success: bool = True,
         range_scale: float = 41.55,
         range_exponent: float = -0.395,
+        range_size_cap: Optional[float] = None,
+        interaction_uses_geometry: bool = False,
+        interaction_min_apparent_size: float = 0.0,
     ):
         self.horizontal_fov_degrees = float(horizontal_fov_degrees)
         self.minimum_component_pixels = int(minimum_component_pixels)
@@ -68,8 +71,17 @@ class TreeResourceAdapter(ResourceAdapter):
         self.reward_is_success = bool(reward_is_success)
         self.range_scale = float(range_scale)
         self.range_exponent = float(range_exponent)
+        self.range_size_cap = range_size_cap
+        self.interaction_uses_geometry = bool(interaction_uses_geometry)
+        self.interaction_min_apparent_size = float(
+            interaction_min_apparent_size
+        )
         if self.range_scale <= 0 or self.range_exponent >= 0:
             raise ValueError("tree range calibration must have positive scale and negative exponent")
+        if self.range_size_cap is not None and self.range_size_cap <= 0:
+            raise ValueError("range_size_cap must be positive")
+        if self.interaction_min_apparent_size < 0:
+            raise ValueError("interaction_min_apparent_size cannot be negative")
 
     @staticmethod
     def trunk_mask(pov: np.ndarray) -> np.ndarray:
@@ -145,6 +157,7 @@ class TreeResourceAdapter(ResourceAdapter):
                     confidence=confidence,
                     apparent_size=leaf_area,
                     center_x=normalized_x,
+                    geometry_size=float(area),
                 )
             )
         return sorted(detections, key=lambda item: -item.apparent_size)
@@ -160,9 +173,16 @@ class TreeResourceAdapter(ResourceAdapter):
         )
 
     def ready_to_interact(self, detection: ResourceDetection) -> bool:
+        interaction_size = (
+            detection.geometry_size
+            if self.interaction_uses_geometry
+            and detection.geometry_size is not None
+            else detection.apparent_size
+        )
         return (
             self.interaction_size is not None
-            and detection.apparent_size >= self.interaction_size
+            and interaction_size >= self.interaction_size
+            and detection.apparent_size >= self.interaction_min_apparent_size
         )
 
     def estimate_range(
@@ -175,7 +195,10 @@ class TreeResourceAdapter(ResourceAdapter):
         noisy visual measurement as an exact block coordinate.
         """
 
-        distance = self.range_scale * float(detection.apparent_size) ** self.range_exponent
+        range_size = float(detection.apparent_size)
+        if self.range_size_cap is not None:
+            range_size = min(range_size, float(self.range_size_cap))
+        distance = self.range_scale * range_size ** self.range_exponent
         edge_fraction = min(1.0, abs(float(detection.horizontal_yaw)) / 35.0)
         uncertainty = max(1.25, 0.12 * distance + 0.75 * edge_fraction)
         return VisualRangeEstimate(distance=distance, uncertainty=uncertainty)

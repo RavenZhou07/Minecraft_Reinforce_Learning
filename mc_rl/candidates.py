@@ -27,6 +27,7 @@ class ResourceDetection:
     confidence: float
     apparent_size: float
     center_x: float = 0.5
+    geometry_size: Optional[float] = None
 
 
 @dataclass
@@ -330,6 +331,30 @@ class CandidateMap:
         position = detection_world_position(
             telemetry, detection.horizontal_yaw, range_estimate
         )
+        if candidate.has_world_position:
+            remembered_distance = hypot(
+                float(candidate.estimated_world_x) - telemetry.x,
+                float(candidate.estimated_world_z) - telemetry.z,
+            )
+            innovation = hypot(
+                float(candidate.estimated_world_x) - position[0],
+                float(candidate.estimated_world_z) - position[2],
+            )
+            innovation_gate = max(
+                3.0,
+                float(candidate.position_uncertainty)
+                + range_estimate.uncertainty
+                + 1.0,
+            )
+            # The range calibration is reliable at curriculum scan ranges.
+            # Very close canopies clip out of frame; a small residual patch
+            # must not make a stationary tree drift away from the player.
+            clipped_close_view = bool(
+                remembered_distance <= 4.0
+                and range_estimate.distance > remembered_distance + 1.5
+            )
+            if innovation > innovation_gate or clipped_close_view:
+                return
         self._fuse_position(
             candidate,
             position,
@@ -364,6 +389,7 @@ class CandidateMap:
                 for second_index in range(first_index + 1, len(self.candidates)):
                     second = self.candidates[second_index]
                     position_error = None
+                    position_match = False
                     if first.has_world_position and second.has_world_position:
                         position_error = hypot(
                             float(first.estimated_world_x)
@@ -376,8 +402,7 @@ class CandidateMap:
                             float(first.position_uncertainty)
                             + float(second.position_uncertainty),
                         )
-                        if position_error > position_gate:
-                            continue
+                        position_match = position_error <= position_gate
                     size_error = abs(
                         log(max(first.apparent_size, 1e-3))
                         - log(max(second.apparent_size, 1e-3))
@@ -391,15 +416,15 @@ class CandidateMap:
                         max(yaw_tolerance, 60.0)
                         if cooldown_identity_match else yaw_tolerance
                     )
-                    if (
-                        first.resource_type != second.resource_type
-                        or self.angular_distance(first.relative_yaw, second.relative_yaw)
-                        > allowed_yaw
-                        or (
-                            size_error > self.merge_log_size_tolerance
-                            and position_error is None
-                            and not cooldown_identity_match
+                    visual_match = bool(
+                        self.angular_distance(
+                            first.relative_yaw, second.relative_yaw
                         )
+                        <= allowed_yaw
+                        and size_error <= self.merge_log_size_tolerance
+                    )
+                    if first.resource_type != second.resource_type or not (
+                        cooldown_identity_match or position_match or visual_match
                     ):
                         continue
                     first.relative_yaw = self._circular_average(

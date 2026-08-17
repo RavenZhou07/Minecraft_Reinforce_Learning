@@ -234,3 +234,46 @@ def test_f3_deployment_path_reads_self_telemetry_but_not_oracle_or_grid():
         log_grid="forbidden",
     )
     assert policy.act(guarded) == policy.config.right_action
+
+
+def test_f3_predicted_coordinate_without_success_replans_to_next_candidate():
+    policy = CandidateSearchPolicy(
+        FakeAdapter(), SearchConfig(sensor_profile="f3_telemetry")
+    )
+    telemetry = policy._telemetry(telemetry_observation())
+    first, _ = policy.candidate_map.add_detection(
+        ResourceDetection("tree", 0, 0.9, 2),
+        0,
+        0,
+        telemetry=telemetry,
+        range_estimate=VisualRangeEstimate(2.0, 1.0),
+    )
+    second, _ = policy.candidate_map.add_detection(
+        ResourceDetection("tree", -90, 0.9, 10),
+        0,
+        0,
+        telemetry=telemetry,
+        range_estimate=VisualRangeEstimate(10.0, 1.0),
+    )
+    first.status = "selected"
+    policy.selected_candidate = first
+    policy.state = SearchState.LOCAL_REACQUIRE
+    policy._local_trigger = "predicted world coordinate reached without visual contact"
+    policy._local_actions.clear()
+
+    policy.act(telemetry_observation())
+    assert first.status == "cooldown"
+    assert policy.selected_candidate is second
+    assert policy.replan_count == 1
+
+
+def test_selected_detection_ties_use_stable_input_order():
+    policy = CandidateSearchPolicy(FakeAdapter())
+    candidate, _ = policy.candidate_map.add_detection(
+        ResourceDetection("tree", 0, 0.9, 10), 0, 0
+    )
+    candidate.status = "selected"
+    policy.selected_candidate = candidate
+    first = ResourceDetection("tree", 0, 0.9, 10)
+    second = ResourceDetection("tree", 0, 0.9, 10)
+    assert policy._selected_detection([first, second], None) is first

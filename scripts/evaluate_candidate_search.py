@@ -149,13 +149,14 @@ def make_environment(args):
             candidate_actions=True,
             sensor_profile=args.sensor_profile,
         )
-    if args.sensor_profile == SENSOR_PROFILE_F3:
-        raise ValueError(
-            "f3_telemetry is currently implemented for the local arena EnvSpec; "
-            "natural Treechop needs its local FullStats EnvSpec after the arena gate"
-        )
     if "oracle" in args.modes:
         raise ValueError("natural Treechop has no privileged oracle mode")
+    if args.sensor_profile == SENSOR_PROFILE_F3:
+        from mc_rl.telemetry_treechop_env import make_telemetry_treechop_env
+
+        return make_telemetry_treechop_env(
+            seed=args.seed, max_episode_steps=args.max_steps
+        )
     from mc_rl.envs import make_env
 
     return make_env(
@@ -228,7 +229,14 @@ def main():
 
                 adapter = TreeResourceAdapter(
                     interaction_action_id=8,
-                    interaction_size=(None if args.environment == "arena" else 150.0),
+                    interaction_size=(None if args.environment == "arena" else 45.0),
+                    interaction_uses_geometry=args.environment == "natural",
+                    interaction_min_apparent_size=(
+                        0.0 if args.environment == "arena" else 12.0
+                    ),
+                    range_size_cap=(
+                        None if args.environment == "arena" else 120.0
+                    ),
                     # Arena navigation uses dense distance progress rewards;
                     # only Treechop's positive log reward is a success signal.
                     reward_is_success=args.environment == "natural",
@@ -237,6 +245,12 @@ def main():
                     backward_action=(7 if args.environment == "arena" else 9),
                     initial_selection_rank=args.force_initial_rank,
                     sensor_profile=args.sensor_profile,
+                    # Dense natural forests can alternate between adjacent
+                    # trunk components. The deadband must exceed one 10-degree
+                    # camera command to prevent left/right limit cycles.
+                    align_threshold_degrees=(
+                        6.0 if args.environment == "arena" else 12.0
+                    ),
                 )
                 policy = CandidateSearchPolicy(adapter, config) if mode == "candidate" else None
                 if policy is not None:

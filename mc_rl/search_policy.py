@@ -16,6 +16,7 @@ from mc_rl.telemetry import (
     SENSOR_PROFILE_F3,
     SENSOR_PROFILES,
     bearing_and_distance_to,
+    detection_world_position,
 )
 
 
@@ -56,6 +57,7 @@ class SearchConfig:
     rescan_after_replan: bool = True
     sensor_profile: str = "pov_only"
     world_arrival_radius: float = 2.5
+    position_update_interval: int = 5
 
 
 class CandidateSearchPolicy:
@@ -169,18 +171,52 @@ class CandidateSearchPolicy:
             )
 
     def _selected_detection(
-        self, detections: Sequence[ResourceDetection]
+        self,
+        detections: Sequence[ResourceDetection],
+        telemetry: Optional[AgentTelemetry],
     ) -> Optional[ResourceDetection]:
         if self.selected_candidate is None:
             return None
         matches = []
-        for detection in detections:
+        for detection_index, detection in enumerate(detections):
             world_yaw = wrap_degrees(self.heading_yaw + detection.horizontal_yaw)
             error = self.candidate_map.angular_distance(
                 world_yaw, self.selected_candidate.relative_yaw
             )
-            if error <= self.config.selected_match_degrees:
-                matches.append((error, -detection.apparent_size, detection))
+            if error > self.config.selected_match_degrees:
+                continue
+            position_error = 0.0
+            if telemetry is not None and self.selected_candidate.has_world_position:
+                range_estimate = self.adapter.estimate_range(detection)
+                if range_estimate is not None:
+                    observed_position = detection_world_position(
+                        telemetry, detection.horizontal_yaw, range_estimate
+                    )
+                    position_error = float(
+                        np.hypot(
+                            float(self.selected_candidate.estimated_world_x)
+                            - observed_position[0],
+                            float(self.selected_candidate.estimated_world_z)
+                            - observed_position[2],
+                        )
+                    )
+                    position_gate = max(
+                        3.0,
+                        float(self.selected_candidate.position_uncertainty)
+                        + range_estimate.uncertainty
+                        + 1.0,
+                    )
+                    if position_error > position_gate:
+                        continue
+            matches.append(
+                (
+                    error,
+                    position_error,
+                    -detection.apparent_size,
+                    detection_index,
+                    detection,
+                )
+            )
         return min(matches)[-1] if matches else None
 
     def _update_selected_bearing(
@@ -193,7 +229,16 @@ class CandidateSearchPolicy:
         range_estimate = (
             None if telemetry is None else self.adapter.estimate_range(detection)
         )
-        if telemetry is not None and range_estimate is not None:
+        position_update_due = bool(
+            self.selected_candidate.last_position_update_step < 0
+            or self.step - self.selected_candidate.last_position_update_step
+            >= self.config.position_update_interval
+        )
+        if (
+            telemetry is not None
+            and range_estimate is not None
+            and position_update_due
+        ):
             self.candidate_map.update_candidate_position(
                 self.selected_candidate,
                 detection,
@@ -310,7 +355,7 @@ class CandidateSearchPolicy:
             self.heading_yaw = telemetry.yaw
             self.candidate_map.refresh_world_bearings(telemetry)
         detections = self.adapter.detect(pov)
-        selected_detection = self._selected_detection(detections)
+        selected_detection = self._selected_detection(detections, telemetry)
         if selected_detection is not None:
             self._update_selected_bearing(selected_detection, telemetry)
         self._record_progress(pov, selected_detection)
@@ -440,9 +485,9 @@ class CandidateSearchPolicy:
                 # Loss recovery may return as soon as the remembered object is
                 # visible. A stall recovery deliberately completes the +/-30
                 # sweep so a nearby false commitment cannot trap the policy.
-                if selected_detection is not None and (
-                    self._local_trigger.startswith("candidate lost")
-                    or self._local_trigger.startswith("predicted world coordinate")
+                if (
+                    selected_detection is not None
+                    and self._local_trigger.startswith("candidate lost")
                 ):
                     self.progress.reset()
                     self._transition(SearchState.ALIGN, "candidate locally reacquired")
@@ -450,6 +495,12 @@ class CandidateSearchPolicy:
                 if self._local_actions:
                     self._previous_pov = pov.copy()
                     return self._return_action(self._local_actions.popleft())
+                if self._local_trigger.startswith("predicted world coordinate"):
+                    self._transition(
+                        SearchState.REPLAN,
+                        "predicted coordinate inspected without resource success",
+                    )
+                    continue
                 candidate_id = (
                     None if self.selected_candidate is None else self.selected_candidate.candidate_id
                 )

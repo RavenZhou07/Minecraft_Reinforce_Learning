@@ -338,3 +338,57 @@ Known non-fatal Windows shutdown output remains: `Failed to delete the temporary
 minecraft directory` and, on some runs, `process already exited`. No Java process
 remained after the runs. MineRL must be launched with the isolated environment's
 JDK 8; inheriting global JDK 21 fails because JAXB is absent.
+
+### Stage 7: F3-assisted world-coordinate candidate map (2026-08-17)
+
+This stage defines a separate `f3_telemetry` sensor profile. It exposes only
+the player's own `x/y/z/yaw/pitch` and biome id/temperature/rainfall from
+Malmo FullStats. Resource locations, the log grid, nearest-tree labels, and
+oracle distance remain unavailable to the deployment policy. The original
+`pov_only` profile and its results remain unchanged and must be reported
+separately.
+
+Each visual detection estimates horizontal range with the existing arena fit
+`41.55 * apparent_size^-0.395`, then projects a rough world point using the
+current self pose and camera-relative yaw. A candidate stores this point,
+uncertainty, range estimate, observation count, and last update step. Repeated
+views are inverse-variance fused. Updates occur at most every five steps and
+reject innovations outside the uncertainty gate or close-range canopy-clipping
+measurements that imply the stationary tree suddenly moved farther away.
+Candidate association accepts either the established yaw/scale match or a
+compatible world point. After player translation, every remembered bearing is
+recomputed from the current self pose.
+
+When a selected object is temporarily invisible, approach follows its world
+point instead of discarding the old candidate. Reaching the uncertainty radius,
+performing the local +/-30-degree inspection, and receiving no success signal
+places that candidate in cooldown and selects another remembered world point.
+This closes the failure mode where walking to one distractor erased the bearing
+to the original target.
+
+Results used new seeds and retained every failure:
+
+| Run | Success | Wilson 95% CI | Initial selection | Mean / median steps | Replan / recovery |
+|---|---:|---:|---:|---:|---:|
+| Forced wrong rank, 13000--13002 v4 | 3/3 | 43.9%--100% | 0/3 correct | 186.0 / 158.0 | 3 / 1 |
+| Paired oracle, 14000--14019 | 20/20 | 83.9%--100% | n/a | 27.15 / 25.0 | n/a |
+| F3 candidate, 14000--14019 | 20/20 | 83.9%--100% | 20/20 | 63.7 / 61.0 | 0 / 0 |
+| F3 candidate, 15000--15029 | 30/30 | 88.7%--100% | 30/30 | 83.3 / 70.0 | 6 / 1 |
+
+The F3-assisted multi-tree gate passes: the 30-seed Wilson lower bound is
+88.65%, there are no 300-step failures, all three forced wrong selections are
+rescued, and guarded tests reject access to oracle or log-grid fields. Long-tail
+cases remain: seeds 15005 and 15006 required 188 steps, seed 15019 required 261
+steps, and two ordinary seeds produced four candidates for three trees.
+
+A local Treechop EnvSpec adds FullStats without modifying MineRL. Natural range
+uses a capped canopy feature, interaction requires trunk-component support, and
+the natural alignment deadband is 12 degrees to avoid a 10-degree camera-action
+limit cycle. On the fixed natural seeds 16000--16004, the final v4 achieved only
+1/5 one-log success (203 steps for seed 16003); the other four episodes exhausted
+300 steps. Natural deployment is therefore **not stable**. Dense overlapping
+canopies still split one physical tree into 5--9 candidates, the arena
+scale-to-range calibration is not reliable under occlusion and terrain, and the
+policy does not yet control pitch/raycast contact well enough to keep the trunk
+under attack. Do not start DQN/PPO; the next work should improve natural-tree
+instance association and add a small trunk-contact interaction sub-state.
