@@ -44,6 +44,8 @@ def test_diagnostic_treechop_spec_translates_line_of_sight_without_grid():
     assert spec.name == RAYCAST_ENV_ID
     assert "<ObservationFromRay/>" in xml
     assert "ObservationFromGrid" not in xml
+    assert "ObservationFromFullInventory" in xml
+    assert "inventory" in spec.observation_space.spaces
 
     handler = next(
         observable

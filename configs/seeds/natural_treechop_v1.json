@@ -1,0 +1,29 @@
+{
+  "manifest_version": "natural_treechop_v1_2026-08-27",
+  "policy": {
+    "development_splits_may_be_inspected": true,
+    "holdout_splits_must_not_be_retuned": true,
+    "final_test_must_not_run_without_project_owner_approval": true,
+    "seeds_are_immutable_after_baseline_commit": true
+  },
+  "splits": {
+    "teacher_dev": {"seed_start": 18000, "count": 64, "role": "teacher diagnostics only"},
+    "teacher_holdout": {"seed_start": 18100, "count": 64, "role": "teacher generalization"},
+    "bc_train": {"seed_start": 18200, "count": 64, "role": "full-trajectory demonstrations"},
+    "bc_validation": {"seed_start": 18300, "count": 32, "role": "offline model selection"},
+    "dagger_rollout": {"seed_start": 18400, "count": 32, "role": "student-induced corrective labels"},
+    "student_dev": {"seed_start": 18500, "count": 64, "role": "learned-policy development evaluation"},
+    "student_holdout": {"seed_start": 18600, "count": 64, "role": "learned-policy generalization"},
+    "final_test": {"seed_start": 19000, "count": 100, "role": "protected milestone test", "protected": true}
+  },
+  "diagnostic_suite": {
+    "seeds": [13000, 16500, 16501, 16502, 16702, 16714, 16716, 16719, 16805, 16812, 17407, 17413, 17500, 17509, 17511, 17513, 17515],
+    "promotion_criterion": false,
+    "role": "historical regression diagnosis only"
+  },
+  "historical_consumed_ranges": [
+    "11000-13002",
+    "16002-16003",
+    "16500-17519"
+  ]
+}

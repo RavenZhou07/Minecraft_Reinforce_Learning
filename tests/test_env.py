@@ -15,22 +15,26 @@ class RewardSequenceEnv(gym.Env):
         {"pov": gym.spaces.Box(0, 255, shape=(64, 64, 3), dtype=np.uint8)}
     )
 
-    def __init__(self, rewards):
+    def __init__(self, rewards, log_counts=None):
         self.rewards = list(rewards)
+        self.log_counts = list(log_counts or [0] * len(rewards))
         self.index = 0
 
     def reset(self):
         self.index = 0
-        return {"pov": np.zeros((64, 64, 3), dtype=np.uint8)}
+        return self.reset_observation(0)
 
     def step(self, action):
         reward = self.rewards[self.index]
         self.index += 1
-        return self.reset_observation(), reward, False, {"source": "fake"}
+        return self.reset_observation(self.log_counts[self.index - 1]), reward, False, {"source": "fake"}
 
     @staticmethod
-    def reset_observation():
-        return {"pov": np.zeros((64, 64, 3), dtype=np.uint8)}
+    def reset_observation(log_count=0):
+        return {
+            "pov": np.zeros((64, 64, 3), dtype=np.uint8),
+            "inventory": {"log": int(log_count), "log2": 0},
+        }
 
 
 def test_one_log_wrapper_terminates_on_positive_reward():
@@ -54,6 +58,33 @@ def test_one_log_wrapper_enforces_step_limit():
     assert done
     assert info["success"] is False
     assert info["TimeLimit.truncated"] is True
+
+
+def test_one_log_wrapper_requires_inventory_when_configured():
+    env = OneLogTreechopWrapper(
+        RewardSequenceEnv([0.0, 1.0], log_counts=[0, 1]),
+        max_episode_steps=10,
+        require_inventory_confirmation=True,
+    )
+    env.reset()
+    _, _, done, info = env.step(0)
+    assert not done and info["success_source"] == "none"
+    _, _, done, info = env.step(0)
+    assert done and info["success"] is True
+    assert info["success_source"] == "inventory"
+    assert info["inventory_log_delta"] == 1
+
+
+def test_positive_reward_does_not_bypass_required_inventory_confirmation():
+    env = OneLogTreechopWrapper(
+        RewardSequenceEnv([1.0], log_counts=[0]),
+        max_episode_steps=1,
+        require_inventory_confirmation=True,
+    )
+    env.reset()
+    _, _, done, info = env.step(0)
+    assert done and info["success"] is False
+    assert info["reward_inventory_mismatch"] is True
 
 
 def test_random_baseline_summary():

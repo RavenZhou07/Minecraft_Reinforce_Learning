@@ -10,6 +10,18 @@ import gym
 from mc_rl.actions import ACTION_NAMES, discrete_action_to_minerl
 
 
+LOG_ITEM_KEYS = ("log", "log2")
+
+
+def inventory_log_count(observation: Dict[str, Any]) -> Optional[int]:
+    """Return the observable log count, or ``None`` if inventory is absent."""
+
+    inventory = observation.get("inventory")
+    if inventory is None:
+        return None
+    return int(sum(int(inventory.get(key, 0)) for key in LOG_ITEM_KEYS))
+
+
 class DiscreteActionWrapper(gym.ActionWrapper):
     """Expose readable integer actions instead of MineRL's Dict space.
 
@@ -35,29 +47,61 @@ class OneLogTreechopWrapper(gym.Wrapper):
     MineRL's original observation and reward.
     """
 
-    def __init__(self, env: gym.Env, max_episode_steps: int = 1000):
+    def __init__(
+        self,
+        env: gym.Env,
+        max_episode_steps: int = 1000,
+        require_inventory_confirmation: bool = False,
+    ):
         if max_episode_steps <= 0:
             raise ValueError("max_episode_steps must be positive")
         super().__init__(env)
         self.max_episode_steps = max_episode_steps
+        self.require_inventory_confirmation = bool(require_inventory_confirmation)
         self.elapsed_steps = 0
+        self.initial_log_count: Optional[int] = None
 
     def reset(self, **kwargs: Any) -> Any:
         self.elapsed_steps = 0
-        return self.env.reset(**kwargs)
+        observation = self.env.reset(**kwargs)
+        self.initial_log_count = inventory_log_count(observation)
+        if self.require_inventory_confirmation and self.initial_log_count is None:
+            raise KeyError(
+                "inventory-confirmed Treechop requires an inventory observation"
+            )
+        return observation
 
     def step(self, action: Any) -> Tuple[Any, float, bool, Dict[str, Any]]:
         observation, reward, done, info = self.env.step(action)
         self.elapsed_steps += 1
 
         info = dict(info)
-        success = bool(reward > 0)
+        current_log_count = inventory_log_count(observation)
+        inventory_delta = (
+            None
+            if current_log_count is None or self.initial_log_count is None
+            else current_log_count - self.initial_log_count
+        )
+        inventory_success = bool(inventory_delta is not None and inventory_delta >= 1)
+        success = (
+            inventory_success
+            if self.require_inventory_confirmation
+            else bool(inventory_success or reward > 0)
+        )
         if success:
             done = True
         if self.elapsed_steps >= self.max_episode_steps and not done:
             done = True
             info["TimeLimit.truncated"] = True
         info["success"] = success
+        info["success_source"] = (
+            "inventory" if inventory_success else ("reward" if success else "none")
+        )
+        info["inventory_log_count"] = current_log_count
+        info["inventory_log_delta"] = inventory_delta
+        info["reward_inventory_mismatch"] = bool(
+            reward > 0 and current_log_count is not None and not inventory_success
+        )
         return observation, reward, done, info
 
 

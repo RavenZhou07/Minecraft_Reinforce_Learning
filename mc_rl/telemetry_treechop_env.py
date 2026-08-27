@@ -16,7 +16,7 @@ def build_telemetry_treechop_spec_class(include_raycast: bool = False):
     """Create local Treechop with F3 telemetry and optional diagnostic ray."""
 
     from minerl.herobraine.env_specs.treechop_specs import Treechop
-    from minerl.herobraine.hero import spaces
+    from minerl.herobraine.hero import handlers, spaces
     from minerl.herobraine.hero.handlers.translation import (
         KeymapTranslationHandler,
         TranslationHandlerGroup,
@@ -130,6 +130,7 @@ def build_telemetry_treechop_spec_class(include_raycast: bool = False):
 
         def create_observables(self) -> List[Any]:
             observables = super().create_observables() + [
+                handlers.FlatInventoryObservation(["log", "log2"]),
                 F3SelfTelemetryObservation()
             ]
             if include_raycast:
@@ -160,6 +161,10 @@ def make_telemetry_treechop_env(
     raw_env = spec_class().make()
     raw_env._is_fault_tolerant = False
     env = DiscreteActionWrapper(raw_env)
-    env = OneLogTreechopWrapper(env, max_episode_steps=max_episode_steps)
+    env = OneLogTreechopWrapper(
+        env,
+        max_episode_steps=max_episode_steps,
+        require_inventory_confirmation=True,
+    )
     env.seed(int(seed))
     return env
