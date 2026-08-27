@@ -1,0 +1,143 @@
+{
+  "profile": "natural_treechop_attack_gate_bc_v2a",
+  "status": "shadow_gate_failed",
+  "purpose": "Binary POV-only permission for v9.6 attack entry and continuation; all non-attack, scan, recovery and drop actions remain scripted",
+  "teacher": {
+    "profile": "terrain_route_drop_completion_v9_6",
+    "sensor_profile": "f3_raycast",
+    "gate_passed": true,
+    "default_behaviour_changed": false
+  },
+  "runtime_semantics": {
+    "eligible_states": [
+      "COORDINATE_AIM",
+      "CENTER_TRUNK",
+      "ADJUST_PITCH",
+      "ATTACK_TRUNK"
+    ],
+    "hold": "when the teacher reaches an attack opportunity, do not enter or advance the attack burst; after three consecutive rejected opportunities transition to CENTER_TRUNK",
+    "attack": "permit the teacher's otherwise valid attack opportunity",
+    "non_attack_teacher_actions": "always unchanged",
+    "script_recovery_and_drop_states": "never gated",
+    "shadow_mode": "student is observational and the frozen v9.6 action always executes",
+    "autonomous_mode": "permission is injected before attack counters or state transitions mutate"
+  },
+  "model": {
+    "type": "linear_softmax_binary",
+    "classes": {
+      "0": "HOLD",
+      "1": "ATTACK"
+    },
+    "feature_size": 10,
+    "frame_stack": 4,
+    "include_centre_pixels": false,
+    "mirror_augmentation": true,
+    "checkpoint": "checkpoints/natural_treechop_attack_gate_bc_v2a_experimental_attempt2_hardneg4.npz",
+    "decision_threshold": 0.635,
+    "hard_negative_repeat": 4
+  },
+  "student_input_manifest": [
+    "pov_frame_stack_4",
+    "previous_action_one_hot_14"
+  ],
+  "student_forbidden_inputs": [
+    "raycast",
+    "telemetry",
+    "exact_log_xyz",
+    "log_grid",
+    "oracle_distance",
+    "target_coordinates",
+    "teacher_contact_state_as_model_feature"
+  ],
+  "dataset": {
+    "train": "logs/find_tree/natural_treechop_bc_v1_train_16900_80.npz",
+    "train_selected_samples": 2793,
+    "train_hold_samples": 1880,
+    "train_attack_samples": 913,
+    "validation_development": "logs/find_tree/natural_treechop_bc_v1_validation_17000_20.npz",
+    "validation_selected_samples": 372,
+    "validation_hold_samples": 208,
+    "validation_attack_samples": 164,
+    "validation_warning": "17000-17019 is a reused development set; offline selection passed but did not generalize to the first untouched shadow range",
+    "attack_label_audit": "all selected attack labels have raycast is_log=1 and in_range=1; audit fields are never model inputs"
+  },
+  "offline_gate": {
+    "coverage_passed": true,
+    "validation_loss_relative_improvement": 0.7054865652,
+    "validation_loss_passed": true,
+    "balanced_accuracy": 0.9416041276,
+    "balanced_accuracy_required": 0.8,
+    "attack_precision": 0.9736842105,
+    "attack_precision_required": 0.97,
+    "attack_recall": 0.9024390244,
+    "attack_recall_required": 0.75,
+    "false_positive_rate": 0.0192307692,
+    "false_positive_rate_maximum": 0.02,
+    "finite_weights": true,
+    "checkpoint_reload_consistent": true,
+    "privileged_model_inputs": 0,
+    "all_conditions_met": true,
+    "hard_negative_weighting": "165 in-range-log HOLD samples repeated four times on training only; validation unchanged"
+  },
+  "training_attempts": [
+    {
+      "name": "smoke",
+      "epochs_requested": 10,
+      "selected_epoch": 8,
+      "result": "pipeline, coverage, save and reload passed; offline metric gate failed as expected before convergence"
+    },
+    {
+      "name": "experimental_attempt1",
+      "epochs_requested": 1500,
+      "selected_epoch": 219,
+      "early_stopped": true,
+      "summary": "logs/find_tree/natural_treechop_attack_gate_bc_v2a_training_experimental_attempt1.summary.json",
+      "result": "offline gate failed; no threshold simultaneously reaches precision 0.97 and recall 0.75"
+    },
+    {
+      "name": "experimental_attempt2_hardneg4",
+      "epochs_requested": 1500,
+      "selected_epoch": 221,
+      "early_stopped": true,
+      "hard_negative_repeat": 4,
+      "summary": "logs/find_tree/natural_treechop_attack_gate_bc_v2a_training_experimental_attempt2_hardneg4.summary.json",
+      "result": "offline gate passed: balanced 0.9416, precision 0.9737, recall 0.9024, FPR 0.0192"
+    }
+  ],
+  "shadow_evaluation": {
+    "status": "failed",
+    "summary": "logs/find_tree/natural_treechop_attack_gate_bc_v2a_shadow_17100_20_v1.summary.json",
+    "seed_range": "17100-17119",
+    "teacher_successes": 12,
+    "teacher_successes_required": 15,
+    "max_step_failures": 8,
+    "gate_samples": 479,
+    "balanced_accuracy": 0.9044992429,
+    "attack_precision": 0.7770700637,
+    "attack_recall": 0.9104477612,
+    "false_positive_rate": 0.1014492754,
+    "contact_owner_mismatches": 0,
+    "privileged_student_input_accesses": 0,
+    "failure_layering": {
+      "gate_zero_max_step_failures": [17102, 17105, 17107, 17109, 17116],
+      "gate_observed_max_step_failures": [17110, 17112, 17119],
+      "note": "shadow never changed an environment action; all eight environment failures are frozen-teacher outcomes"
+    }
+  },
+  "seed_isolation": {
+    "banned_teacher_development_and_gate": "16500-16819",
+    "train": "16900-16979",
+    "validation_development": "17000-17019",
+    "shadow_consumed": "17100-17119",
+    "autonomous_holdout_reserved_not_run": "17200-17219"
+  },
+  "gate_status": {
+    "implementation_complete": true,
+    "unit_and_regression_tests_passed": true,
+    "offline_gate_passed": true,
+    "shadow_gate_passed": false,
+    "autonomous_smoke_passed": false,
+    "student_holdout_passed": false,
+    "next_stage_rl_authorized": false
+  }
+}

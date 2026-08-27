@@ -22,6 +22,10 @@ ACTION_NAMES = (
     "attack",
     "forward_attack",
     "backward",
+    "fine_turn_left",
+    "fine_turn_right",
+    "fine_look_up",
+    "fine_look_down",
 )
 
 DEFAULT_CAMERA_DELTA = 10.0
@@ -79,6 +83,22 @@ def discrete_action_to_minerl(
         action["attack"] = 1
     elif action_id == 9:
         action["back"] = 1
+    elif action_id == 10:
+        action["camera"] = np.array(
+            [0.0, -0.5 * camera_delta], dtype=np.float32
+        )
+    elif action_id == 11:
+        action["camera"] = np.array(
+            [0.0, 0.5 * camera_delta], dtype=np.float32
+        )
+    elif action_id == 12:
+        action["camera"] = np.array(
+            [-0.5 * camera_delta, 0.0], dtype=np.float32
+        )
+    elif action_id == 13:
+        action["camera"] = np.array(
+            [0.5 * camera_delta, 0.0], dtype=np.float32
+        )
 
     if not action_space.contains(action):
         raise ValueError("converted action is not accepted by MineRL action_space")

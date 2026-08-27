@@ -392,3 +392,1097 @@ scale-to-range calibration is not reliable under occlusion and terrain, and the
 policy does not yet control pitch/raycast contact well enough to keep the trunk
 under attack. Do not start DQN/PPO; the next work should improve natural-tree
 instance association and add a small trunk-contact interaction sub-state.
+
+## Natural v5: hypothesis layer, trunk-based range, and trunk contact
+
+The v5 iteration addresses exactly those two v4 layers without touching the
+overall scan/select/approach architecture:
+
+- **Hypothesis layer.** Trunk sightings and canopy patches are recorded
+  separately per candidate (`trunk_observations` / `canopy_observations`,
+  bbox, centroid, bottom-centre, angular extents, trunk fraction). A trunk
+  view merges into a trunk-supported hypothesis by bearing alone, and into a
+  canopy hypothesis inside the world-position gate, which reunifies the split
+  trunk/canopy views of one tree while keeping distinct trees apart.
+  Surviving near-duplicate hypotheses receive an `overlap` score penalty;
+  `duplicate_candidate_count` and `split_candidate_count` are both logged.
+- **Range and coordinates.** Trunk geometry (assumed 4.5-block height, or
+  1-block width when the height is clipped) replaces the canopy power law
+  whenever a trunk is visible; canopy-only views keep the calibration with a
+  larger uncertainty floor, so they can never outvote a trunk fix in the
+  weighted position fusion. Updates record the observer pose; after 2 blocks
+  of baseline the two bearing rays are intersected as a range-free
+  consistency check. Gross disagreement lowers confidence, and a second
+  conflict re-seeds the hypothesis from the newest view (counted as a
+  split). The coarse coordinate only steers the agent into a 6-block
+  region; inside it, aiming is purely visual.
+- **Trunk contact controller** (`mc_rl/trunk_contact.py`). Once the approach
+  enters the region (or the trunk visually fills the frame, or the world
+  route stalls), the policy delegates to APPROACH_REGION -> FIND_TRUNK ->
+  CENTER_TRUNK -> ADJUST_PITCH -> ATTACK_TRUNK -> VERIFY_PROGRESS with
+  BACKOFF and ORBIT_REACQUIRE recovery. MineRL 0.4.4 has no raycast
+  observation, so crosshair contact is approximated by the trunk-coloured
+  fraction of the 8x8 image-centre patch. Yaw and pitch are steered
+  independently with deadbands that exceed one 10-degree camera command;
+  when the required command direction flips, the target is bracketed by the
+  two quantized headings and aiming stops (this and a CENTER<->ADJUST cycle
+  counter kill the 10-degree limit cycles observed in the first smoke
+  runs). Trunk selection requires a vertical aspect ratio so ground and
+  cliff blobs are not attacked, and an attack only starts (or resumes) when
+  the trunk is large enough for the ~4-block reach. Attack proceeds in
+  bursts and only a positive log reward counts as success. Bursts without
+  progress trigger backoff, then a quarter orbit around the tree, and after
+  the attempt budget the controller returns to the global REPLAN instead of
+  attacking in place until timeout.
+
+## Natural v6: bounded contact, component identity, and smoke diagnosis
+
+The v6 contact pass keeps the global candidate architecture and makes the
+terminal controller finite and auditable. Contact now uses 5-degree fine yaw
+and pitch actions, attacks without walking, probes forward for two steps to
+collect a dropped log, and treats only positive Treechop reward as completed
+progress. Attempt counters and contact transitions accumulate across candidate
+switches. An 80-step per-attempt budget, one orbit, two failed attack rounds,
+candidate cooldown, and world-route obstacle recovery prevent the old silent
+300-step attack/centring loops. Oak and birch components are extracted
+separately and a material/centroid lock prevents per-frame component switching.
+Repeated observations from one F3 position retain a 1-block coordinate
+uncertainty floor; only a translated view can reduce it.
+
+Fixed natural validation retained all seeds and failures:
+
+| Run | Success | Mean / median steps | Replans | Contact attacks | Result |
+|---|---:|---:|---:|---:|---|
+| 16002--16003 v6 | 2/2 | 203.0 / 203.0 | 3 | 72 steps | both collected one log |
+| 16500--16502 v6 (pre component lock) | 0/3 | 300.0 / 300.0 | 11 | 110 steps | false dirt/grass attacks exposed |
+| 16500--16502 v6.1 | 1/3 | 238.0 / 300.0 | 4 | 21 steps | seed 16502 succeeded in 114 steps |
+
+The v6.1 attack gate removed the observed unreachable dirt attacks, but 16500
+and 16501 still exhausted 300 steps. Seed 16500 selected dirt-bank edges because
+candidate detection paired every brown component with the nearest leaf
+component by x coordinate alone. A broad distant skyline canopy therefore gave
+an unrelated bottom-of-frame dirt edge a large apparent size. The detector now
+requires two-dimensional support: the canopy interval must overlap or lie
+within 8 pixels horizontally and must meet the top of the trunk component with
+at most a height-scaled vertical gap. Offline replay of all saved 16500--16502
+frames leaves zero bottom-of-frame components carrying remote canopy scale. This
+post-smoke detector fix is unit-tested but has not yet been claimed as a new
+Minecraft success result.
+
+Seed 16501 is a distinct remaining failure. It starts beside real trees, but
+the coarse world point routes the player into leaves; after route stall the
+contact sweep sees only brief, small oak-coloured fragments and never reaches
+the attack gate. The next natural-only change should therefore add a small
+ground-level trunk reacquisition manoeuvre (back out of the canopy, look down,
+then perform a wider visual sweep) and reject contact entry based only on an
+uncertain canopy coordinate. It should not relax the attack-size gate, which is
+what prevented the v6 false attacks.
+
+The non-integration suite after the post-smoke detector fix is 90 passed and 4
+deselected (one legacy Gym float32-bound warning). The natural stability gate
+remains **not passed**: the latest fixed smoke is 1/3, so no 20/30-seed natural
+evaluation or RL training is justified yet. Windows shutdown still emits the
+known non-fatal temporary-directory/process-exited warnings; results were
+flushed, no Java process remained, and the exact empty MineRL temp directory was
+removed after the run.
+
+## Natural v7: bounded drop recovery and same-trunk reacquisition
+
+The v7 contact profile keeps v6.1 and `clear_occlusion` frozen. After a
+privileged diagnostic ray reports that an in-range log disappeared, the
+controller freezes that last block coordinate and enters `DROP_RECOVERY`.
+`DropRecoveryPlanner` visits the broken block centre and an eight-direction
+0.85-block ring. It skips a waypoint after three forward commands without
+measurable self-pose progress and stops after 20 actions. A reward ends the
+episode immediately. Without reward, the controller restores the bearing to
+the frozen coordinate and enters `REACQUIRE_SAME_TRUNK`; it no longer performs
+the old unconditional backoff. A second failed attack/search round replans the
+candidate. POV-only execution retains a bounded dead-reckoned fallback, while
+raycast coordinates remain diagnostic-only.
+
+Results retain every seed and use one sequential Minecraft instance:
+
+| Run | Success | Mean / median steps | In-range contact -> success | Disappearance -> resolved |
+|---|---:|---:|---:|---:|
+| 16500--16502 v7 smoke | 2/3 | 167.7 / 122 | 2/2 | 2/2 |
+| 16600--16609 v7 new seeds | 3/10 | 250.3 / 300 | 3/4 | 3/4 |
+| 16603 coordinate-freeze regression | 1/1 | 60 / 60 | 1/1 | 1/1 |
+
+The 10-seed Wilson 95% interval is 10.8%--60.3%, so the required 8/10
+privileged-teacher gate fails. Seven failures reached the 300-step cap. Only
+four episodes entered sustained in-range raycast attack; three of those
+collected a log. The dominant bottleneck is therefore still before drop
+recovery: local trunk centring and close-range contact under canopy. One failed
+drop trace also revealed that a neighbouring log seen during recovery could
+overwrite the broken block coordinate; the coordinate is now frozen, and the
+targeted 16603 rerun completed in 60 steps. Because natural resets are not
+bitwise repeatable, that one rerun is a regression check rather than a revised
+10-seed success estimate.
+
+The non-integration suite is now 111 passed and 4 deselected. The one-log gate
+and the prerequisite for behaviour-cloning data collection remain **not
+passed**. Do not train the local BC or implement `HARVEST_NEIGHBORS` until a
+privileged local contact controller succeeds on at least 8/10 new seeds.
+
+## Natural v8: episode-scale 3-D log memory and coordinate servo
+
+The `coordinate_aim` profile is an explicitly privileged scripted teacher, not
+a POV/F3 deployment claim. During the full scan and local contact, each log
+point actually observed by the crosshair ray is stored in an episode-local
+`TrunkTargetMemory`. Hits within 0.7 blocks merge by a running mean; distinct
+points retain target id, observation count, attempt count, cooldown, and
+status. At contact entry the point closest to the selected candidate's rough
+world XZ is selected. A later local ray hit can also bootstrap the controller
+after RGB reacquisition.
+
+Every action step recomputes the target from current self pose. For target
+`(x_t, y_t, z_t)`, player `(x, y, z)`, and eye height 1.62, the controller uses
+`yaw = atan2(-(x_t-x), z_t-z)` and
+`pitch = -atan2(y_t-(y+1.62), horizontal_distance)`. It first closes yaw, then
+pitch, using 10-degree commands outside 14 degrees and 5-degree commands near
+the deadband. It walks only after angular alignment, attacks only when the
+raycast confirms an in-range log, clears confirmed leaves, and otherwise falls
+back to the bounded RGB local search. Existing v6.1, clear-occlusion, and v7
+profiles are unchanged.
+
+All fixed seeds and failures were retained:
+
+| Run | Success | Wilson 95% CI | Mean / median steps | Max-step failures | In-range contact -> success |
+|---|---:|---:|---:|---:|---:|
+| 16500--16502 v7 | 2/3 | 20.8%--93.9% | 167.7 / 122 | 1 | 2/2 |
+| 16500--16502 v8 | 2/3 | 20.8%--93.9% | 171.3 / 134 | 1 | 2/2 |
+| 16600--16609 v7 | 3/10 | 10.8%--60.3% | 250.3 / 300 | 7 | 3/4 |
+| 16600--16609 v8 | 8/10 | 49.0%--94.3% | 178.7 / 150 | 2 | 8/9 |
+
+On the paired ten seeds, v8 rescued six v7 failures (16600, 16602, 16603,
+16604, 16606, 16608), regressed on 16601, preserved two successes, and left
+16609 failed. All ten episodes recorded at least one coordinate target; the
+controller made 16 selections, spent 620 steps in coordinate aiming, and
+started 12 coordinate-confirmed attacks. Two late successes (16602 and 16607,
+both 288 steps) demonstrate that replanning can rescue an episode but leave
+almost no time margin.
+
+The remaining failure is now narrower. In seed 16601 the selected point was
+about eight horizontal blocks away and 5 blocks above eye level after the
+agent entered lower terrain. Forward commands made almost no progress until
+the 120-step contact budget expired. Seed 16609 similarly selected high trunk
+surface points; only two in-range attacks landed before contact was lost, and
+the next coordinate route was obstructed. The coordinate servo currently has
+angular feedback but no translation-progress monitor and ranks points mostly
+by XZ proximity, ignoring reachability and vertical cost.
+
+The v8 point gate reaches 8/10, but the Wilson lower bound is only 49.0% and
+both failures still run to 300 steps. Natural stability is therefore **not
+passed**, and this privileged result does not authorize a POV deployment or
+behaviour-cloning rollout yet. The next bounded change should (1) rank lower,
+reachable log faces ahead of upper trunk hits, (2) monitor decrease in 3-D or
+horizontal target distance during forward commands, (3) trigger one
+jump/backoff/lateral obstacle recovery when distance stalls, then cooldown and
+select another stored face, and (4) rerun the same 16600--16609 A/B before any
+30-seed or learning experiment.
+
+After the v8 implementation and target-status regression fix, the fast suite
+reports 119 passed and 4 integration tests deselected, with only the existing
+legacy Gym float32-bound warning.
+
+## Natural v9: translation progress, reachability cost, and bounded recovery
+
+The new `coordinate_recovery` profile preserves v8 and adds three independently
+logged mechanisms. A `CoordinateProgressMonitor` records horizontal distance
+only when the teacher commands translation. Twelve such commands with less
+than 0.35 blocks of best distance improvement count as a stall. Each exact log
+point receives at most one recovery sequence: three backward actions, a
+20-degree offset, four forward-jump actions, and restoration of the original
+heading. A second stall places that point in 45-step cooldown and selects a
+different remembered point; no available point returns control to global
+replanning.
+
+Target selection logs a decomposed score. Costs cover distance from the coarse
+candidate hint, current horizontal distance, vertical distance from eye level,
+distance beyond four-block attack reach, and failed attempts; repeated exact
+ray observations add a small support term. All terms are stored in the target
+CSV rather than hidden in a single rank.
+
+Fixed results retain every failure:
+
+| Run | Success | Wilson 95% CI | Mean / median steps | Max-step failures | Coordinate recovery -> success |
+|---|---:|---:|---:|---:|---:|
+| 16500--16502 v9 smoke | 2/3 | 20.8%--93.9% | 167.3 / 108 | 1 | 0/1 |
+| 16600--16609 v8 | 8/10 | 49.0%--94.3% | 178.7 / 150 | 2 | n/a |
+| 16600--16609 v9 | 6/10 | 31.3%--83.2% | 180.2 / 150 | 4 | 0/4 |
+
+The fast suite is 123 passed and 4 integration tests deselected. v9 produced
+seven distance stalls, four bounded recoveries, and three target switches.
+Every recovery occurred in a final failure, and all three switches occurred in
+seed 16602 without reaching an in-range log. The new mechanism is finite and
+auditable, but it did not rescue a hard episode. Compared with v8, v9 preserved
+16600 and 16603--16606/16608, lost the late successes on 16602 and 16607, and
+left 16601/16609 failed. Natural resets are not bitwise deterministic, so the
+same-seed comparison is diagnostic rather than an exact paired world replay.
+
+Failure layers are now distinct. Seeds 16601 and 16602 never reached in-range
+attack: candidate-hint costs (often tens of score units) dominated vertical
+and reachability costs, binding the controller to a poor coarse identity even
+though natural one-log Treechop accepts any tree. Seeds 16607 and 16609 did
+break logs, but drop recovery produced no pickup reward. Thus the next version
+should separate natural-task target utility from arena identity: after entering
+local contact, rank exact log points primarily by current reachable 3-D
+distance and use candidate-hint distance only as a weak association tie-break.
+It should also preserve a minimum post-recovery verification budget before the
+overall contact timeout and revisit blocked drop pickup independently.
+
+The predefined training gate (at least 9/10 and zero 300-step failures) failed.
+No local BC checkpoint was trained: all four recovery demonstrations came from
+failed episodes, so cloning them would encode the known bad recovery rather
+than test a stable teacher. The v9 logs and failed traces remain available for
+the next teacher revision; no seeds were replaced and no success threshold was
+lowered.
+
+## Natural v9.1: one-log utility, verified recovery, and centre-first pickup
+
+The independent `coordinate_recovery_v9_1` profile leaves v6.1, v7, v8, and
+v9 unchanged. Exact raycast log points are scored for the natural one-log task
+using current reachability rather than coarse candidate identity:
+
+```text
+score =
+    - 1.00 * horizontal_distance
+    - 1.25 * abs(target_y - eye_y)
+    - 2.00 * max(0, distance_3d - 4.0)
+    - 2.00 * approach_attempts
+    - 3.00 * recovery_attempts
+    - 0.05 * candidate_hint_distance
+    + 0.10 * log1p(observation_count)
+```
+
+The candidate hint is now a weak tie-break. A point more than 14 horizontal
+blocks away is still scored and logged but is not allowed to force local
+coordinate contact when no reachable exact point exists. This threshold uses
+only the privileged teacher's permitted raycast coordinate and the player's
+own F3 pose. Arena candidate ordering is unchanged. Target CSV rows flatten
+every score term; a separate target-event CSV records old/new ids and scores,
+selection reason, and player XYZ.
+
+After a bounded coordinate obstacle manoeuvre, v9.1 enters
+`POST_RECOVERY_VERIFY`. It has 24 translation samples independent of the
+ordinary 140-step contact budget. Camera-only alignment does not consume a
+sample; a separate 60-step safety cap prevents a camera loop. A decrease of
+0.25 blocks returns to `COORDINATE_AIM`; otherwise the point is cooled down and
+the next scored point is selected. A recovery is not started when fewer than
+the manoeuvre plus 24 verification steps remain before the fixed 300-step
+episode cap. Four fixed-evaluation recoveries in the first diagnostic run all
+entered verification, two recorded explicit progress, and three episodes
+eventually succeeded after recovery.
+
+Drop pickup keeps the broken coordinate frozen. It drives to that centre before
+the eight-point ring, recomputes bearing from every F3 pose, permits one jump
+and one 0.35-block lateral detour, and records start/min/end distance, action
+count, jump/offset attempts, end reason, and reward for each waypoint. The
+centre has a strict 24-step budget, ring points have seven steps each, and the
+whole search has a 72-step cap. A v9.1-only contact extension lets that finite
+search finish without changing the environment's 300-step episode cap.
+
+All retained runs used one sequential Minecraft instance. The first v9.1 smoke
+diagnostic was 1/3 and exposed the seven-step centre-budget defect. After the
+centre-first correction, the final smoke on 16500--16502 was 2/3 (Wilson
+20.8%--93.9%), mean 172.3, median 112, with one 300-step failure and 2/2 pickup
+after disappearance. The final fixed run was:
+
+| Run | Success | Wilson 95% CI | Mean / median | Max-step failures | Recovery -> success | Disappearance pickup |
+|---|---:|---:|---:|---:|---:|---:|
+| v8, 16600--16609 | 8/10 | 49.0%--94.3% | 178.7 / 150 | 2 | n/a | 5/9 |
+| v9, 16600--16609 | 6/10 | 31.3%--83.2% | 180.2 / 150 | 4 | 0/4 | 5/9 |
+| v9.1 fixed v2, 16600--16609 | 8/10 | 49.0%--94.3% | 151.6 / 106 | 2 | 1/1 | 8/9 |
+
+The final v9.1 run succeeded on 16600, 16602, 16603, 16605--16609 and failed on
+16601 and 16604. All eight episodes that reached in-range raycast contact
+succeeded. Seed 16601 never observed an exact coordinate target and spent its
+contact budget alternating RGB `CENTER_TRUNK`, `ADJUST_PITCH`, and
+`FIND_TRUNK`; it made no attack and never entered drop recovery. Seed 16604
+observed one point but rejected it twice as non-local, then accumulated 125 RGB
+attack actions while every privileged check remained out of range; it repeatedly
+cycled `ATTACK_TRUNK -> CENTER_TRUNK` without a block disappearance. These are
+local visual-contact failures, not target-score or pickup failures.
+
+The strict training gate failed: the final run has only 8/10 success and two
+300-step failures, despite one success after coordinate recovery and no
+oracle/log-grid action input. No BC data was collected and no checkpoint was
+trained. The failed traces and an earlier 9/10 diagnostic fixed run remain
+retained; the latter is not the final claim because the eligibility change
+required a complete fresh ten-seed evaluation.
+
+The fast suite reports 137 passed and four integration tests deselected. Known
+non-fatal Windows shutdown messages remain (`Failed to delete the temporary
+minecraft directory` and occasional `process no longer exists`). The first
+launch attempt also hit a PID-file sandbox restriction, and one permitted retry
+hit a JitPack read timeout before any episode began. Both produced no evaluation
+CSV; later launches completed under the isolated JDK 8. No Java process remained
+after the final run.
+
+## Natural v9.2: exact-log rescan and attack confirmation guard
+
+The independent `coordinate_contact_guard_v9_2` profile inherits all v9.1
+target scoring, the 14-block local eligibility limit, verified coordinate
+recovery, and centre-first drop pickup without changing their weights or
+budgets. It addresses only the two final v9.1 contact failures.
+
+When contact begins without an eligible exact raycast log point, or when the
+RGB controller exhausts a `CENTER_TRUNK`/`ADJUST_PITCH`,
+`CENTER_TRUNK`/`FIND_TRUNK`, or out-of-range `ATTACK_TRUNK` loop budget, the
+controller enters `EXACT_LOG_RESCAN`. The scan is a fixed 40-action local
+camera raster: pitch samples +10, -10, -30, and -40 degrees while yaw sweeps
+locally by 5--10 degrees at each height; both axes return to their starting
+pose after a failed scan. It consumes the
+ordinary episode/contact budget, adds no timeout extension, and is permitted
+once per candidate per episode. A newly observed eligible log immediately
+returns to coordinate aiming; exhaustion cools the candidate and returns to
+global replanning.
+
+For this privileged teacher profile, an attack action is legal only while the
+current crosshair raycast reports both a log and `in_range=true`. RGB trunk
+area alone cannot begin or sustain an attack. A log disappearance after five
+confirmed attack steps remains valid break evidence and continues into the
+unchanged v9.1 drop recovery. New counters record scan attempts/steps/results,
+prevented unconfirmed attacks, and each loop family. Exact log XYZ and
+in-range contact remain explicitly privileged inputs; oracle distance and log
+grids are still excluded.
+
+Before Minecraft evaluation, the fast suite reports 145 passed and two skipped
+integration cases. Smoke seeds 16500--16502 and fixed seeds 16600--16609 use
+the same 300-step cap and unchanged gate: at least 9/10, zero max-step
+failures, and at least one success after coordinate recovery.
+
+The first smoke diagnostic kept the scan within only +10 to -10 degrees of
+pitch. All three scans exhausted without a hit; trace evidence showed seed
+16500 standing nine blocks below the candidate tree, so that raster did not
+actually span trunk heights. The corrected raster above was rerun as a new,
+preserved `smoke_v2`: 3/3 success (Wilson 43.9%--100%), mean 169.7, median 127,
+and zero max-step failures. Seeds 16500/16501/16502 finished in 291/127/91
+steps. The scan triggered once, acquired an eligible log on action 26, and
+eventually rescued 16500; all three episodes that reached in-range raycast
+contact succeeded. Natural resets are not bitwise deterministic, so the v1/v2
+comparison is diagnostic rather than a replay of an identical world.
+
+The fixed 16600--16609 run retained every seed and finished as follows:
+
+| Run | Success | Wilson 95% CI | Mean / median | Max-step failures | In-range contact -> success | Exact rescans |
+|---|---:|---:|---:|---:|---:|---:|
+| v9.1 fixed v2 | 8/10 | 49.0%--94.3% | 151.6 / 106 | 2 | 8/8 | n/a |
+| v9.2 fixed v1 | 8/10 | 49.0%--94.3% | 145.1 / 107.5 | 2 | 8/8 | 0/5 succeeded |
+
+v9.2 succeeded on 16600, 16602, 16603, and 16605--16609 at
+84/157/60/63/73/131/84/199 steps. Seeds 16601 and 16604 again reached the
+300-step cap. Across the run, the controller issued 116 confirmed attack
+steps, broke eight logs, collected seven disappearance drops, and preserved
+8/8 success conditional on reaching an in-range log. It made one coordinate
+recovery and that episode eventually succeeded. The scan guard prevented one
+unconfirmed attack transition; notably, failed seed 16604 emitted zero attack
+actions instead of v9.1's 125 out-of-range RGB attacks.
+
+The five exact rescans were confined to the two failures and all exhausted.
+Seed 16601 remembered only one log point, 32.6 horizontal blocks away. Seed
+16604 remembered only one point, 24.0 horizontal blocks away and about 10.5
+blocks above eye level. Both points remained correctly ineligible under the
+unchanged 14-block local limit, and the candidate regions handed to the local
+controller contained no raycast-visible log across the bounded raster. This
+moves the remaining bottleneck upstream: coarse candidate localization and
+route handoff sometimes deliver the agent to the wrong local region. More
+contact-score, scan, attack, or drop tuning would not repair that error.
+
+The strict gate therefore remains failed: 8/10 is below 9/10 and two max-step
+failures remain, although a recovery success exists and no oracle/log grid was
+used for actions or scoring. No behaviour-cloning data, BC checkpoint, DQN,
+or PPO training was started. All smoke diagnostics, final CSVs, target/event
+tables, drop-waypoint tables, and per-seed traces were retained. The same
+non-fatal Windows shutdown warnings appeared, and no Java process remained.
+
+## Natural v9.3: candidate handoff guard and current-pose relocalization
+
+The independent `candidate_handoff_guard_v9_3` profile inherits v9.2 without
+changing its contact scoring, exact-log raster, strict in-range attack rule,
+drop budget, or 300-step episode cap. v9.2 and all earlier profiles remain
+frozen. This version addresses the upstream failure seen in v9.2 seeds 16601
+and 16604, where a coarse RGB candidate delivered the agent to a region with
+no eligible local log.
+
+At target selection, v9.3 snapshots the chosen world coordinate and its
+uncertainty. Later RGB component associations may still update diagnostic
+candidate memory, but they cannot drag the active route target, and contact
+camera motion cannot update the selected candidate position. Only two blocks
+of uncertainty may enlarge the six-block contact region. A first contact
+handoff additionally requires either an aligned visible trunk or a local log
+raycast within 14 blocks. Interaction geometry alone and visual-progress
+stall paths cannot bypass this evidence gate.
+
+When a predicted coordinate inspection, exact-log scan, or coordinate
+recovery ends without usable local progress, the policy rebuilds its candidate
+map with a fresh 360-degree scan from the translated player pose. Old failed
+identities are retained only to prevent accidental merging; their cooldown is
+locked through the end of the episode so they cannot become selectable during
+the 36-action scan. Cooldown association and consolidation require compatible
+world positions instead of yaw-only similarity. Relocalization begins only
+when the configured episode budget still leaves a 56-step reserve. New trace
+columns and summary counters expose the frozen route target, evidence checks,
+rejections, visual/raycast confirmations, relocalization scans, late skips,
+and suppressed contact-time position updates.
+
+The final fast suite reports 156 passed and four Minecraft integration tests
+deselected. The evaluator imports the new profile, records its diagnostics,
+and emits a separate v9.3 training gate with the unchanged conditions: at
+least 9/10, zero max-step failures, at least one success after coordinate
+recovery, and no oracle/log-grid action or scoring input.
+
+Two preserved smoke runs used seeds 16500--16502 and the unchanged 300-step
+cap:
+
+| Run | Success | Wilson 95% CI | Mean / median | Max-step failures | Relocalization scans |
+|---|---:|---:|---:|---:|---:|
+| v9.3 smoke v1 | 2/3 | 20.8%--93.9% | 168 / 114 | 1 | 1 |
+| v9.3 smoke v2 | 1/3 | 6.2%--79.2% | 230.3 / 300 | 2 | 1 |
+
+The first diagnostic exposed a concrete implementation bug: seed 16500 began
+relocalization at step 229, but its original candidate cooldown expired during
+the full scan and the stale coordinate was selected again at step 265. The
+trace-driven correction locks those old candidates and also treats verified
+coordinate recovery without translation progress as a reason to rebuild
+immediately. In smoke v2, seed 16500 consequently rebuilt at step 146 and
+selected a new candidate, proving that the upstream recovery path operated as
+designed, but the new local contact still did not finish before termination.
+Seed 16501 broke a log at step 83 and then exhausted downstream drop recovery;
+seed 16502 succeeded in 91 steps.
+
+The final smoke gate therefore failed. End-to-end stability did not improve
+enough to justify a fixed ten-seed claim: one failure remained in local contact
+after a corrected handoff, and another occurred in pickup after a confirmed
+log break. No fixed 16600--16609 evaluation, behaviour-cloning collection,
+checkpoint training, DQN, or PPO run was started. Both smoke outputs and all
+failure traces remain retained; the final result is a tested and observable
+upstream mechanism, not a passing stability claim.
+
+## Natural v9.4: local contact and broken-block completion
+
+The independent `contact_drop_completion_v9_4` profile inherits every v9.3
+candidate snapshot, evidence gate, current-pose relocalization, exact-log
+rescan, and strict in-range attack rule. It changes only two downstream paths
+identified by the v9.3 final smoke traces; v9.3 and all older profiles remain
+frozen.
+
+Seed 16500 showed an out-of-range log continuously under the ray while the
+player was several blocks below it. The old four-action forward-jump segment
+ended during the first jump arc and gained only about one block before camera
+alignment resumed. v9.4 keeps the one-recovery-per-target rule but uses eight
+consecutive forward-jump actions in that single bounded recovery. The extra
+actions are included in the existing episode-reserve calculation and do not
+extend the 300-step environment cap.
+
+Seed 16501 exposed that `ObservationFromRay` reports a hit-face coordinate,
+not a block centre: the remembered point was `(-218.0, 213.3446)`, while the
+containing horizontal block centre was `(-217.5, 213.5)`. When a disappearance
+is confirmed, v9.4 nudges the hit through the face using the player-to-hit ray,
+floors the containing Minecraft block coordinates, and sends the drop planner
+to the resulting half-block centre. The original hit remains frozen for
+diagnostics and coordinate memory. No item-entity coordinate is observed.
+
+The surrounding eight-point search now follows adjacent 45-degree ring points
+instead of jumping N/E/S/W across the centre. Its centre and ring waypoint
+budgets are 28 and 10 actions respectively, while the unchanged 72-action
+global drop budget remains the hard bound. A new counter records block-centre
+normalizations, and traces expose both the original hit and normalized drop
+target.
+
+The final fast suite reports 162 passed and four Minecraft integration tests
+deselected. Focused contact, drop, coordinate, and search-policy tests report
+110 passed. Profile-freeze tests confirm v9.3 retains its four jump actions,
+24/7 waypoint budgets, hit-face target, and original ring ordering.
+
+Smoke seeds 16500--16502 all succeeded in 248/101/196 steps: 3/3, Wilson 95%
+43.9%--100%, mean 181.7, median 196, and zero max-step failures. All three
+episodes that reached in-range contact succeeded; both confirmed block
+disappearances were collected, and two episodes succeeded after coordinate
+recovery. This repaired both failures from the final v9.3 smoke run.
+
+The fixed 16600--16609 run retained every seed and finished as follows:
+
+| Run | Success | Wilson 95% CI | Mean / median | Max-step failures | In-range contact -> success | Disappearance -> pickup |
+|---|---:|---:|---:|---:|---:|---:|
+| v9.2 fixed v1 | 8/10 | 49.0%--94.3% | 145.1 / 107.5 | 2 | 8/8 | 7/8 |
+| v9.4 fixed v1 | 8/10 | 49.0%--94.3% | 149.0 / 113.5 | 2 | 8/9 | 7/8 |
+
+v9.4 succeeded on 16600, 16601, 16603, and 16605--16609 at
+109/206/62/60/73/118/88/174 steps. It repaired the former v9.2 failure on
+16601, but 16602 and 16604 reached the 300-step cap. Across ten episodes it
+performed eight block-centre normalizations, collected seven of eight
+confirmed disappearances, made three coordinate recoveries, and produced one
+success after coordinate recovery.
+
+Seed 16602 did reach and break a log, but disappearance occurred at step 293;
+only seven environment steps remained for the correctly normalized drop
+search. Seed 16604 never reached an eligible local log: two independent
+40-action exact scans exhausted after current-pose candidate rebuilds, and a
+third scan was rejected because insufficient episode budget remained. It
+issued no attack and never entered drop recovery. The remaining failures are
+therefore a late-contact budget problem and an upstream wrong-region problem,
+not another block-centre or ring-navigation defect.
+
+The strict gate failed because 8/10 is below 9/10 and two max-step failures
+remain, although a recovery success exists and no oracle distance, log grid,
+or item-entity coordinate entered actions or scoring. No behaviour-cloning
+data, checkpoint, DQN, or PPO training was started. The smoke, fixed CSV,
+summaries, waypoint/target tables, and full failure traces are retained. The
+known Windows temporary-directory cleanup warning appeared; Minecraft had
+already exited during final close.
+
+## Natural v9.5: atomic contact ownership and spatial handoff guard
+
+The independent `contact_ownership_spatial_guard_v9_5` profile inherits v9.4
+without changing its coordinate-recovery, attack, block-centre, ring-search,
+or 300-step episode budgets. v9.4 and older profiles remain frozen. The v9.4
+fixed failures showed two upstream state-ownership defects: seed 16602 changed
+the globally selected candidate while the previous candidate's contact
+controller remained active, and seed 16604 bought repeated 40-action exact
+scans by rebuilding the same physical region under new candidate identities.
+
+v9.5 makes an active contact controller the sole action owner until success or
+an audited local replan. The selected candidate id must match the contact
+candidate id; mismatches cancel contact and are counted. Outside the capped
+local region, the frozen world coordinate owns coarse steering, distant RGB
+components cannot induce a left/right loop, and visual geometry cannot trigger
+a contact handoff. Only a log raycast within 14 blocks may override that
+boundary. A failed exact raster records the player's horizontal position for
+the rest of the episode; a new candidate within eight blocks of that failed
+region is rejected without paying another 40 actions. A coarse route that is
+stalled inside the local envelope without trunk/log evidence now rebuilds the
+candidate map from the translated pose instead of replaying forward forever.
+
+Regression tests cover profile freezing, atomic ownership across an erroneous
+global `REPLAN` state, mismatch cancellation, far visual rejection, the
+14-block raycast override, world-route steering outside the region, in-region
+stall relocalization, and cross-candidate spatial scan cooldown. The final
+suite reports 173 passed and two skipped Minecraft integration cases; focused
+contact, coordinate, and search-policy tests report 110 passed.
+
+Three preserved smoke diagnostics on 16500--16502 exposed and repaired the two
+remaining implementation gaps before the gate:
+
+| Run | Success | Mean / median | Max-step failures | Diagnostic result |
+|---|---:|---:|---:|---|
+| v9.5 smoke v1 | 2/3 | 178.7 / 141 | 1 | seed 16500 replayed distant RGB left/right steering for 206 ticks |
+| v9.5 smoke v2 | 2/3 | 167.7 / 110 | 1 | visual `ready_to_interact` still bypassed the intended local boundary |
+| v9.5 smoke v3 | 2/3 | 216.0 / 260 | 1 | final boundary behavior; 16500 rescued in 260 steps, zero owner mismatches |
+
+The old ten-episode rule was replaced for v9.5 by a predeclared 20-episode
+gate on unseen seeds 16700--16719: at least 18/20 success, at most two 300-step
+failures, at least one success after coordinate recovery, and no oracle/log
+grid used for actions or scoring. This avoids the earlier accidental effective
+10/10 requirement produced by combining 9/10 success with zero max-step
+failures. The formal unseen gate v1 was retained at 15/20 and exposed one more
+general in-region no-evidence deadlock. After the trace-derived exit condition
+and its regression test were added, the same seeds were rerun as regression
+validation v2, not treated as a new independent holdout:
+
+| Run | Success | Wilson 95% CI | Mean / median | Max-step failures | In-range contact -> success | Disappearance -> pickup |
+|---|---:|---:|---:|---:|---:|---:|
+| v9.5 gate v1 | 15/20 | 53.1%--88.8% | 175.8 / 162 | 5 | 15/16 | 13/13 |
+| v9.5 gate v2 | 16/20 | 58.4%--91.9% | 170.85 / 180 | 4 | 16/18 | 14/17 |
+
+Validation v2 recorded 1,203 contact-owner lock steps and zero owner mismatches. It
+made one coordinate recovery with verified progress, but that episode did not
+finish successfully. The four failures were heterogeneous: 16702 never passed
+coarse terrain routing; 16714 recovered coordinate progress but never obtained
+an in-range attack; 16716 and 16719 both observed a block disappearance but did
+not collect the drop before the episode ended. Consequently all three
+performance conditions failed (`16 < 18`, `4 > 2`, and no recovery success),
+while oracle/log-grid isolation passed.
+
+The v9.5 mechanism is therefore implemented, tested, and trace-validated, but
+the formal unseen gate failed at 15/20 and the same-seed post-fix validation
+also failed at 16/20. No behaviour cloning, checkpoint training,
+DQN, or PPO run was started. Both gate runs, all smoke diagnostics, summaries,
+tables, and per-seed traces are retained. Further work should use a fresh
+evaluation set and treat coarse terrain routing, reachable local contact, and
+drop pickup as separate hypotheses rather than continuing to tune v9.5 on the
+16700--16719 gate set.
+
+## Natural v9.6: terrain route recovery, climb-assisted contact, and elevated drop pickup
+
+The independent `terrain_route_drop_completion_v9_6` profile inherits every
+v9.5 default unchanged. All new mechanisms default to disabled in code and
+are enabled only by this profile, so v9.5 and every older profile remain
+byte-identical in behaviour. The v9.5 gate-v2 failure audit (transitions,
+per-step traces, contact transitions, drop waypoint records, and player
+pose deltas) split the four failures into three independent hypotheses and
+each fix below is backed by that trace evidence alone:
+
+1. **Coarse terrain routing (16702).** Outside the contact region the world
+   route steers with plain `forward` only; on staircased terrain the agent
+   walked at roughly 0.06 blocks per step, exhausted its two obstacle
+   recoveries per candidate, and spent two 36-step rescans on replans. The
+   route distance only fell from 12.7 to 7.9 blocks in 300 steps. v9.6 adds
+   `enable_terrain_route_recovery`: a ten-forward window with less than 0.5
+   blocks of real route-distance progress arms a six-jump climb burst, each
+   burst is graded by the actual route-distance reduction, two consecutive
+   failed bursts disable the assist and replan, and the blocked physical
+   region (6-block radius around the frozen route target) cools down any
+   candidate that would replay the same walk.
+2. **Reachable local contact (16714).** The 3-D coordinate servo also
+   steered with plain `forward` against an uphill remembered log, closing at
+   roughly 0.05 blocks per step until the cap. v9.6 adds
+   `enable_coordinate_climb_assist`: the same slow-progress window arms
+   bounded jump bursts inside COORDINATE_AIM, graded by real distance
+   reduction with a per-target burst cap and a two-failure disable limit.
+   The strict raycast attack confirmation is untouched.
+3. **Post-disappearance pickup (16716/16719).** 16716 exposed a genuine
+   implementation defect: at step 142 the exact log rescan *succeeded* and
+   supplied a 3-D target, but the attempt's stale centring-loop budget
+   immediately demanded another raster, which the candidate had already
+   spent, so the whole first tree attempt was discarded and 122 steps were
+   re-walked. v9.6 adds `reset_loop_budgets_on_rescan_success`. Both 16716
+   and 16719 then failed only at pickup: the drop rested 2.5--3.5 blocks
+   above the player on a lower trunk block, and the 2-D ring planner walked
+   blocked waypoints forever without jumping. v9.6 adds
+   `drop_recovery_elevated_pickup`: when the normalised block centre is more
+   than 1.2 blocks above the player, waypoints inside a 1.8-block arrival
+   radius switch to eight bounded jump apexes per waypoint before skipping.
+
+The 300-step episode cap, ownership invariants, 14-block raycast handoff
+override, 8-block failed-scan spatial cooldown, block-centre normalisation,
+and ordered ring are all inherited unchanged. No item-entity, oracle, or log
+grid input is read anywhere on the drop path.
+
+Regression coverage lives in `tests/test_terrain_route_v9_6.py` (16 tests):
+v9.5 default freezing, v9.6 inheritance across every config field, active
+contact ownership across a global REPLAN state, mismatch cancellation and
+recording, real-progress-not-stall, bounded no-displacement replanning,
+verified climb bursts with full displacement records, blocked-region
+cooldown, rescan-success loop reset (plus the frozen v9.5 behaviour test),
+climb assist arm/disable, strict attack confirmation, elevated jump pickup
+with bounded budget, elevated navigation gating, frozen 2-D drop behaviour,
+and the no-external-input drop path signature. The full suite reports
+189 passed and two skipped Minecraft integration cases.
+
+Smoke diagnostics reused the four v9.5 failure seeds as the development set
+(they are burned for holdout purposes), one episode each, all under fresh
+v9.6 output paths:
+
+| Seed | v9.5 gate v2 | v9.6 smoke v1 | Mechanism evidence |
+|---|---|---|---|
+| 16702 | 300-step failure, no contact | success, 258 steps | one terrain climb burst verified; one failure fell through to the ordinary obstacle path |
+| 16714 | 300-step failure, no in-range attack | failure at cap, but in-range attack, block disappearance, and a near-miss elevated pickup with 31 steps left | spatial cooldown rejected the second raster; three bounded replan cycles exhausted the budget |
+| 16716 | 300-step failure, drop never collected | success, 191 steps | one rescan-success loop reset; elevated pickup with vertical gap 2.5 rewarded at step 190 |
+| 16719 | 300-step failure, 66 blocked drop steps | success, 233 steps | eight elevated jumps; waypoint 1 rewarded at step 232 |
+
+All four smoke runs recorded zero contact-owner mismatches, every recovery
+and replan reason matched its mechanism, and each Minecraft instance closed
+normally. No smoke_v2 rerun was needed.
+
+The predeclared unseen gate then ran once on fresh seeds 16800--16819 with
+identical conditions to v9.5 (at least 18/20 success, at most two 300-step
+failures, at least one coordinate-recovery success, zero owner mismatches,
+and no oracle/log-grid use) and passed on the first attempt:
+
+| Run | Success | Wilson 95% CI | Mean / median | Max-step failures | In-range contact -> success | Disappearance -> pickup |
+|---|---:|---:|---:|---:|---:|---:|
+| v9.5 gate v1 | 15/20 | 53.1%--88.8% | 175.8 / 162 | 5 | 15/16 | 13/13 |
+| v9.5 gate v2 (same-seed regression) | 16/20 | 58.4%--91.9% | 170.85 / 180 | 4 | 16/18 | 14/17 |
+| v9.6 gate v1 (unseen 16800--16819) | 18/20 | 69.9%--97.2% | 140.35 / 111 | 2 | 18/20 | 16/20 |
+
+The v9.6 gate recorded 1,396 contact-owner lock steps and zero mismatches,
+three successes after coordinate recovery, eight terrain-route recovery
+attempts (one verified rescue, six graded failures that fell through to the
+ordinary bounded paths), two rescan-success loop resets (both episodes
+succeeded), nineteen elevated pickup attempts with 118 bounded jump steps,
+and two spatial exact-scan rejections. The two failures were classified as
+one post-disappearance pickup failure (16805: the drop rested 4.5 blocks
+above the player on top of the trunk column, beyond jump reach from the
+standing level) and one budget exhaustion (16812: a failed first exact
+rescan plus two correctly rejected spatial-cooldown approaches left only 28
+steps for the third attempt's drop recovery). Both remained fully bounded
+with correct transition reasons; neither reproduced a v9.5 failure pattern.
+
+Because the formal unseen gate passed on the first attempt, no same-seed
+regression was run and none is needed; any future fix must be judged on
+another fresh seed range, not on 16800--16819. The gate passing authorises
+*proposing* the next training stage; no behaviour cloning collection,
+checkpoint training, DQN, or PPO run has been started, and the 300-step cap
+is unchanged.
+
+## Natural Treechop BC v1: first-stage behaviour cloning (offline gate failed)
+
+With the v9.6 teacher gate passed, the authorised first training stage
+clones only the local contact controller. The upstream script keeps the
+360-degree scan, candidate map, world-coordinate coarse navigation,
+terrain route recovery, contact handoff judgement, replan/relocalization,
+and the contact-owner invariant; the student acts only while the contact
+owner holds action ownership. The existing arena scripts
+(`collect_find_tree.py`, `train_find_tree_vision.py`) are flat-world,
+three-class navigation pipelines and are unusable here: natural contact
+needs all fourteen discrete actions, drop-recovery behaviour, and the
+natural Treechop environment, so a separate pipeline was built.
+
+**Teacher/student information boundary.** The teacher runs
+`terrain_route_drop_completion_v9_6` with the `f3_raycast` diagnostic
+sensor exactly as it did during its gate. The student model's only inputs
+are a four-frame causal POV stack and the previous discrete action
+one-hot; raycast, exact log XYZ, the log grid, oracle distance, target
+coordinates, item-entity coordinates, and teacher contact state are
+forbidden. The boundary is enforced structurally: `StudentObservation` is
+a dict subclass whose `__missing__` raises on any key other than `pov`,
+and the runner counts every such raise as a privileged student input
+access before re-raising. Teacher-only audit metadata (contact state,
+raycast flags, recovery activity, transition reasons) is stored in
+separate `audit_*` arrays that the trainer never loads as model input.
+
+**Interface design.** A purely observational `last_action_source` field
+("global"/"contact") was added to `CandidateSearchPolicy.act`; it never
+influences the action, and the full frozen-profile suite (212 passed,
+2 skipped) confirms no behavioural change. `NaturalContactRunner` wraps
+the teacher and owns exactly one decision: in `teacher` mode the teacher
+action executes (collection); in `shadow` mode the teacher action
+executes while the student prediction is only recorded; in `autonomous`
+mode the student action executes whenever the contact owner is active
+with no teacher fallback inside the contact phase. The teacher's own
+state machine still consumes the post-action observation, so handoff,
+replan, and mismatch cancellation remain the teacher's. When contact
+ends, control returns upstream automatically because the teacher simply
+stops emitting contact actions.
+
+**Seed isolation.** 16500--16819 are burned (development and gates). The
+collector rejects any seed in that range. New pre-declared ranges: train
+16900--16979, reserved extension 16980--16999 (unused), validation
+17000--17019, shadow 17100--17119, holdout 17200--17219. A two-episode
+collector smoke ran on 16850--16851 (also outside every formal range)
+verifying NPZ loadability, episode/action/contact boundaries, no
+cross-episode frames, CSV/summary consistency, and clean Minecraft
+shutdown before any formal collection.
+
+**Datasets.** Train: 80 episodes, 66 successes, 6,053 contact samples
+(4,937 from successful episodes; 1,116 failure samples excluded from
+training and reported, never silently deleted). Validation: 20 episodes,
+13 successes, 883 successful-episode samples. Coverage exceeded every
+threshold (11 successful coordinate-recovery episodes vs 5 required, 63
+successful drop-recovery episodes vs 10 required, and attack,
+forward-jump, fine-yaw, and fine-pitch samples all present), so the
+16980--16999 extension was not consumed.
+
+**Model and training.** A NumPy/OpenCV linear softmax over fourteen
+classes (no new ML dependency): per frame a 10x10 RGB grid, Sobel
+gradients, the scalar centre trunk fraction, trunk-mask geometry
+(fraction, centroid offsets, left/right and top/bottom asymmetries),
+inter-frame motion differences, and a previous-action one-hot. Training
+uses class-balanced cross-entropy, verified horizontal-mirror augmentation
+(3<->4, 10<->11 only), early stopping on minimum validation loss, fixed
+seed 42, and non-finite gradient checks. Six configurations were trained
+and every checkpoint retained as experimental:
+
+| Attempt | Change | Result |
+|---|---|---|
+| 1 | lr 0.05, 300 epochs | underfit; loss improvement 16.3% |
+| 2 | lr 0.15 | diverged |
+| 3 | momentum 0.9 | diverged |
+| 4 | 6000 epochs | converged; train 80% vs validation 50% -> episode memorisation |
+| 5 | + trunk-mask geometry | no material change |
+| 6 | drop raw centre pixels, l2 1e-3 | best: loss improvement 39.2%, attack recall 85.5% |
+
+**Offline gate: FAILED.** Pre-declared conditions vs the best
+experimental checkpoint (attempt 6): loss improvement 39.2% (>=20% pass),
+balanced accuracy 37.5% (>=55% fail), attack precision 89.8% (>=90%
+fail), attack recall 85.5% (>=75% pass), finite weights and checkpoint
+reload consistency pass, privileged input accesses zero pass. Per the
+pre-declared protocol the checkpoint is marked experimental, the shadow
+evaluation (17100--17119) and the autonomous holdout (17200--17219) were
+NOT run, and no DQN/PPO/online stage may start.
+
+The failure is structural, not a tuning accident. A state-level
+diagnostic on the validation set shows that of 269 teacher-yaw samples,
+EXACT_LOG_RESCAN (38 samples, direction agreement 0.42) replays a fixed
+open-loop camera raster and REACQUIRE_SAME_TRUNK (16 samples, agreement
+0.06, with 81% non-yaw predictions) turns toward a remembered bearing;
+both action sources are invisible to a POV+previous-action student. When
+the student does predict a yaw action its direction agreement is 0.882,
+so the directional signal itself is learned well; the strict 90% target
+cannot be met under the declared input boundary. Balanced accuracy is
+similarly limited by rare teacher-internal classes (noop=2, backward=3,
+look_up=7, look_down=8 validation samples). Removing the 3,072-dimension
+raw centre-crop pixel block closed most of the memorisation gap
+(validation loss improvement 20.9% -> 39.2%, attack recall 61.8% ->
+85.5%), confirming episode-level overfitting as the recoverable part.
+
+Passing the offline gate in a future version requires either widening
+the student model input manifest (the runner already receives the
+player's own F3 pose, which the specification permits the student agent
+but not the model) or retargeting the yaw metric to samples where the
+teacher action is pixel-determined; both are protocol changes that need
+explicit authorization before any retraining.
+
+## Natural Treechop BC v2: hybrid pixel-grounded contact policy
+
+BC v2 resolves the v1 structural failure by narrowing control ownership,
+not by weakening the failed v1 thresholds. The frozen v9.6 script retains
+every phase whose action depends on exact coordinates, remembered target
+bearing, an open-loop scan queue, obstacle recovery, or drop waypoints.
+The student is eligible only when a decision starts and ends in
+`CENTER_TRUNK`, `ADJUST_PITCH`, or `ATTACK_TRUNK`; transitions entering or
+leaving this set stay scripted. In autonomous mode there is no confidence
+fallback once a decision is inside this learned boundary.
+
+The reduced student action vocabulary is noop, forward, attack, fine yaw
+left/right, and fine pitch up/down (actions 0, 1, 7, 10, 11, 12, 13). Its
+input remains a four-frame POV stack plus a fourteen-way previous-action
+one-hot. The fourteen-way history is intentional: a preceding action may
+have been issued by the script even though the student is not allowed to
+predict that action. Teacher contact state is used only by the hybrid
+router and dataset selector and is never included in model features.
+
+The collector now records both `audit_decision_contact_state` and
+`audit_resulting_contact_state`. Existing v1 datasets contain only the
+post-decision audit, so they are allowed only for an explicitly marked
+diagnostic smoke run and can never pass the formal v2 gate. Formal v2
+collection uses 17300--17379 for training and 17400--17419 for validation.
+The untouched 17100--17119 shadow range and 17200--17219 autonomous holdout
+remain reserved. The repeatedly tuned 17000--17019 range is permanently a
+development set.
+
+Before offline metrics are considered, coverage requires at least 500
+training and 100 validation visual-boundary samples, ten successful
+validation seeds, and actions 7/10/11/12/13 represented at least 20 times
+each in training and five times each in validation. The predeclared offline
+thresholds are: loss improvement 20%, balanced accuracy 70%, attack
+precision 90%, attack recall 80%, fine-yaw direction 85%, and fine-pitch
+direction 80%, together with finite weights, reload consistency, formal
+pre/post audits, and zero privileged model inputs. Shadow and autonomous
+evaluation remain forbidden until all offline conditions pass.
+
+## Natural Treechop BC v2a: visual attack permission gate
+
+The conservative first branch of BC v2 is implemented independently from
+the multi-action v2b prototype. Its binary student predicts HOLD or ATTACK
+from the same four-frame POV stack and previous-action one-hot. The model
+never receives raycast, telemetry, exact coordinates, contact state, or a
+log grid. Training selects successful `COORDINATE_AIM`, `CENTER_TRUNK`,
+`ADJUST_PITCH`, and `ATTACK_TRUNK` samples from the existing v1 datasets;
+environment action 7 is ATTACK and all other selected actions are HOLD.
+
+The runtime permission is injected before the contact controller mutates an
+attack burst. HOLD therefore cannot increment attack steps or accidentally
+trigger drop recovery. Three consecutive rejected attack opportunities
+return to `CENTER_TRUNK`; non-attack teacher actions are unchanged, and
+scan/recovery/drop states are never gated. With no external permission (the
+default and every frozen profile test), v9.6 behavior is byte-for-byte on the
+existing action path. Shadow mode records predictions without setting the
+permission.
+
+Coverage passed with 2,793 training samples (913 ATTACK) and 372 development
+samples (164 ATTACK). Attempt 1 early-stopped at epoch 219 with validation
+loss improvement 68.7%. At threshold 0.85 the gate obtains balanced accuracy
+88.37%, attack precision 96.9925%, recall 78.66%, and false-positive rate
+1.923%. This misses the predeclared 97% precision condition by one grouped
+development error, so it is not promoted. Raising the threshold to obtain
+97% precision drops recall below 75%; the offline gate therefore remains
+failed and neither 17100--17119 shadow nor 17200--17219 holdout is consumed.
+
+One predeclared targeted follow-up mined training-only hard negatives: HOLD
+samples for which the audit raycast saw an in-range log while the teacher
+still issued yaw/pitch. There were 165 such training samples across 43 seeds;
+repeat factor four added 495 weighted examples before mirror augmentation.
+The audit flags selected weights only and were not model inputs. Attempt 2
+early-stopped at epoch 221 and passed the unchanged offline gate at threshold
+0.635: balanced accuracy 94.16%, precision 97.37%, recall 90.24%, FPR 1.923%,
+and loss improvement 70.55%.
+
+The first untouched shadow evaluation then ran on 17100--17119. Because
+shadow executed only the frozen teacher, its 12/20 successes and eight
+300-step failures are teacher outcomes: five failures never reached a gate
+state (17102, 17105, 17107, 17109, 17116), while three observed gate states
+(17110, 17112, 17119). Across 479 gate predictions, unseen balanced accuracy
+was 90.45% and recall 91.04%, but precision fell to 77.71% and FPR rose to
+10.14%. The shadow gate therefore failed both the 15-teacher-success and
+precision/FPR conditions. There were zero contact-owner mismatches, zero
+privileged student accesses, and zero permission applications. The 17200--
+17219 autonomous holdout remains untouched.
+
+## Natural Treechop BC v2b: diagnostic closed loop and temporal permission
+
+BC v2b treats the failed 17100--17119 shadow range as consumed diagnostic
+data. A replay produced 528 complete gate samples plus 52 error/near-threshold
+PNG frames. The replay teacher succeeded 13/20; the raw v2a gate produced 38
+false positives, while a causal two-frame confirmation filter reduced that
+count to 26 but also reduced recall from 92.53% to 82.18%. The temporal filter
+therefore remains a safety layer rather than a substitute for targeted data.
+
+The v2b trainer keeps the original POV-stack plus previous-action manifest.
+Raycast and teacher state remain audit-only. The first eight diagnostic seeds
+with gate samples train the model, and the final eight form a disjoint 299-row
+calibration set. Twenty v2a false positives in the targeted training split are
+repeated four times; 165 base hard negatives are repeated twice. Training
+early-stopped at epoch 416. At threshold 0.97 with two-frame confirmation, the
+targeted calibration gate passed: balanced accuracy 88.76%, attack precision
+97.33%, recall 78.49%, FPR 0.97%, and validation-loss improvement 69.83%.
+Checkpoint reload and privileged-input checks passed. The reused 17000--17019
+development set has only 75.67% raw balanced accuracy at this conservative
+threshold and remains an explicit regression warning, not a hidden result.
+
+The formal new-seed shadow then ran on 17400--17419. The frozen teacher again
+succeeded only 13/20. One failure (17409) never reached the gate; six failures
+(17404, 17407, 17412, 17413, 17415, 17418) reached contact/gate states but did
+not complete the task. Across 978 gate samples, confirmed FPR was reduced to
+1.19%, but precision was 92.74%, recall 52.51%, and balanced accuracy 75.66%.
+The model is now conservative enough on HOLD states but misses too many valid
+attacks. The formal shadow gate failed, so 17200--17219 remains untouched and
+autonomous evaluation is forbidden.
+
+Step diagnostics also exposed a runtime integration ordering issue. The
+ATTACK_TRUNK controller previously consulted external permission before the
+frozen teacher confirmed a raycast-valid attack opportunity, allowing ordinary
+raycast-loss HOLD frames to accumulate student rejection streaks. The optional
+permission check now occurs only after the teacher establishes an attack
+opportunity. The default `None` permission path is unchanged, and regression
+tests cover both valid-opportunity rejection and non-opportunity bypass.
+
+## Natural Treechop v9.7: trace-guided drop recovery
+
+The v2b 17400--17419 shadow failures were replayed with step-level contact and
+terminal diagnostics. Every replay that reached the relevant phase actually
+broke a log; the stable failure was post-disappearance item collection. Seed
+17407 abandoned a still-distant block centre after the fixed 28-step centre
+budget and then spent its remaining time turning around the ring. Seed 17413
+treated the remembered broken-block height as a persistent item height and
+issued 27 forward-jumps across successive ring waypoints, leaving almost no
+ordinary horizontal sweep.
+
+v9.7 is a new frozen profile and does not mutate v9.6. It extends the centre
+waypoint budget from 28 to 48, widens the recovery yaw tolerance from 12 to 18
+degrees, rotates the ordered ring so its first waypoint is nearest the player
+pose at recovery start, and applies the elevated repeated-jump probe only at
+the centre waypoint. The ring is walked normally because a dropped item falls
+after the supporting block disappears. The episode limit remains 300. New
+flags default to disabled, the `DropRecoveryPlanner` constructor remains
+unchanged, 70 targeted regressions passed, and the full suite passed with 247
+tests and two skips.
+
+The two-seed smoke was 1/2. Seed 17407 completed at step 289 and collected the
+drop in 11 post-disappearance recovery steps. Seed 17413 failed in the upstream
+exact-log scan without reaching an attack or drop phase, so it was not evidence
+against the recovery mechanism.
+
+The unseen 17500--17519 teacher gate was run to the full 20 episodes, split
+into two contiguous output files after the first half had already made the
+18/20 threshold mathematically impossible. The combined result was 13/20
+(65%, Wilson 95% 43.29%--81.88%), mean 217.05 steps, median 225.5, and seven
+300-step failures. Five failures never produced a student gate sample and two
+reached contact but did not complete; both contact failures broke a log and
+ended in `DROP_RECOVERY`. This fails the unchanged requirement of at least
+18/20 successes and at most two timeouts.
+
+A separate 324-step diagnostic on 17500, 17507, and 17509 produced only 1/3
+success and changed trajectories because the environment is not perfectly
+replay-deterministic. Uniform episode extension is therefore rejected as a
+fix. v9.7 is retained as an experimental recovery improvement but is not
+promoted, and BC v2c training remains blocked. The next teacher profile must
+instrument and reduce upstream global-search time, late candidate handoff, and
+failed 40-step exact-log rescans before making further student changes.
+
+## Natural Treechop v9.8: raycast-owned handoff and exact coarse routes
+
+v9.8 instruments the global search state on every diagnostic step: selected
+candidate, route distance and yaw error, remaining episode budget, scan and
+replan counts, handoff rejections, terrain-recovery work, and the full terminal
+search timeline. Replaying the five v9.7 upstream failures produced 1/5. The
+single success used an exact raycast handoff with no local rescan. All four
+failures used visual-only handoff at roughly 4.8--8 blocks and together paid
+five 40-step exact-log rescans, all unsuccessful. Importantly, those episodes
+had already recorded exact log coordinates during their 360-degree scans.
+
+The v9.8 profile retains v9.7's contact configuration exactly. A visual trunk
+may still guide global navigation but cannot own contact. Current exact-log
+raycasts and eligible exact coordinates remembered earlier in the episode may
+own contact. If a remembered coordinate is farther than the unchanged 14-block
+contact limit, it first replaces the noisy visual candidate as the coarse
+route target; ordinary global terrain navigation moves toward it, and contact
+begins only after the existing reachability rule passes. No new oracle or log
+grid input is introduced, and the 300-step episode limit is unchanged.
+
+Three bounded smoke iterations used the same consumed diagnostic seeds. A
+current-raycast-only handoff remained 1/5. Adding reachable raycast-memory
+handoff also remained 1/5 because several remembered targets were farther than
+14 blocks. Adding exact-memory coarse routing improved the set to 2/5: seed
+17500 changed from repeated timeout to success at step 219, and 17515 succeeded
+at step 178. Seed 17509 observed its only exact log too late; 17511 reached
+real coordinate contact but failed to converge; 17513 broke a log at step 67
+and then exhausted 72 drop-recovery steps around an elevated tree.
+
+The final mechanism is retained as an experimental improvement, but 2/5 is not
+enough evidence to consume the reserved 17600--17619 formal gate. BC v2c
+therefore remains blocked. The full regression suite passes with 253 tests and
+two skips, with zero contact-owner mismatches and zero privileged student input
+accesses in smoke evaluation.
+### v9.9 early exact route and bounded recovery
+
+The v9.8 targeted smoke isolated three separate losses: an exact log first
+appeared too late in a mandatory panorama, a real 3-D route stalled against
+terrain, and a broken log's 72-step pickup search remained trapped near the
+block column. The `early_route_recovery_v9_9` profile addresses them without
+changing v9.8: a scan ends as soon as both a visual candidate and exact log
+route exist; target-local recovery memory mirrors a failed right diagonal on
+the next attempt; and drop recovery visits the block's horizontal projection,
+an oriented 1.6-block outer ring, the projection again, and the original
+0.85-block pickup ring. The first projection receives 24 rather than 48 steps
+so an obstacle cannot consume most of the global 72-step recovery budget.
+
+Promotion remains evidence-gated. Replay seeds `17500, 17509, 17511, 17513,
+17515` first; run the untouched `17600-17619` formal gate only if at least four
+of those five targeted episodes succeed.
+
+Three v9.9 smoke iterations each finished 3/5. Seeds 17511, 17513, and 17515
+succeeded every time, validating the diagonal coordinate recovery and the
+projection/ground-sweep drop recovery. Dynamic exact-route adoption plus a
+single-failure terrain replan moved 17509's contact engagement from global step
+298 to step 185, but the controller retained a substantially worse upper log
+until post-recovery verification failed at step 291. The formal 17600--17619
+gate was therefore not consumed. The next experiment should freeze v9.9 and
+add margin-gated online 3-D target preemption when a newly observed reachable
+log scores materially better than the current target.
+
+### v9.10 margin-gated online coordinate target preemption
+
+The `coordinate_target_preemption_v9_10` profile freezes every v9.9 value and
+adds one state-local decision in `COORDINATE_AIM`. Remembered exact logs are
+rescored as new ray observations arrive. A replacement must have at least
+three observations, the current target must have been held for eight steps,
+and the new score must exceed the current score by at least three points. An
+accepted replacement clears only the stale distance-progress and climb-assist
+state; it preserves the episode, candidate owner, and global time budget.
+These constraints are intended to capture the roughly 20-point improvement
+seen in seed 17509 without oscillating between adjacent faces of one trunk.
+The final trace-directed refinement also permits this switch during
+`POST_RECOVERY_VERIFY`; in that state the failed old target is cooled down and
+verification ends immediately instead of spending its remaining sample budget.
+
+Both v9.10 targeted smoke variants nevertheless remained 3/5. In the final
+17509 trace the controller performed 95 preemption checks and accepted none;
+81 checks rejected the alternative for having fewer than three observations.
+The ordinary failure path switched at step 291, leaving a well-aligned target
+only 5.3 blocks away but nine episode steps remaining. This rules out a global
+score-margin change as the next move. A future frozen profile should retain the
+three-observation rule in ordinary coordinate aim, but allow a one-observation
+emergency switch during `POST_RECOVERY_VERIFY` only after the current target
+has failed recovery and the alternative is lower, reachable, and score-better.
+The untouched 17600--17619 gate was not run.
+
+### v9.11 state-conditioned emergency target preemption
+
+The `emergency_target_preemption_v9_11` profile freezes v9.10 and leaves its
+ordinary `COORDINATE_AIM` support rule unchanged. Only after the current target
+has completed a failed obstacle recovery and entered `POST_RECOVERY_VERIFY` may
+one exact observation trigger an emergency switch. The replacement must remain
+inside the existing 14-block reachability limit, be at least 0.75 blocks lower,
+and have a non-negative score gain. Acceptance cools down the failed old target,
+clears its verification/progress state, and resumes coordinate aim immediately.
+
+The v9.11 targeted smoke remained 3/5, so the formal gate was not run, but its
+specific repair worked. Seed 17509 switched at step 265 with a score gain of
+6.67 and a 1.56-block lower target, versus the old ordinary switch at step 291.
+It entered attack at step 293, lost exact reach for one frame, traversed the
+visual `CENTER_TRUNK -> ADJUST_PITCH` loop, and reacquired attack at step 299.
+The next frozen experiment should therefore preserve v9.11 and route an exact
+coordinate attack's reach loss directly back to bounded coordinate aim instead
+of spending the terminal budget in the visual recenter loop.

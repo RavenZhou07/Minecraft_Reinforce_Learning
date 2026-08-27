@@ -1,0 +1,144 @@
+{
+  "profile": "natural_treechop_contact_bc_v1",
+  "status": "experimental_offline_gate_failed",
+  "purpose": "Visual behaviour cloning of the v9.6 local contact controller; first-stage training after the v9.6 teacher gate",
+  "teacher": {
+    "profile": "terrain_route_drop_completion_v9_6",
+    "sensor_profile": "f3_raycast",
+    "gate_summary": "logs/find_tree/candidate_search_f3_raycast_terrain_route_drop_completion_v9_6_16800_20_gate_v1.summary.json",
+    "gate_result": "18/20 success, 2 max-step failures, 3 successes after coordinate recovery, 0 contact-owner mismatches, no oracle/log-grid action input",
+    "gate_passed": true
+  },
+  "model": {
+    "type": "linear_softmax",
+    "feature_size": 10,
+    "frame_stack": 4,
+    "action_classes": 14,
+    "include_centre_pixels": false,
+    "mirror_augmentation": true,
+    "features": "per frame: 10x10 RGB + Sobel gradients + scalar centre trunk fraction + trunk-mask geometry (fraction, centroid offsets, left/right and top/bottom asymmetries); inter-frame motion differences; previous-action one-hot"
+  },
+  "student_input_manifest": [
+    "pov_frame_stack_4",
+    "previous_action_one_hot_14"
+  ],
+  "student_forbidden_inputs": [
+    "raycast",
+    "exact_log_xyz",
+    "log_grid",
+    "oracle_distance",
+    "target_coordinates",
+    "item_entity_coordinates",
+    "teacher_contact_state"
+  ],
+  "seed_isolation": {
+    "banned_development_and_gate_range": "16500-16819",
+    "collector_smoke": "16850-16851",
+    "train": "16900-16979",
+    "train_extension_reserved_unused": "16980-16999",
+    "validation": "17000-17019",
+    "shadow_reserved_not_run": "17100-17119",
+    "student_holdout_reserved_not_run": "17200-17219"
+  },
+  "datasets": {
+    "train": {
+      "path": "logs/find_tree/natural_treechop_bc_v1_train_16900_80.npz",
+      "sha256": "fb62faf6f48a1180fe2ebd50f5f8c558688d0feabc665df68e9d75eb40ccae13",
+      "episodes": 80,
+      "successes": 66,
+      "contact_samples": 6053,
+      "successful_episode_samples": 4937,
+      "excluded_failure_samples": 1116
+    },
+    "validation": {
+      "path": "logs/find_tree/natural_treechop_bc_v1_validation_17000_20.npz",
+      "sha256": "d580d2b4f343ad2c8299d982f7346b6fa0b2d284bda2e745e463be424ef0f679",
+      "episodes": 20,
+      "successes": 13,
+      "contact_samples": 1524,
+      "successful_episode_samples": 883,
+      "excluded_failure_samples": 641
+    }
+  },
+  "coverage_check": {
+    "successful_coordinate_recovery_episodes": 11,
+    "required": 5,
+    "successful_drop_recovery_episodes": 63,
+    "required": 10,
+    "attack_samples": 918,
+    "forward_jump_samples": 537,
+    "fine_yaw_samples": 359,
+    "fine_pitch_samples": 161,
+    "all_present": true,
+    "extension_16980_16999_used": false
+  },
+  "training_attempts": [
+    {
+      "attempt": 1,
+      "config": "lr=0.05 l2=1e-4 epochs=300 feature_size=10 centre_pixels=yes",
+      "selected_epoch": 300,
+      "result": "underfit (still improving); accuracy 0.484 balanced 0.369 attack_p 0.864 attack_r 0.618 yaw 0.743 loss_improvement 0.163"
+    },
+    {
+      "attempt": 2,
+      "config": "lr=0.15 feature_size=12 centre_pixels=yes",
+      "result": "diverged; selected_epoch=0"
+    },
+    {
+      "attempt": 3,
+      "config": "lr=0.05 momentum=0.9 feature_size=12 centre_pixels=yes",
+      "result": "diverged (effective step too large); selected_epoch=0"
+    },
+    {
+      "attempt": 4,
+      "config": "lr=0.05 epochs=6000 patience=500 centre_pixels=yes",
+      "selected_epoch": 432,
+      "result": "converged; train_accuracy 0.80 vs validation 0.50 -> generalization gap from episode memorisation; balanced 0.388 yaw 0.714"
+    },
+    {
+      "attempt": 5,
+      "config": "attempt4 + trunk-mask geometric features",
+      "selected_epoch": 433,
+      "result": "no material change (balanced 0.379 yaw 0.714); mask features retained"
+    },
+    {
+      "attempt": 6,
+      "config": "lr=0.05 l2=0.001 epochs=6000 patience=500 centre_pixels=NO (scalar centre fraction only)",
+      "selected_epoch": 1351,
+      "result": "best; accuracy 0.556 balanced 0.375 attack_p 0.898 attack_r 0.855 yaw 0.717 loss_improvement 0.392; checkpoint checkpoints/natural_treechop_contact_bc_v1_stack4_experimental_attempt6.npz"
+    }
+  ],
+  "offline_gate": {
+    "conditions": {
+      "validation_loss_relative_improvement_at_least_20_percent": {"value": 0.392, "passed": true},
+      "balanced_accuracy_at_least_55_percent": {"value": 0.375, "passed": false},
+      "attack_precision_at_least_90_percent": {"value": 0.898, "passed": false},
+      "attack_recall_at_least_75_percent": {"value": 0.855, "passed": true},
+      "yaw_direction_agreement_at_least_90_percent": {"value": 0.717, "passed": false},
+      "finite_weights": {"passed": true},
+      "checkpoint_reload_consistent": {"passed": true},
+      "privileged_input_accesses_zero": {"passed": true}
+    },
+    "all_conditions_met": false,
+    "failure_analysis": {
+      "generalization_gap": "train accuracy 0.80 vs validation 0.50 with raw centre pixels; removing the 3072-dim raw centre-crop block (attempt 6) raised validation loss improvement from 0.209 to 0.392 and attack recall from 0.618 to 0.855",
+      "yaw_direction_structural_limit": "of 269 validation yaw-teacher samples, EXACT_LOG_RESCAN (n=38, direction agreement 0.42) replays a fixed open-loop camera raster and REACQUIRE_SAME_TRUNK (n=16, agreement 0.06, 81 percent non-yaw predictions) turns toward a remembered bearing; both are invisible to a POV+previous-action student. When the student itself predicts a yaw action its direction agreement is 0.882, so the directional signal is learned; the strict 90 percent target is not reachable under the declared input boundary",
+      "balanced_accuracy_structural_limit": "validation successful-episode class counts include noop=2, backward=3, look_up=7, look_down=8, fine_look_up=10, fine_look_down=9; these rare classes dominate the balanced mean and several are teacher-internal (probe/noop) rather than pixel-determined",
+      "attack_precision": "0.898 vs 0.90 threshold (one sample)"
+    }
+  },
+  "evaluation_runs": {
+    "collector_smoke": "logs/find_tree/natural_treechop_bc_v1_smoke_16850_2.summary.json (2 episodes, 1 success, 85 contact samples, NPZ/CSV/summary consistent, no cross-episode frames, clean Minecraft shutdown)",
+    "shadow_evaluation": "NOT RUN (offline gate failed)",
+    "autonomous_holdout": "NOT RUN (offline gate failed)"
+  },
+  "gate_status": {
+    "training_started": true,
+    "teacher_gate_passed": true,
+    "offline_gate_passed": false,
+    "shadow_gate_passed": false,
+    "student_holdout_passed": false,
+    "next_stage_rl_authorized": false
+  },
+  "next_stage_recommendation": "The offline gate thresholds exceed what the declared POV+previous-action boundary supports because roughly one fifth of teacher yaw actions come from open-loop scripts or remembered bearings. Passing would require either widening the student model input manifest (for example allowing the player's own F3 pose, which the runner already receives) or retargeting the yaw metric to samples where the action is pixel-determined; both changes need explicit authorization before any retraining."
+}

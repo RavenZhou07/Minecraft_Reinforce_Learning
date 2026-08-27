@@ -1,0 +1,27 @@
+{
+  "profile": "drop_recovery",
+  "purpose": "Bounded drop-coordinate search and same-trunk reacquisition",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "contact": {
+    "enable_clear_occlusion": true,
+    "enable_drop_recovery": true,
+    "region_max_steps": 100,
+    "drop_recovery_radius": 0.85,
+    "drop_recovery_arrival_radius": 0.35,
+    "drop_recovery_yaw_tolerance_degrees": 12.0,
+    "drop_recovery_blocked_forward_steps": 3,
+    "drop_recovery_minimum_progress": 0.04,
+    "drop_recovery_max_steps": 20,
+    "same_trunk_reacquire_steps": 8,
+    "max_attack_rounds": 2
+  },
+  "evaluation": {
+    "seeds": [16500, 16501, 16502],
+    "episodes": 3,
+    "success_gate": "pickup or same-trunk retry after at least 80% of observed block disappearances"
+  },
+  "note": "Privileged raycast is diagnostic only. Candidate selection remains POV plus self telemetry and internal memory."
+}

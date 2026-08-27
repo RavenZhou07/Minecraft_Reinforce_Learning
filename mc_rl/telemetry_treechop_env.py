@@ -9,10 +9,11 @@ from mc_rl.wrappers import DiscreteActionWrapper, OneLogTreechopWrapper
 
 
 ENV_ID = "MineRLTreechopF3Local-v0"
+RAYCAST_ENV_ID = "MineRLTreechopF3RaycastLocal-v0"
 
 
-def build_telemetry_treechop_spec_class():
-    """Create a Treechop subclass that exposes only F3-like self telemetry."""
+def build_telemetry_treechop_spec_class(include_raycast: bool = False):
+    """Create local Treechop with F3 telemetry and optional diagnostic ray."""
 
     from minerl.herobraine.env_specs.treechop_specs import Treechop
     from minerl.herobraine.hero import spaces
@@ -59,14 +60,81 @@ def build_telemetry_treechop_spec_class():
         def xml_template(self) -> str:
             return "<ObservationFromFullStats/>"
 
+    class _RayScalar(KeymapTranslationHandler):
+        def __init__(
+            self,
+            hero_key: str,
+            actor_key: str,
+            low: float,
+            high: float,
+            default: float,
+        ):
+            super().__init__(
+                hero_keys=["LineOfSight", hero_key],
+                univ_keys=["raycast", actor_key],
+                to_string=actor_key,
+                default_if_missing=default,
+                ignore_missing=True,
+                space=spaces.Box(
+                    low=low, high=high, shape=(), dtype=np.float32
+                ),
+            )
+
+    class _RayPredicate(KeymapTranslationHandler):
+        def __init__(self, hero_key: str, actor_key: str, accepted):
+            self.accepted = frozenset(accepted)
+            super().__init__(
+                hero_keys=["LineOfSight", hero_key],
+                univ_keys=["raycast", actor_key],
+                to_string=actor_key,
+                default_if_missing="",
+                ignore_missing=True,
+                space=spaces.Box(
+                    low=0.0, high=1.0, shape=(), dtype=np.float32
+                ),
+            )
+
+        def from_hero(self, hero_dict):
+            raw = self.walk_dict(hero_dict, self.hero_keys)
+            value = raw.item() if getattr(raw, "shape", ()) == () else raw
+            return np.float32(str(value) in self.accepted)
+
+    class DiagnosticRaycastObservation(TranslationHandlerGroup):
+        def __init__(self):
+            super().__init__(
+                handlers=[
+                    _RayPredicate("hitType", "has_block", ("block",)),
+                    _RayPredicate("type", "is_log", ("log", "log2")),
+                    _RayPredicate(
+                        "type", "is_leaves", ("leaves", "leaves2")
+                    ),
+                    _RayScalar("inRange", "in_range", 0.0, 1.0, 0.0),
+                    _RayScalar("distance", "distance", 0.0, 50.0, 50.0),
+                    _RayScalar("x", "x", -640000.0, 640000.0, 0.0),
+                    _RayScalar("y", "y", -640000.0, 640000.0, 0.0),
+                    _RayScalar("z", "z", -640000.0, 640000.0, 0.0),
+                ]
+            )
+
+        def to_string(self) -> str:
+            return "raycast"
+
+        def xml_template(self) -> str:
+            return "<ObservationFromRay/>"
+
     class TelemetryTreechop(Treechop):
         def __init__(self):
-            super().__init__(name=ENV_ID)
+            super().__init__(
+                name=RAYCAST_ENV_ID if include_raycast else ENV_ID
+            )
 
         def create_observables(self) -> List[Any]:
-            return super().create_observables() + [
+            observables = super().create_observables() + [
                 F3SelfTelemetryObservation()
             ]
+            if include_raycast:
+                observables.append(DiagnosticRaycastObservation())
+            return observables
 
         def is_from_folder(self, _folder: str) -> bool:
             return False
@@ -75,7 +143,9 @@ def build_telemetry_treechop_spec_class():
 
 
 def make_telemetry_treechop_env(
-    seed: int = 42, max_episode_steps: int = 300
+    seed: int = 42,
+    max_episode_steps: int = 300,
+    include_raycast: bool = False,
 ):
     """Construct natural Treechop with discrete actions and one-log success."""
 
@@ -84,7 +154,9 @@ def make_telemetry_treechop_env(
     configure_minerl_runtime()
     import minerl  # noqa: F401 - initializes the MineRL runtime
 
-    spec_class = build_telemetry_treechop_spec_class()
+    spec_class = build_telemetry_treechop_spec_class(
+        include_raycast=include_raycast
+    )
     raw_env = spec_class().make()
     raw_env._is_fault_tolerant = False
     env = DiscreteActionWrapper(raw_env)

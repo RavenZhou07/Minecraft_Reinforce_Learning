@@ -3,9 +3,14 @@ import numpy as np
 from mc_rl.candidates import CandidateMap, ResourceDetection
 from mc_rl.telemetry import (
     AgentTelemetry,
+    RaycastHit,
+    SENSOR_PROFILE_F3,
+    SENSOR_PROFILE_POV_ONLY,
+    SENSOR_PROFILE_RAYCAST,
     VisualRangeEstimate,
     bearing_and_distance_to,
     detection_world_position,
+    sensor_uses_telemetry,
 )
 
 
@@ -18,6 +23,26 @@ def test_detection_projects_with_minecraft_yaw_convention():
     assert np.allclose(detection_world_position(pose(), 0.0, distance), (0, 4, 10))
     assert np.allclose(detection_world_position(pose(), 90.0, distance), (-10, 4, 0))
     assert np.allclose(detection_world_position(pose(), -90.0, distance), (10, 4, 0))
+
+
+def test_raycast_profile_and_hit_are_explicitly_privileged():
+    assert not sensor_uses_telemetry(SENSOR_PROFILE_POV_ONLY)
+    assert sensor_uses_telemetry(SENSOR_PROFILE_F3)
+    assert sensor_uses_telemetry(SENSOR_PROFILE_RAYCAST)
+    hit = RaycastHit.from_observation(
+        {
+            "has_block": 1,
+            "is_log": 1,
+            "is_leaves": 0,
+            "in_range": 1,
+            "distance": 3.0,
+            "x": 1.5,
+            "y": 65.0,
+            "z": -2.5,
+        }
+    )
+    assert hit.has_block and hit.is_log and hit.in_range
+    assert not hit.is_leaves
 
 
 def test_same_candidate_fuses_observations_after_translation():

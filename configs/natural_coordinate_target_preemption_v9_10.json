@@ -1,0 +1,71 @@
+{
+  "profile": "coordinate_target_preemption_v9_10",
+  "purpose": "Prevent a stale upper or distant exact log from consuming the remaining coordinate approach budget when a materially better reachable log becomes visible",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "early_route_recovery_v9_9",
+  "frozen_boundary": {
+    "v9_9_source_unchanged": true,
+    "all_v9_9_contact_values_identical_except_preemption_switch": true,
+    "all_v9_10_behaviour_profile_gated": true
+  },
+  "implemented_behaviour": {
+    "online_coordinate_target_rescoring": true,
+    "minimum_current_target_hold_steps": 8,
+    "minimum_new_target_observations": 3,
+    "minimum_score_gain": 3.0,
+    "reset_old_target_progress_on_preemption": true,
+    "reset_old_target_climb_state_on_preemption": true,
+    "preemption_allowed_states": ["COORDINATE_AIM", "POST_RECOVERY_VERIFY"],
+    "episode_max_steps_unchanged": 300,
+    "no_new_oracle_or_log_grid_input": true
+  },
+  "source_trace": {
+    "seed": 17509,
+    "summary": "logs/find_tree/natural_treechop_v9_9_fast_replan_smoke_failures5.summary.json",
+    "finding": "Fast route replan advanced contact engagement from step 298 to step 185, but target 1 remained selected until post-recovery failure at step 291 even though target 2 later scored about 20 points better."
+  },
+  "promotion_protocol": {
+    "targeted_seeds": [17500, 17509, 17511, 17513, 17515],
+    "targeted_smoke_minimum": "4/5",
+    "formal_gate_seed_range": "17600-17619",
+    "formal_gate_threshold": "at least 18/20 with at most 2 max-step failures",
+    "formal_gate_run_only_after_targeted_smoke": true
+  },
+  "verification": {
+    "targeted_tests": "39 passed",
+    "full_tests": "265 passed, 2 skipped",
+    "smoke_iterations": [
+      {
+        "name": "coordinate-aim-only preemption with 6-point margin",
+        "result": "3/5",
+        "summary": "logs/find_tree/natural_treechop_v9_10_target_preemption_smoke_failures5.summary.json"
+      },
+      {
+        "name": "coordinate-aim and recovery-verification preemption with 3-point margin",
+        "result": "3/5",
+        "successes": [17511, 17513, 17515],
+        "failures": [17500, 17509],
+        "summary": "logs/find_tree/natural_treechop_v9_10_verify_preemption_smoke_failures5.summary.json"
+      }
+    ],
+    "contact_owner_mismatches": 0,
+    "privileged_student_input_accesses": 0
+  },
+  "decision": {
+    "promote_teacher": false,
+    "run_formal_gate_17600_17619": false,
+    "reason": "Both v9.10 targeted smoke iterations remained 3/5, below the predeclared 4/5 threshold.",
+    "seed_17509": {
+      "preemption_checks": 95,
+      "preemptions": 0,
+      "support_rejections": 81,
+      "ordinary_target_switch_step": 291,
+      "new_target_horizontal_distance_at_timeout": 5.3,
+      "finding": "Exact observations were fragmented across several log targets, so the globally required three observations were not accumulated before recovery verification expired."
+    },
+    "next_direction": "Use state-conditioned evidence in a new frozen profile: retain three-observation support during ordinary coordinate aim, but permit a one-observation emergency switch during POST_RECOVERY_VERIFY only when the current target has already failed recovery and the new target is lower, reachable, and score-improving."
+  }
+}

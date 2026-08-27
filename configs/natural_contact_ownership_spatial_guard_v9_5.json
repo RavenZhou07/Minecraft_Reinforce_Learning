@@ -1,0 +1,47 @@
+{
+  "profile": "contact_ownership_spatial_guard_v9_5",
+  "purpose": "Keep terminal contact action ownership atomic and prevent repeated exact scans in the same failed physical region",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "contact_drop_completion_v9_4",
+  "upstream_handoff": {
+    "contact_owner_lock": true,
+    "selected_candidate_must_match_contact_candidate": true,
+    "visual_handoff_requires_local_region": true,
+    "route_stall_alone_is_not_local_evidence": true,
+    "relocalize_on_in_region_route_stall_without_local_evidence": true,
+    "raycast_log_handoff_max_distance": 14.0
+  },
+  "exact_log_rescan": {
+    "budget": 40,
+    "max_attempts_per_candidate": 1,
+    "failed_region_radius": 8.0,
+    "failed_regions_persist_for_episode": true
+  },
+  "drop_recovery": {
+    "unchanged_from_v9_4": true
+  },
+  "evaluation": {
+    "smoke_seeds": [16500, 16501, 16502],
+    "training_gate_seeds": [16700, 16701, 16702, 16703, 16704, 16705, 16706, 16707, 16708, 16709, 16710, 16711, 16712, 16713, 16714, 16715, 16716, 16717, 16718, 16719],
+    "training_gate": "at least 18/20 success, at most two 300-step failures, at least one success after coordinate recovery, and no oracle or log grid used for actions or scoring",
+    "smoke_result": "final smoke v3: 2/3, Wilson 95% 20.8%-93.9%, mean 216.0, median 260, one 300-step failure; zero contact-owner mismatches",
+    "smoke_summary": "logs/find_tree/candidate_search_f3_raycast_contact_ownership_spatial_guard_v9_5_16500_3_smoke_v3.summary.json",
+    "training_gate_result": "formal unseen gate v1: 15/20, Wilson 95% 53.1%-88.8%, mean 175.8, median 162, five 300-step failures, zero contact-owner mismatches, and zero successes after coordinate recovery",
+    "training_gate_summary": "logs/find_tree/candidate_search_f3_raycast_contact_ownership_spatial_guard_v9_5_16700_20_gate_v1.summary.json",
+    "post_fix_validation_result": "same-seed regression v2 after repairing the v1 in-region route-stall deadlock: 16/20, Wilson 95% 58.4%-91.9%, mean 170.85, median 180, four 300-step failures; this is not a new holdout gate",
+    "post_fix_validation_summary": "logs/find_tree/candidate_search_f3_raycast_contact_ownership_spatial_guard_v9_5_16700_20_gate_v2.summary.json",
+    "gate_passed": false,
+    "training_started": false
+  },
+  "failure_analysis": {
+    "16702": "Never entered contact; two coarse world routes exhausted obstacle recovery outside the contact region.",
+    "16714": "One coordinate recovery made verified progress, but no in-range attack was obtained; an exact scan failed and the second approach reached the episode cap.",
+    "16716": "Reached in-range contact and observed a disappearance, but did not collect the drop; a later route blocked outside the contact region.",
+    "16719": "Reached in-range contact and observed a disappearance, but 66 drop-recovery steps did not collect it before the episode cap.",
+    "remaining_bottleneck": "The four gate-v2 failures span coarse terrain routing, local reachable-contact acquisition, and two downstream pickup failures; the v9.5 ownership invariant itself had zero mismatches."
+  },
+  "note": "Independent v9.5 profile. v9.4 and older profiles remain frozen. This is an upstream ownership/locality repair; it does not add drop-path tuning or learned control."
+}

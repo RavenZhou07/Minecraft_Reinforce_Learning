@@ -1,0 +1,69 @@
+{
+  "profile": "trace_guided_drop_recovery_v9_7",
+  "purpose": "Use v2b failure traces to reduce wasted movement after log disappearance without changing the 300-step episode boundary",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "terrain_route_drop_completion_v9_6",
+  "frozen_boundary": {
+    "v9_6_defaults_unchanged": true,
+    "drop_recovery_orient_ring_to_start_default": false,
+    "drop_recovery_elevated_jump_centre_only_default": false
+  },
+  "trace_derived_changes": {
+    "centre_waypoint_max_steps": 48,
+    "previous_centre_waypoint_max_steps": 28,
+    "yaw_tolerance_degrees": 18.0,
+    "previous_yaw_tolerance_degrees": 12.0,
+    "ordered_ring_starts_nearest_initial_player_pose": true,
+    "elevated_jump_probe_limited_to_centre_waypoint": true,
+    "episode_max_steps_unchanged": 300
+  },
+  "diagnostic_basis": {
+    "source_shadow": "logs/find_tree/natural_treechop_attack_gate_bc_v2b_shadow_17400_20.summary.json",
+    "failure_replay": "logs/find_tree/natural_treechop_v9_7_diagnostic_174_failures6.contact.episodes.json",
+    "far_centre_failure_seed": 17407,
+    "elevated_ring_jump_failure_seed": 17413
+  },
+  "verification": {
+    "targeted_tests": "70 passed",
+    "full_tests": "247 passed, 2 skipped",
+    "smoke_seeds": [17407, 17413],
+    "smoke_result": "1/2: 17407 succeeded at 289 steps and collected the post-disappearance drop in 11 recovery steps; 17413 failed upstream without reaching attack or drop recovery",
+    "smoke_episode_diagnostics": "logs/find_tree/natural_treechop_v9_7_smoke_17407_17413.contact.episodes.json"
+  },
+  "teacher_gate": {
+    "seeds": "17500-17519",
+    "execution_note": "The first ten and second ten episodes were written separately after an early mathematical-failure checkpoint, then combined without seed reuse.",
+    "successes": 13,
+    "episodes": 20,
+    "success_rate": 0.65,
+    "wilson_95_percent": [0.4329, 0.8188],
+    "mean_steps": 217.05,
+    "median_steps": 225.5,
+    "max_step_failures": 7,
+    "upstream_no_gate_failures": 5,
+    "contact_or_completion_after_gate_failures": 2,
+    "required": "at least 18/20 successes and at most two 300-step failures",
+    "gate_passed": false,
+    "outputs": [
+      "logs/find_tree/natural_treechop_v9_7_teacher_gate_17500_20.csv",
+      "logs/find_tree/natural_treechop_v9_7_teacher_gate_17500_20.contact.episodes.json",
+      "logs/find_tree/natural_treechop_v9_7_teacher_gate_17510_10.csv",
+      "logs/find_tree/natural_treechop_v9_7_teacher_gate_17510_10.contact.episodes.json"
+    ]
+  },
+  "grace_diagnostic": {
+    "max_steps": 324,
+    "seeds": [17500, 17507, 17509],
+    "result": "1/3; uniform episode extension did not reliably recover late-start failures and is rejected as the next fix",
+    "summary": "logs/find_tree/natural_treechop_v9_7_grace_diagnostic_17500_17507_17509.summary.json"
+  },
+  "decision": {
+    "promote_teacher": false,
+    "start_bc_v2c_training": false,
+    "next_profile": "v9.8 upstream search-time and handoff-reserve diagnostics",
+    "reason": "Five of seven failures never produced a gate sample; the dominant bottleneck is late global search/contact handoff rather than attack permission or the v9.7 ring traversal."
+  }
+}

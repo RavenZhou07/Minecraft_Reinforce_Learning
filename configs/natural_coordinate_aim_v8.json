@@ -1,0 +1,28 @@
+{
+  "profile": "coordinate_aim",
+  "purpose": "Episode-scale 3-D log target memory with closed-loop yaw/pitch servo",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "contact": {
+    "enable_clear_occlusion": true,
+    "enable_drop_recovery": true,
+    "enable_coordinate_aim": true,
+    "coordinate_eye_height": 1.62,
+    "coordinate_coarse_threshold_degrees": 14.0,
+    "coordinate_target_merge_distance": 0.7,
+    "coordinate_target_cooldown_steps": 45,
+    "coordinate_miss_budget": 8,
+    "coordinate_forward_stop_distance": 1.7,
+    "region_max_steps": 120
+  },
+  "evaluation": {
+    "smoke_seeds": [16500, 16501, 16502],
+    "fixed_evaluation_seeds": [16600, 16601, 16602, 16603, 16604, 16605, 16606, 16607, 16608, 16609],
+    "smoke_result": "2/3, mean 171.3, median 134",
+    "fixed_result": "8/10, Wilson 95% 49.0%-94.3%, mean 178.7, median 150",
+    "fixed_summary": "logs/find_tree/candidate_search_f3_raycast_coordinate_aim_16600_10_diag_v6.summary.json"
+  },
+  "note": "Privileged scripted teacher: raycast log XYZ participates in local target selection. It is not a POV/F3 deployment result."
+}

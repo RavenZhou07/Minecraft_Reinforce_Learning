@@ -1,0 +1,76 @@
+{
+  "profile": "early_route_recovery_v9_9",
+  "purpose": "Convert v9.8 late-discovery, stalled-coordinate, and failed-drop traces into bounded early routing, mirrored detours, and horizontal ground sweep behaviour",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "raycast_owned_handoff_v9_8",
+  "frozen_boundary": {
+    "v9_8_source_unchanged": true,
+    "search_config_default_unchanged": true,
+    "all_v9_9_behaviour_profile_gated": true
+  },
+  "implemented_behaviour": {
+    "end_scan_when_visual_candidate_and_exact_log_route_exist": true,
+    "coordinate_detour_sequence": "backward, diagonal forward-jump, restore heading",
+    "coordinate_detour_direction_memory": "first right, failed retry left per exact target",
+    "coordinate_max_recoveries_per_target": 2,
+    "drop_recovery_sequence": "horizontal projection, oriented outer ring, projection revisit, oriented inner ring",
+    "drop_recovery_centre_max_steps": 24,
+    "drop_recovery_outer_radius": 1.6,
+    "drop_recovery_inner_radius": 0.85,
+    "episode_max_steps_unchanged": 300,
+    "no_new_oracle_or_log_grid_input": true
+  },
+  "diagnostics": {
+    "exact_log_early_scan_exits": true,
+    "coordinate_right_detours": true,
+    "coordinate_left_detours": true,
+    "drop_waypoint_records": true,
+    "source_seeds": [17500, 17509, 17511, 17513, 17515]
+  },
+  "promotion_protocol": {
+    "targeted_smoke_minimum": "4/5",
+    "formal_gate_seed_range": "17600-17619",
+    "formal_gate_threshold": "at least 18/20 with at most 2 max-step failures",
+    "formal_gate_run_only_after_targeted_smoke": true
+  },
+  "verification": {
+    "targeted_tests": "57 passed",
+    "full_tests": "259 passed, 2 skipped",
+    "smoke_iterations": [
+      {
+        "name": "early route plus recovery",
+        "result": "3/5",
+        "summary": "logs/find_tree/natural_treechop_v9_9_targeted_smoke_failures5.summary.json"
+      },
+      {
+        "name": "dynamic exact route adoption",
+        "result": "3/5",
+        "summary": "logs/find_tree/natural_treechop_v9_9_dynamic_route_smoke_failures5.summary.json"
+      },
+      {
+        "name": "single-failure terrain replan",
+        "result": "3/5",
+        "successes": [17511, 17513, 17515],
+        "failures": [17500, 17509],
+        "summary": "logs/find_tree/natural_treechop_v9_9_fast_replan_smoke_failures5.summary.json"
+      }
+    ],
+    "contact_owner_mismatches": 0,
+    "privileged_student_input_accesses": 0
+  },
+  "decision": {
+    "promote_teacher": false,
+    "run_formal_gate_17600_17619": false,
+    "reason": "All three targeted smoke iterations remained 3/5, below the predeclared 4/5 promotion threshold.",
+    "validated_improvements": [
+      "17511 coordinate convergence succeeded in all three v9.9 runs",
+      "17513 drop completion succeeded in all three v9.9 runs",
+      "17515 remained successful in all three v9.9 runs",
+      "fast terrain replan moved 17509 contact engagement from step 298 to step 185"
+    ],
+    "next_direction": "Allow a newly observed substantially better reachable 3-D log target to preempt the current coordinate target before stall recovery; keep v9.9 frozen for comparison."
+  }
+}

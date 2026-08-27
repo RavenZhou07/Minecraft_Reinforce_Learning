@@ -1,0 +1,50 @@
+{
+  "profile": "contact_drop_completion_v9_4",
+  "purpose": "Complete elevated local log contact and recover drops from the true broken-block centre",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "candidate_handoff_guard_v9_3",
+  "upstream_handoff": {
+    "unchanged_from_v9_3": true,
+    "freeze_selected_route_target": true,
+    "require_local_trunk_or_log_evidence": true,
+    "rebuild_candidate_map_after_bad_local_handoff": true,
+    "cooldown_candidate_requires_world_position_match": true
+  },
+  "local_contact": {
+    "coordinate_max_recoveries_per_target": 1,
+    "coordinate_recovery_jump_steps": 8,
+    "coordinate_post_recovery_translation_budget": 24,
+    "require_raycast_attack_confirmation": true,
+    "exact_log_rescan_budget": 40
+  },
+  "drop_recovery": {
+    "normalize_hit_face_to_block_centre": true,
+    "ordered_adjacent_ring": true,
+    "centre_waypoint_max_steps": 28,
+    "ring_waypoint_max_steps": 10,
+    "global_max_steps": 72,
+    "jump_budget_per_waypoint": 1,
+    "offset_budget_per_waypoint": 1,
+    "uses_item_entity_coordinates": false
+  },
+  "evaluation": {
+    "smoke_seeds": [16500, 16501, 16502],
+    "fixed_evaluation_seeds": [16600, 16601, 16602, 16603, 16604, 16605, 16606, 16607, 16608, 16609],
+    "stability_gate": "at least 9/10 success, zero 300-step failures, and at least one success after coordinate recovery",
+    "smoke_result": "3/3, Wilson 95% 43.9%-100%, mean 181.7, median 196, zero 300-step failures; 2/2 pickup after disappearance and two successes after coordinate recovery.",
+    "smoke_summary": "logs/find_tree/candidate_search_f3_raycast_contact_drop_completion_v9_4_16500_3_smoke_v1.summary.json",
+    "fixed_result": "8/10, Wilson 95% 49.0%-94.3%, mean 149.0, median 113.5, two 300-step failures; 8/9 success after in-range contact and 7/8 pickup after disappearance.",
+    "fixed_summary": "logs/find_tree/candidate_search_f3_raycast_contact_drop_completion_v9_4_16600_10_fixed_v1.summary.json",
+    "gate_passed": false,
+    "training_started": false
+  },
+  "failure_analysis": {
+    "16602": "The log disappeared at step 293 after a late coordinate approach, leaving only seven episode steps for drop recovery; the normalized centre was used but the fixed episode cap ended first.",
+    "16604": "Three candidate handoffs produced no eligible local log; two exact 40-action rescans exhausted and the third was skipped for insufficient episode budget. No attack or drop recovery occurred.",
+    "remaining_bottleneck": "One failure is late contact leaving no pickup budget; the other remains an upstream candidate-region localization failure. Neither is repaired by further block-centre or ring tuning."
+  },
+  "note": "Independent downstream completion profile. v9.3 and older profiles remain frozen. The block centre is derived only from the remembered ray hit and player pose; no item entity coordinates, oracle distance, or log grid are used. No training was started because the fixed gate failed."
+}

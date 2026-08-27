@@ -11,7 +11,12 @@ from mc_rl.actions import ACTION_NAMES, discrete_action_to_minerl
 
 
 class DiscreteActionWrapper(gym.ActionWrapper):
-    """Expose nine readable integer actions instead of MineRL's Dict space."""
+    """Expose readable integer actions instead of MineRL's Dict space.
+
+    The final four actions are half-step camera motions used only for precise
+    resource contact. Existing action ids remain unchanged for checkpoints
+    and earlier curriculum logs.
+    """
 
     def __init__(self, env: gym.Env, camera_delta: float = 10.0):
         super().__init__(env)

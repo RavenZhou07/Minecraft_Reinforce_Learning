@@ -1,0 +1,120 @@
+{
+  "profile": "natural_treechop_contact_bc_v2_hybrid",
+  "status": "implementation_ready_recollection_required",
+  "purpose": "Hybrid visual BC: learn only pixel-grounded centering, pitch and attack decisions while the frozen v9.6 script retains hidden-state contact phases",
+  "teacher": {
+    "profile": "terrain_route_drop_completion_v9_6",
+    "sensor_profile": "f3_raycast",
+    "gate_summary": "logs/find_tree/candidate_search_f3_raycast_terrain_route_drop_completion_v9_6_16800_20_gate_v1.summary.json",
+    "gate_passed": true,
+    "behaviour_changed": false
+  },
+  "hybrid_boundary": {
+    "learnable_states": [
+      "CENTER_TRUNK",
+      "ADJUST_PITCH",
+      "ATTACK_TRUNK"
+    ],
+    "scripted_states": [
+      "APPROACH_REGION",
+      "COORDINATE_AIM",
+      "COORDINATE_RECOVER",
+      "POST_RECOVERY_VERIFY",
+      "COORDINATE_REPLAN",
+      "EXACT_LOG_RESCAN",
+      "FIND_TRUNK",
+      "CLEAR_OCCLUSION",
+      "BLOCK_DISAPPEARED",
+      "DROP_RECOVERY",
+      "REACQUIRE_SAME_TRUNK",
+      "COLLECT_DROP",
+      "VERIFY_PROGRESS",
+      "BACKOFF",
+      "ORBIT_REACQUIRE",
+      "SUCCESS",
+      "REPLAN"
+    ],
+    "routing_rule": "student eligibility requires both the pre-decision and post-decision state to be learnable and the teacher action to be in the reduced action vocabulary",
+    "transition_safety": "any transition entering or leaving a scripted state executes the teacher action",
+    "student_fallback_inside_learned_boundary": false
+  },
+  "model": {
+    "type": "linear_softmax",
+    "feature_size": 10,
+    "frame_stack": 4,
+    "include_centre_pixels": false,
+    "mirror_augmentation": true,
+    "action_classes": [0, 1, 7, 10, 11, 12, 13],
+    "action_meanings": [
+      "noop",
+      "forward",
+      "attack",
+      "fine_turn_left",
+      "fine_turn_right",
+      "fine_look_up",
+      "fine_look_down"
+    ]
+  },
+  "student_input_manifest": [
+    "pov_frame_stack_4",
+    "previous_action_one_hot_14"
+  ],
+  "student_forbidden_inputs": [
+    "raycast",
+    "exact_log_xyz",
+    "log_grid",
+    "oracle_distance",
+    "target_coordinates",
+    "item_entity_coordinates",
+    "teacher_contact_state_as_model_feature"
+  ],
+  "dataset_selection": {
+    "successful_episodes_only": true,
+    "teacher_state_usage": "routing/sample-selection audit only; never a model feature",
+    "formal_required_audits": [
+      "audit_decision_contact_state",
+      "audit_resulting_contact_state"
+    ],
+    "v1_data": "diagnostic smoke only because it contains only the post-decision state",
+    "v1_validation_17000_17019": "burned development set; not an independent model-selection or final holdout claim"
+  },
+  "seed_isolation": {
+    "banned_development_and_teacher_gate": "16500-16819",
+    "v1_train_burned": "16900-16979",
+    "v1_development_burned": "17000-17019",
+    "v2_formal_train": "17300-17379",
+    "v2_formal_validation": "17400-17419",
+    "shadow_reserved_untouched": "17100-17119",
+    "autonomous_holdout_reserved_untouched": "17200-17219"
+  },
+  "coverage_gate": {
+    "train_visual_samples_at_least": 500,
+    "validation_visual_samples_at_least": 100,
+    "validation_success_seeds_at_least": 10,
+    "required_actions": [7, 10, 11, 12, 13],
+    "required_action_train_samples_each_at_least": 20,
+    "required_action_validation_samples_each_at_least": 5
+  },
+  "offline_gate": {
+    "validation_loss_relative_improvement_at_least": 0.2,
+    "balanced_accuracy_at_least": 0.7,
+    "attack_precision_at_least": 0.9,
+    "attack_recall_at_least": 0.8,
+    "fine_yaw_direction_agreement_at_least": 0.85,
+    "fine_pitch_direction_agreement_at_least": 0.8,
+    "finite_weights_required": true,
+    "checkpoint_reload_consistency_required": true,
+    "privileged_model_inputs_required": 0,
+    "passed": false
+  },
+  "gate_status": {
+    "implementation_complete": true,
+    "collector_transition_audit_complete": true,
+    "formal_v2_collection_complete": false,
+    "training_started": false,
+    "offline_gate_passed": false,
+    "shadow_gate_passed": false,
+    "student_holdout_passed": false,
+    "next_stage_rl_authorized": false
+  }
+}

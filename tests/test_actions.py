@@ -41,6 +41,10 @@ def test_camera_order_and_directions_are_pitch_then_yaw():
     np.testing.assert_array_equal(discrete_action_to_minerl(4, env)["camera"], [0, 10])
     np.testing.assert_array_equal(discrete_action_to_minerl(5, env)["camera"], [-10, 0])
     np.testing.assert_array_equal(discrete_action_to_minerl(6, env)["camera"], [10, 0])
+    np.testing.assert_array_equal(discrete_action_to_minerl(10, env)["camera"], [0, -5])
+    np.testing.assert_array_equal(discrete_action_to_minerl(11, env)["camera"], [0, 5])
+    np.testing.assert_array_equal(discrete_action_to_minerl(12, env)["camera"], [-5, 0])
+    np.testing.assert_array_equal(discrete_action_to_minerl(13, env)["camera"], [5, 0])
 
 
 def test_invalid_discrete_action_is_rejected():

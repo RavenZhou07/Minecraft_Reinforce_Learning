@@ -1,0 +1,87 @@
+{
+  "profile": "raycast_owned_handoff_v9_8",
+  "purpose": "Reduce v9.7 upstream time loss by letting exact episode raycast memory own handoff and coarse routing while rejecting visual-only contact ownership",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "trace_guided_drop_recovery_v9_7",
+  "frozen_boundary": {
+    "v9_7_contact_config_identical": true,
+    "require_raycast_handoff_confirmation_default": false,
+    "all_v9_8_behaviour_profile_gated": true
+  },
+  "diagnostics": {
+    "step_fields": [
+      "search_state",
+      "remaining_steps",
+      "selected_candidate_id",
+      "candidate_count",
+      "route_distance",
+      "route_yaw_error",
+      "scan_cycles",
+      "replan_count",
+      "handoff_rejections",
+      "raycast_memory_route_selections",
+      "terrain_route_recovery_steps"
+    ],
+    "source_seeds": [17500, 17509, 17511, 17513, 17515],
+    "v9_7_replay_result": "1/5",
+    "v9_7_replay_summary": "logs/find_tree/natural_treechop_v9_8_upstream_diagnostic_failures5.summary.json",
+    "finding": "The successful episode used raycast ownership and no exact rescan. All four failures used one or more visual handoffs; five fixed 40-step exact scans failed in total. Exact log coordinates were nevertheless present in episode memory."
+  },
+  "implemented_behaviour": {
+    "visual_trunk_can_guide_navigation": true,
+    "visual_trunk_can_own_contact": false,
+    "current_exact_log_raycast_can_own_contact": true,
+    "reachable_remembered_log_raycast_can_own_contact": true,
+    "nearest_remembered_exact_log_can_override_noisy_visual_coarse_route": true,
+    "remembered_target_contact_radius_unchanged": 14.0,
+    "episode_max_steps_unchanged": 300,
+    "no_new_oracle_or_log_grid_input": true
+  },
+  "iteration_results": [
+    {
+      "name": "current-raycast-only handoff",
+      "result": "1/5",
+      "summary": "logs/find_tree/natural_treechop_v9_8_raycast_handoff_smoke_failures5.summary.json",
+      "decision": "insufficient; it prevented false contact but left scan-verified coordinates unused after the crosshair moved"
+    },
+    {
+      "name": "reachable raycast-memory handoff",
+      "result": "1/5",
+      "summary": "logs/find_tree/natural_treechop_v9_8_raycast_memory_smoke_failures5.summary.json",
+      "decision": "insufficient; three failure targets remained beyond the unchanged 14-block contact boundary"
+    },
+    {
+      "name": "exact raycast-memory coarse route plus bounded handoff",
+      "result": "2/5",
+      "successes": [17500, 17515],
+      "failures": [17509, 17511, 17513],
+      "summary": "logs/find_tree/natural_treechop_v9_8_exact_route_smoke_failures5.summary.json",
+      "decision": "retained as experimental because it rescued two stable failures, but promotion stopped because targeted smoke remained below a defensible teacher gate"
+    }
+  ],
+  "verification": {
+    "targeted_tests": "69 passed",
+    "full_tests": "253 passed, 2 skipped",
+    "contact_owner_mismatches": 0,
+    "privileged_student_input_accesses": 0
+  },
+  "teacher_gate": {
+    "new_seed_range_reserved": "17600-17619",
+    "run": false,
+    "gate_passed": false,
+    "reason": "The final targeted smoke was only 2/5. Running the formal 20 episodes would consume fresh seeds without adequate promotion evidence."
+  },
+  "remaining_failure_model": {
+    "17509": "the only exact log observation arrived near the episode end, so neither exact routing nor contact could begin in time",
+    "17511": "exact routing reached real contact, but coordinate approach/recovery and target switching consumed the remaining episode",
+    "17513": "a log was broken at step 67, but 72-step drop recovery failed around an elevated tree and later target attempts exhausted the episode"
+  },
+  "decision": {
+    "promote_teacher": false,
+    "start_bc_v2c_training": false,
+    "next_direction": "separate exact-target discovery coverage from coordinate-contact convergence and elevated drop recovery; do not tune the BC gate yet"
+  }
+}

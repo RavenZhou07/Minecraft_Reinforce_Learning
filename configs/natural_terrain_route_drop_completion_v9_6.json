@@ -1,0 +1,85 @@
+{
+  "profile": "terrain_route_drop_completion_v9_6",
+  "purpose": "Repair the three trace-verified v9.5 failure classes: coarse terrain routing, reachable local contact, and post-disappearance pickup",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "contact_ownership_spatial_guard_v9_5",
+  "frozen_boundary": {
+    "v9_5_defaults_unchanged": true,
+    "all_new_behaviours_gated_behind_v9_6_flags": true,
+    "reset_loop_budgets_on_rescan_success_default": false,
+    "enable_coordinate_climb_assist_default": false,
+    "drop_recovery_elevated_pickup_default": false,
+    "enable_terrain_route_recovery_default": false
+  },
+  "upstream_handoff": {
+    "contact_owner_lock": true,
+    "selected_candidate_must_match_contact_candidate": true,
+    "visual_handoff_requires_local_region": true,
+    "route_stall_alone_is_not_local_evidence": true,
+    "relocalize_on_in_region_route_stall_without_local_evidence": true,
+    "raycast_log_handoff_max_distance": 14.0
+  },
+  "exact_log_rescan": {
+    "budget": 40,
+    "max_attempts_per_candidate": 1,
+    "failed_region_radius": 8.0,
+    "failed_regions_persist_for_episode": true,
+    "v9_6_reset_loop_budgets_on_success": true
+  },
+  "terrain_route_recovery": {
+    "progress_window_forward_steps": 10,
+    "progress_minimum_blocks": 0.5,
+    "climb_burst_steps": 6,
+    "max_attempts_per_candidate": 6,
+    "consecutive_failure_limit": 2,
+    "success_requires_route_distance_reduction": 0.5,
+    "blocked_region_radius": 6.0,
+    "blocked_region_cooldown_steps": 45,
+    "episode_max_steps_unchanged": 300
+  },
+  "coordinate_climb_assist": {
+    "slow_progress_window": 8,
+    "slow_progress_minimum_blocks": 0.5,
+    "burst_steps": 6,
+    "max_bursts_per_target": 4,
+    "consecutive_failure_limit": 2,
+    "success_requires_distance_reduction": 0.4,
+    "strict_raycast_attack_confirmation_unchanged": true
+  },
+  "drop_recovery": {
+    "block_centre_normalization_from_v9_4": true,
+    "ordered_ring_from_v9_4": true,
+    "max_steps_unchanged": 72,
+    "no_item_entity_oracle_or_log_grid_inputs": true,
+    "elevated_vertical_gap_blocks": 1.2,
+    "elevated_arrival_radius": 1.8,
+    "elevated_jump_steps_per_waypoint": 8
+  },
+  "evaluation": {
+    "smoke_seeds": [16702, 16714, 16716, 16719],
+    "smoke_note": "development diagnostics on the v9.5 gate-v2 failure seeds; these seeds are burned for holdout purposes",
+    "smoke_result": "smoke v1: 3/4 (16702 success 258 steps with one successful terrain climb burst; 16714 failed at the cap after three bounded replan cycles but reached in-range attack, block disappearance, and a near-miss elevated pickup with 31 steps left; 16716 success 191 steps with one rescan-success loop reset and an elevated pickup; 16719 success 233 steps with eight elevated jumps); zero contact-owner mismatches in all four runs",
+    "smoke_summaries": [
+      "logs/find_tree/candidate_search_f3_raycast_terrain_route_drop_completion_v9_6_16702_1_smoke_v1.summary.json",
+      "logs/find_tree/candidate_search_f3_raycast_terrain_route_drop_completion_v9_6_16714_1_smoke_v1.summary.json",
+      "logs/find_tree/candidate_search_f3_raycast_terrain_route_drop_completion_v9_6_16716_1_smoke_v1.summary.json",
+      "logs/find_tree/candidate_search_f3_raycast_terrain_route_drop_completion_v9_6_16719_1_smoke_v1.summary.json"
+    ],
+    "training_gate_seeds": [16800, 16801, 16802, 16803, 16804, 16805, 16806, 16807, 16808, 16809, 16810, 16811, 16812, 16813, 16814, 16815, 16816, 16817, 16818, 16819],
+    "training_gate": "at least 18/20 success, at most two 300-step failures, at least one success after coordinate recovery, contact owner mismatches zero, and no oracle or log grid used for actions or scoring",
+    "training_gate_result": "formal unseen gate v1: 18/20, Wilson 95% 69.9%-97.2%, mean 140.35, median 111, two 300-step failures (16805 post-disappearance pickup with a 4.5-block vertical gap; 16812 budget exhaustion after a failed first exact rescan), zero contact-owner mismatches, three successes after coordinate recovery",
+    "training_gate_summary": "logs/find_tree/candidate_search_f3_raycast_terrain_route_drop_completion_v9_6_16800_20_gate_v1.summary.json",
+    "gate_passed": true,
+    "training_started": false
+  },
+  "failure_model": {
+    "16702": "coarse terrain routing: plain forward cannot climb one-block staircases, two obstacle recoveries per candidate then replan-rescan exhausted the 300-step budget before any contact",
+    "16714": "reachable local contact: premature visual handoff paid a failed 40-step exact rescan, then the remembered 3-D log sat 6-13 blocks away uphill with no climb assistance in coordinate aim",
+    "16716": "exact-rescan success was discarded one step later by a stale centring-loop budget, wasting the first tree attempt; the remaining ten steps were too few for pickup of a drop 2.5 blocks above the player",
+    "16719": "post-disappearance pickup: the drop rested 3.5 blocks above the player on a lower trunk block; the 2-D ring planner burned 66 blocked waypoints without jumping under the block column"
+  },
+  "note": "Independent v9.6 profile. v9.5 and older profiles remain frozen; every new mechanism defaults to disabled and is enabled only by this profile."
+}

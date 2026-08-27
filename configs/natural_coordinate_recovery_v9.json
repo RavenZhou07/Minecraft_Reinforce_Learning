@@ -1,0 +1,40 @@
+{
+  "profile": "coordinate_recovery",
+  "purpose": "Reachability-ranked 3-D log targets with translation progress and bounded recovery",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "contact": {
+    "enable_clear_occlusion": true,
+    "enable_drop_recovery": true,
+    "enable_coordinate_aim": true,
+    "enable_coordinate_recovery": true,
+    "coordinate_progress_window": 12,
+    "coordinate_minimum_progress": 0.35,
+    "coordinate_max_recoveries_per_target": 1,
+    "coordinate_recovery_backward_steps": 3,
+    "coordinate_recovery_turn_steps": 2,
+    "coordinate_recovery_jump_steps": 4,
+    "coordinate_target_cooldown_steps": 45,
+    "coordinate_hint_distance_weight": 2.0,
+    "coordinate_horizontal_distance_weight": 0.12,
+    "coordinate_vertical_distance_weight": 0.9,
+    "coordinate_reach_excess_weight": 0.35,
+    "coordinate_failure_weight": 2.0,
+    "coordinate_observation_weight": 0.05,
+    "coordinate_attack_reach": 4.0,
+    "region_max_steps": 140
+  },
+  "evaluation": {
+    "smoke_seeds": [16500, 16501, 16502],
+    "fixed_evaluation_seeds": [16600, 16601, 16602, 16603, 16604, 16605, 16606, 16607, 16608, 16609],
+    "stability_gate": "at least 9/10 success and zero 300-step failures before local BC training",
+    "smoke_result": "2/3, mean 167.3, median 108",
+    "fixed_result": "6/10, Wilson 95% 31.3%-83.2%, mean 180.2, median 150",
+    "fixed_summary": "logs/find_tree/candidate_search_f3_raycast_coordinate_recovery_16600_10_diag_v8.summary.json",
+    "gate_passed": false,
+    "training_started": false
+  },
+  "note": "Privileged teacher only: raycast log XYZ participates in local target ranking and actions."
+}

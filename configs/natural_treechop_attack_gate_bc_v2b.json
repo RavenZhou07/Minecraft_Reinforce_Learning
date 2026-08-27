@@ -1,0 +1,179 @@
+{
+  "profile": "natural_treechop_attack_gate_bc_v2b",
+  "status": "shadow_gate_failed",
+  "checkpoint": "checkpoints/natural_treechop_attack_gate_bc_v2b_experimental.npz",
+  "training_summary": "logs/find_tree/natural_treechop_attack_gate_bc_v2b_training.summary.json",
+  "decision_threshold": 0.97,
+  "attack_confirmation_frames": 2,
+  "student_input_manifest": [
+    "pov_frame_stack_4",
+    "previous_action_one_hot_14"
+  ],
+  "student_forbidden_inputs": [
+    "raycast",
+    "telemetry",
+    "exact_log_xyz",
+    "log_grid",
+    "target_coordinates",
+    "teacher_contact_state_as_model_feature"
+  ],
+  "dataset": {
+    "base_train": "logs\\find_tree\\natural_treechop_bc_v1_train_16900_80.npz",
+    "base_validation": "logs\\find_tree\\natural_treechop_bc_v1_validation_17000_20.npz",
+    "targeted_diagnostic": "logs\\find_tree\\natural_treechop_attack_gate_bc_v2a_diagnostics_17100_20.npz",
+    "hashes": {
+      "base_train": "fb62faf6f48a1180fe2ebd50f5f8c558688d0feabc665df68e9d75eb40ccae13",
+      "base_validation": "d580d2b4f343ad2c8299d982f7346b6fa0b2d284bda2e745e463be424ef0f679",
+      "targeted_diagnostic": "f8d45994f96cfe4e84aa2c6de20d7b66f71e6e0a368a5cb585be745fec8e4555"
+    },
+    "base_train_selection": {
+      "total_contact_samples": 6053,
+      "selected_successful_gate_samples": 2793,
+      "excluded_samples": 3260,
+      "hold_samples": 1880,
+      "attack_samples": 913,
+      "contact_state_counts": {
+        "ATTACK_TRUNK": 913,
+        "CENTER_TRUNK": 10,
+        "COORDINATE_AIM": 1870
+      },
+      "attack_label_raycast_audit": {
+        "positive_samples": 913,
+        "raycast_log_fraction": 1.0,
+        "raycast_in_range_fraction": 1.0
+      }
+    },
+    "base_validation_selection": {
+      "total_contact_samples": 1524,
+      "selected_successful_gate_samples": 372,
+      "excluded_samples": 1152,
+      "hold_samples": 208,
+      "attack_samples": 164,
+      "contact_state_counts": {
+        "ATTACK_TRUNK": 164,
+        "COORDINATE_AIM": 208
+      },
+      "attack_label_raycast_audit": {
+        "positive_samples": 164,
+        "raycast_log_fraction": 1.0,
+        "raycast_in_range_fraction": 1.0
+      }
+    },
+    "targeted_split": {
+      "training_seeds": [
+        17100,
+        17101,
+        17103,
+        17104,
+        17105,
+        17106,
+        17108,
+        17110
+      ],
+      "calibration_seeds": [
+        17111,
+        17112,
+        17113,
+        17114,
+        17115,
+        17117,
+        17118,
+        17119
+      ],
+      "training_samples": 229,
+      "calibration_samples": 299
+    }
+  },
+  "offline_gate": {
+    "coverage_gate_passed": true,
+    "calibration_threshold_meets_joint_targets": true,
+    "validation_loss_improvement_at_least_20_percent": true,
+    "targeted_balanced_accuracy_at_least_80_percent": true,
+    "targeted_attack_precision_at_least_97_percent": true,
+    "targeted_attack_recall_at_least_75_percent": true,
+    "targeted_false_positive_rate_at_most_2_percent": true,
+    "finite_weights": true,
+    "checkpoint_reload_consistent": true,
+    "privileged_model_inputs_zero": true,
+    "all_conditions_met": true
+  },
+  "legacy_regression_warning": {
+    "base_validation_balanced_accuracy": 0.7567424953,
+    "base_validation_attack_recall": 0.5182926829,
+    "formal_gate_effect": "warning_only",
+    "reason": "17000-17019 is a reused v2a development set and lacks complete gate-eligible rows for faithful temporal replay"
+  },
+  "seed_isolation": {
+    "consumed_diagnostic": {
+      "training_seeds": [
+        17100,
+        17101,
+        17103,
+        17104,
+        17105,
+        17106,
+        17108,
+        17110
+      ],
+      "calibration_seeds": [
+        17111,
+        17112,
+        17113,
+        17114,
+        17115,
+        17117,
+        17118,
+        17119
+      ],
+      "training_samples": 229,
+      "calibration_samples": 299
+    },
+    "autonomous_holdout_reserved_not_used": "17200-17219",
+    "formal_shadow_consumed": "17400-17419"
+  },
+  "shadow_evaluation": {
+    "status": "failed",
+    "summary": "logs/find_tree/natural_treechop_attack_gate_bc_v2b_shadow_17400_20.summary.json",
+    "diagnostic_dataset": "logs/find_tree/natural_treechop_attack_gate_bc_v2b_shadow_17400_20.npz",
+    "seed_range": "17400-17419",
+    "teacher_successes": 13,
+    "teacher_successes_required": 15,
+    "gate_samples": 978,
+    "raw_agreement": {
+      "balanced_accuracy": 0.7856498276,
+      "attack_precision": 0.9275362319,
+      "attack_recall": 0.5844748858,
+      "false_positive_rate": 0.0131752306,
+      "false_positive": 10,
+      "false_negative": 91
+    },
+    "confirmed_agreement": {
+      "balanced_accuracy": 0.7566282239,
+      "attack_precision": 0.9274193548,
+      "attack_recall": 0.5251141553,
+      "false_positive_rate": 0.0118577075,
+      "false_positive": 9,
+      "false_negative": 104
+    },
+    "failure_layering": {
+      "upstream_no_gate": [17409],
+      "contact_or_completion_after_gate": [17404, 17407, 17412, 17413, 17415, 17418]
+    },
+    "contact_owner_mismatches": 0,
+    "privileged_student_input_accesses": 0,
+    "permissions_applied": 0,
+    "all_conditions_met": false
+  },
+  "runtime_safety_fix": {
+    "external_permission_checked_only_after_teacher_attack_opportunity": true,
+    "default_v9_6_path_changed": false,
+    "reason": "non-opportunity raycast-loss frames must not accumulate student rejection streaks"
+  },
+  "gate_status": {
+    "implementation_complete": true,
+    "offline_gate_passed": true,
+    "new_shadow_gate_passed": false,
+    "autonomous_smoke_passed": false,
+    "next_stage_rl_authorized": false
+  }
+}

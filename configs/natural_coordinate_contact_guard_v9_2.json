@@ -1,0 +1,45 @@
+{
+  "profile": "coordinate_contact_guard_v9_2",
+  "purpose": "Bounded exact-log reacquisition and strict privileged attack confirmation",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "coordinate_recovery_v9_1",
+  "contact": {
+    "enable_exact_log_rescan": true,
+    "require_raycast_attack_confirmation": true,
+    "exact_log_rescan_budget": 40,
+    "exact_log_rescan_max_attempts_per_candidate": 1,
+    "exact_log_rescan_loop_budget": 3,
+    "coordinate_maximum_horizontal_selection_distance": 14.0,
+    "coordinate_hint_distance_weight": 0.05,
+    "coordinate_horizontal_distance_weight": 1.0,
+    "coordinate_vertical_distance_weight": 1.25,
+    "coordinate_reach_excess_weight": 2.0,
+    "coordinate_failure_weight": 2.0,
+    "coordinate_recovery_weight": 3.0,
+    "coordinate_observation_weight": 0.1,
+    "drop_recovery_centre_max_steps": 24,
+    "drop_recovery_max_steps": 72,
+    "drop_recovery_contact_extension_steps": 72,
+    "region_max_steps": 140
+  },
+  "evaluation": {
+    "smoke_seeds": [16500, 16501, 16502],
+    "fixed_evaluation_seeds": [16600, 16601, 16602, 16603, 16604, 16605, 16606, 16607, 16608, 16609],
+    "stability_gate": "at least 9/10 success, zero 300-step failures, and at least one success after coordinate recovery",
+    "smoke_result": "3/3, Wilson 95% 43.9%-100%, mean 169.7, median 127, zero 300-step failures; one exact-log rescan succeeded after 26 actions",
+    "smoke_summary": "logs/find_tree/candidate_search_f3_raycast_coordinate_contact_guard_v9_2_16500_3_smoke_v2.summary.json",
+    "fixed_result": "8/10, Wilson 95% 49.0%-94.3%, mean 145.1, median 107.5, two 300-step failures; 8/8 success after in-range contact, five exact-log rescans all exhausted",
+    "fixed_summary": "logs/find_tree/candidate_search_f3_raycast_coordinate_contact_guard_v9_2_16600_10_fixed_v1.summary.json",
+    "gate_passed": false,
+    "training_started": false
+  },
+  "failure_analysis": {
+    "16601": "Only remembered log was 32.6 horizontal blocks away; two bounded local rescans found no eligible point.",
+    "16604": "Only remembered log was 24.0 horizontal blocks away and about 10.5 blocks above eye level; three bounded local rescans found no eligible point and emitted zero attack actions.",
+    "remaining_bottleneck": "Upstream candidate localization and route handoff can enter a region containing no local log; local contact scanning cannot repair a wrong region."
+  },
+  "note": "Privileged teacher only. The local crosshair raycast may acquire exact log XYZ and confirm attack reach; oracle distance and log grids remain excluded. The scan adds no episode or contact timeout extension. No BC or RL training was started because the fixed gate failed."
+}

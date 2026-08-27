@@ -1,0 +1,70 @@
+{
+  "profile": "emergency_target_preemption_v9_11",
+  "purpose": "Allow a failed coordinate recovery to yield promptly to one newly visible lower, reachable, score-improving exact log without weakening ordinary aim stability",
+  "sensor_profile": "f3_raycast",
+  "environment": "MineRLTreechopF3RaycastLocal-v0",
+  "one_log_success": true,
+  "max_steps": 300,
+  "inherits": "coordinate_target_preemption_v9_10",
+  "frozen_boundary": {
+    "v9_10_source_unchanged": true,
+    "all_v9_10_values_identical_except_emergency_switch": true,
+    "ordinary_coordinate_aim_still_requires_three_observations": true,
+    "all_v9_11_behaviour_profile_gated": true
+  },
+  "emergency_preemption": {
+    "allowed_state": "POST_RECOVERY_VERIFY",
+    "current_target_minimum_recovery_attempts": 1,
+    "minimum_new_target_observations": 1,
+    "minimum_vertical_drop": 0.75,
+    "minimum_score_gain": 0.0,
+    "candidate_must_be_within_existing_14_block_selection_limit": true,
+    "failed_old_target_enters_cooldown": true,
+    "recovery_verification_ends_immediately": true
+  },
+  "source_trace": {
+    "seed": 17509,
+    "summary": "logs/find_tree/natural_treechop_v9_10_verify_preemption_smoke_failures5.summary.json",
+    "preemption_checks": 95,
+    "support_rejections": 81,
+    "finding": "The better lower target did not accumulate the globally required three observations before ordinary switching at step 291."
+  },
+  "promotion_protocol": {
+    "targeted_seeds": [17500, 17509, 17511, 17513, 17515],
+    "targeted_smoke_minimum": "4/5",
+    "formal_gate_seed_range": "17600-17619",
+    "formal_gate_threshold": "at least 18/20 with at most 2 max-step failures",
+    "formal_gate_run_only_after_targeted_smoke": true
+  },
+  "verification": {
+    "targeted_tests": "80 passed",
+    "full_tests": "271 passed, 2 skipped",
+    "targeted_smoke": {
+      "result": "3/5",
+      "successes": [17511, 17513, 17515],
+      "failures": [17500, 17509],
+      "summary": "logs/find_tree/natural_treechop_v9_11_emergency_preemption_smoke_failures5.summary.json",
+      "contact_owner_mismatches": 0,
+      "privileged_student_input_accesses": 0
+    }
+  },
+  "decision": {
+    "promote_teacher": false,
+    "run_formal_gate_17600_17619": false,
+    "reason": "Targeted smoke remained 3/5, below the predeclared 4/5 threshold.",
+    "validated_repair": {
+      "seed": 17509,
+      "emergency_preemption_step": 265,
+      "score_gain": 6.67,
+      "vertical_drop": 1.56,
+      "previous_ordinary_switch_step": 291,
+      "first_attack_step": 293,
+      "second_attack_step": 299
+    },
+    "remaining_failure": {
+      "17500": "Exact contact began only at step 251 and the episode lacked budget for verified recovery.",
+      "17509": "Emergency target switching succeeded, but a one-frame reach loss entered the visual CENTER/ADJUST loop; exact coordinate aim reacquired attack only at step 299."
+    },
+    "next_direction": "Freeze v9.11. In a new profile, when an exact-coordinate attack loses reach without movement, return directly to coordinate aim with a bounded exact-target reacquire instead of entering the visual CENTER_TRUNK and ADJUST_PITCH loop."
+  }
+}
