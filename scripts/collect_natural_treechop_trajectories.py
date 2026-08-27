@@ -140,7 +140,6 @@ def main():
             env.seed(seed)
             observation = env.reset()
             legal_adapter = LegalObservationAdapter(args.max_steps)
-            legal_adapter.reset(observation)
             teacher = make_bootstrap_teacher(args.max_steps, args.contact_profile)
             teacher.reset(episode=episode_index)
             previous_action = 0

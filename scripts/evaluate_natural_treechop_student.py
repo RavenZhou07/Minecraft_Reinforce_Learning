@@ -171,8 +171,7 @@ def main():
             first_in_range = None
             first_interaction = None
             inferred_break = None
-            consecutive_valid_attacks = 0
-            previously_valid_attack = False
+            sustained_valid_attacks = 0
             episode_dagger_indices: List[int] = []
             episode_started = time.perf_counter()
             while not done:
@@ -193,18 +192,15 @@ def main():
                 if first_interaction is None and student_action in (7, 8) and is_log and in_range:
                     first_interaction = step
                 valid_attack = student_action in (7, 8) and is_log and in_range
-                consecutive_valid_attacks = consecutive_valid_attacks + 1 if valid_attack else 0
+                if valid_attack:
+                    sustained_valid_attacks += 1
                 if (
                     inferred_break is None
-                    and previously_valid_attack
+                    and sustained_valid_attacks >= 5
                     and not is_log
-                    and consecutive_valid_attacks == 0
                     and first_interaction is not None
                 ):
                     inferred_break = step
-                previously_valid_attack = valid_attack or (
-                    previously_valid_attack and consecutive_valid_attacks > 0
-                )
                 if args.mode == "dagger":
                     index = len(dagger["action"])
                     episode_dagger_indices.append(index)

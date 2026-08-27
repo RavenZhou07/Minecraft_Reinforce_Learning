@@ -2,19 +2,26 @@
 
 [简体中文](README.zh-CN.md) | English
 
-An intentionally small and inspectable Minecraft research project for resource
-search, candidate memory, recovery, and replanning. It targets the legacy
-MineRL/Malmo stack and favors explicit wrappers and state machines over a large
-end-to-end reinforcement-learning framework.
+An inspectable Minecraft learning project whose long-term goal is autonomous
+survival and completion. Natural Treechop is the first learning milestone, not
+the final product. The repository now contains a strict legal-observation
+adapter, complete teacher-trajectory collection, end-to-end behaviour cloning,
+autonomous learned-policy rollout, and limited DAgger data aggregation on the
+legacy MineRL/Malmo stack.
 
 The current curriculum asks an agent to locate the initially nearest tree among
 visually identical distractors. The policy scans the full scene, builds an
 object-centric candidate map, selects and approaches a target, monitors visual
 progress, and attempts recovery or replanning when progress stalls.
 
-> This repository does **not** contain DQN, PPO, an LLM agent, or a claim of
-> general Minecraft competence. Natural `MineRLTreechop-v0` evaluation remains
-> gated on reliable recovery from a deliberately wrong initial selection.
+> The current learned baseline is deliberately weak and is not a claim of
+> general Minecraft competence. The first honest autonomous result is 0/4;
+> every failure and timeout is retained. Teacher state machines are bootstrap
+> infrastructure and do not execute actions for the autonomous student.
+
+See [`docs/learning_architecture.md`](docs/learning_architecture.md) for the
+observation boundary and [`docs/checkpoint_2026-08-27_learning_round1.md`](docs/checkpoint_2026-08-27_learning_round1.md)
+for the first end-to-end learning checkpoint.
 
 ## Current status
 
@@ -196,4 +203,3 @@ checkpoints/find_tree_visual_distance3_10_stack4.npz
 
 No open-source license has been selected. Add an explicit license before public
 release; until then, normal copyright restrictions apply.
-
