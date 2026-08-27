@@ -1,0 +1,40 @@
+{
+  "profile": "exp04a_e2e_bc_no_phase",
+  "model": {
+    "feature_size": 6,
+    "frame_stack": 4,
+    "action_history": 8,
+    "use_phase_head": false,
+    "epochs": 250,
+    "learning_rate": 0.03,
+    "l2": 0.001,
+    "patience": 35,
+    "class_weight_power": 0.5,
+    "include_failure_teacher": false
+  },
+  "student_input_manifest": [
+    "pov_frame_stack_4",
+    "legal_player_state_vector_16",
+    "causal_action_history_8_one_hot_14"
+  ],
+  "train_only_privileged_supervision": [
+    "audit_coarse_phase"
+  ],
+  "forbidden_student_inputs": [
+    "raycast",
+    "tree_xyz",
+    "target_vector",
+    "log_grid",
+    "teacher_phase_label",
+    "teacher_candidate_list",
+    "reachability"
+  ],
+  "seed_manifest": "configs/seeds/natural_treechop_v1.json",
+  "datasets": {
+    "train": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "validation": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+  },
+  "checkpoint": "checkpoints/natural_treechop_e2e_bc_no_phase_exp04a.npz",
+  "checkpoint_sha256": "9ce88e5e1c0a7861f54d727858e8c10a1b1a211d90e18a53d7bf06da320478a8",
+  "training_summary": "logs/learning/e2e_bc_no_phase_exp04a.summary.json"
+}
