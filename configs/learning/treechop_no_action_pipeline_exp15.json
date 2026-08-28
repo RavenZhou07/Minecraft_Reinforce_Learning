@@ -1,0 +1,45 @@
+{
+  "pipeline_id": "treechop_no_action_bounded_pipeline_exp15",
+  "predeclared_utc": "2026-08-28T16:02:47Z",
+  "repository_head": "7c959f7ca3c6f624c463d72aa196904bce85c720",
+  "state_machine": [
+    "PRECHECK",
+    "MULTI_CAPACITY",
+    "FORMAL_TRAIN_SEED29",
+    "RECORDED_REPLAY",
+    "AUTONOMOUS_SEED29",
+    "CONDITIONAL_REPLICATION",
+    "FINAL_DECISION"
+  ],
+  "stage_configs": {
+    "MULTI_CAPACITY": "configs/learning/no_action_multi_capacity_exp15.json",
+    "FORMAL_TRAIN_SEED29": "configs/learning/no_action_formal_seed29_exp16.json",
+    "CONDITIONAL_REPLICATION": "configs/learning/no_action_replication_exp17.json"
+  },
+  "training_budget": {
+    "capacity_models": 1,
+    "formal_models": 3,
+    "formal_seeds": [29, 11, 47]
+  },
+  "automatic_progression": true,
+  "resume": true,
+  "protected_splits": ["student_holdout", "final_test"],
+  "human_boundary": [
+    "new_teacher_trajectory_collection",
+    "dataset_expansion",
+    "observation_change",
+    "teacher_change",
+    "DAgger2",
+    "PPO",
+    "student_holdout",
+    "final_test",
+    "checkpoint_promotion"
+  ],
+  "pipeline_artifacts": {
+    "state": "artifacts/pipeline/pipeline_state.json",
+    "history": "artifacts/pipeline/stage_history.jsonl",
+    "decision": "artifacts/pipeline/current_decision.json",
+    "failure": "artifacts/pipeline/failure.json",
+    "report": "reports/bounded_no_action_pipeline.md"
+  }
+}

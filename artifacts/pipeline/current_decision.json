@@ -1,0 +1,6 @@
+{
+  "classification": "correctness_or_predeclared_gate_blocked",
+  "exactly_one_recommendation": "Repair only the reported correctness/provenance failure, then resume the same frozen pipeline; do not substitute another intervention.",
+  "protected_splits_accessed": false,
+  "promotion": "none"
+}

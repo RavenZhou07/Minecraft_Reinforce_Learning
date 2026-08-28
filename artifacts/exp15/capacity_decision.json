@@ -1,0 +1,8 @@
+{
+  "classification": "multi_trajectory_capacity_supported",
+  "first_passing_epoch": 206,
+  "training_epochs": 206,
+  "reload_exact": true,
+  "invariance_passed": true,
+  "next_state": "FORMAL_TRAIN_SEED29"
+}

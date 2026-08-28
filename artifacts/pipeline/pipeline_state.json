@@ -1,0 +1,11 @@
+{
+  "pipeline_id": "treechop_no_action_bounded_pipeline_exp15",
+  "status": "RUNNING",
+  "next_state": "FORMAL_TRAIN_SEED29",
+  "completed_stages": [
+    "PRECHECK",
+    "MULTI_CAPACITY"
+  ],
+  "training_runs": 1,
+  "autonomous_episodes": 0
+}

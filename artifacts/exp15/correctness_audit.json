@@ -1,0 +1,14 @@
+{
+  "start_plus_14_token_mutation_invariance": true,
+  "complete_sequence_mutation_invariance": true,
+  "zero_slot_exact_zero": true,
+  "no_serialized_or_trainable_action_embedding": true,
+  "episode_local_hidden_reset": true,
+  "causal_sequence_alignment": true,
+  "padding_mask_correctness": true,
+  "privileged_array_absence": true,
+  "checkpoint_reload_infrastructure": true,
+  "test_summary": "307 passed, 2 skipped, 29 warnings in 43.78s",
+  "passed": true,
+  "protected_splits_accessed": false
+}

@@ -1,0 +1,82 @@
+{
+  "experiment_id": "exp16_no_action_formal_seed29",
+  "stage": "FORMAL_SEED29_AND_EVALUATION",
+  "predeclared_utc": "2026-08-28T16:02:47Z",
+  "repository_head": "7c959f7ca3c6f624c463d72aa196904bce85c720",
+  "previous_action_mode": "disabled_zero",
+  "datasets": {
+    "train": {
+      "path": "logs/learning/e2e_bc_train_18200_8.npz",
+      "sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+      "samples": 1324,
+      "seeds": [18200, 18201, 18203, 18204, 18205, 18206, 18207]
+    },
+    "validation": {
+      "path": "logs/learning/e2e_bc_validation_18300_4.npz",
+      "sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368",
+      "samples": 534,
+      "seeds": [18302, 18303]
+    }
+  },
+  "architecture": {
+    "spatial_embedding": 96,
+    "scalar_embedding": 32,
+    "disabled_zero_slot_width": 16,
+    "gru_input_width": 144,
+    "hidden_size": 128,
+    "action_count": 14
+  },
+  "training": {
+    "training_seed": 29,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size_episodes": 2,
+    "class_weight_power": 0.5,
+    "gradient_clip": 1.0,
+    "minimum_recorded_horizon": 60,
+    "maximum_epochs": 180,
+    "validation_ce_patience_after_minimum_horizon": 30,
+    "checkpoint_selection": "minimum_validation_cross_entropy_within_single_run",
+    "policy_training_runs": 1,
+    "offline_performance_gate": false
+  },
+  "recorded_replay": {
+    "history_modes": ["teacher_previous_action", "model_predicted_previous_action", "all_start", "all_noop", "random_valid_action"],
+    "required_exact_outputs": ["hidden", "logits", "probabilities", "argmax"]
+  },
+  "autonomous": {
+    "split": "student_dev",
+    "seeds": [18500, 18501, 18502, 18503],
+    "maximum_steps": 500,
+    "action_selection": "deterministic_argmax",
+    "teacher_actions_executed": 0,
+    "privileged_actor_inputs": 0
+  },
+  "replication_gate": {
+    "maximum_pure_single_action_episodes": 1,
+    "minimum_median_action_transitions": 10,
+    "maximum_median_dominant_action_fraction_exclusive": 0.95,
+    "minimum_episodes_below_0_80_dominant_period_1_to_4_cycle": 3,
+    "alternative_progression_triggers": ["block_break", "pickup", "inventory_success"]
+  },
+  "outputs": {
+    "root": "artifacts/exp16",
+    "checkpoint": "artifacts/exp16/no_action_formal_seed29.pt",
+    "training_log": "artifacts/exp16/training_log.csv",
+    "training_summary": "artifacts/exp16/training_summary.json",
+    "epoch60_snapshot_metrics": "artifacts/exp16/epoch60_snapshot_metrics.json",
+    "initialization_audit": "artifacts/exp16/initialization_pairing_audit.json",
+    "dataset_hash_audit": "artifacts/exp16/dataset_hash_audit.json",
+    "selected_validation_metrics": "artifacts/exp16/selected_validation_metrics.json",
+    "per_action_recall": "artifacts/exp16/per_action_recall.csv",
+    "history_invariance": "artifacts/exp16/history_invariance_replay.json",
+    "recorded_replay_csv": "artifacts/exp16/recorded_observation_replay.csv",
+    "autonomous_summary": "artifacts/exp16/autonomous_summary.json",
+    "autonomous_episode_summary": "artifacts/exp16/autonomous_episode_summary.csv",
+    "periodic_cycle_summary": "artifacts/exp16/periodic_cycle_summary.csv",
+    "seed29_decision": "artifacts/exp16/seed29_decision.json"
+  },
+  "protected_splits": ["student_holdout", "final_test"],
+  "promotion": "none"
+}

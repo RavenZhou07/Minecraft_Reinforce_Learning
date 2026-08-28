@@ -1,0 +1,1336 @@
+..EE.E.................................................................. [ 23%]
+......................ss....................E..E.....................E.. [ 46%]
+...........EE...E..............E.............E.......................... [ 69%]
+........................................................................ [ 93%]
+..................E..                                                    [100%]
+=================================== ERRORS ====================================
+_______ ERROR at setup of test_live_and_standalone_replay_are_identical _______
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x0000027978C50B80>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_ ERROR at setup of test_selected_executed_action_mapping_and_previous_token_are_causal _
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x0000027941B179D0>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+____________ ERROR at setup of test_trace_serialization_round_trip ____________
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x00000279790BA430>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_ ERROR at setup of test_attack_gate_checkpoint_preserves_threshold_and_previous_action_vocab _
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x0000027906CAE3A0>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_ ERROR at setup of test_temporal_replay_requires_episode_steps_from_base_loader _
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x000002797B93BF70>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_____ ERROR at setup of test_checkpoint_save_load_reproduces_predictions ______
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x0000027906CAE4C0>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+__ ERROR at setup of test_v2_checkpoint_roundtrip_preserves_reduced_classes ___
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x0000027906DB5940>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_ ERROR at setup of test_v2_loader_rejects_legacy_dataset_without_explicit_diagnostic_flag _
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x000002797B93BF70>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_ ERROR at setup of test_end_to_end_policy_trains_and_reloads_without_privileged_inputs _
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x0000027911D58F70>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_ ERROR at setup of test_disabled_actor_has_no_action_embedding_parameter_or_checkpoint_dependency _
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x0000027906DB5160>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_ ERROR at setup of test_recurrent_checkpoint_reload_preserves_legal_manifest _
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x00000279790F5F70>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+_ ERROR at setup of test_linear_visual_policy_learns_spatial_target_direction _
+
+cls = <class '_pytest.runner.CallInfo'>
+func = <function call_and_report.<locals>.<lambda> at 0x0000027906DB5CA0>
+when = 'setup'
+reraise = (<class '_pytest.outcomes.Exit'>, <class 'KeyboardInterrupt'>)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -> CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        start = timing.time()
+        precise_start = timing.perf_counter()
+        try:
+>           result: TResult | None = func()
+
+..\.conda-env\lib\site-packages\_pytest\runner.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.conda-env\lib\site-packages\_pytest\runner.py:242: in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:90: in pytest_runtest_setup
+    yield from unraisable_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\unraisableexception.py:70: in unraisable_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\logging.py:840: in pytest_runtest_setup
+    yield from self._runtest_for(item, "setup")
+..\.conda-env\lib\site-packages\_pytest\logging.py:829: in _runtest_for
+    yield
+..\.conda-env\lib\site-packages\_pytest\capture.py:893: in pytest_runtest_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:87: in pytest_runtest_setup
+    yield from thread_exception_runtest_hook()
+..\.conda-env\lib\site-packages\_pytest\threadexception.py:68: in thread_exception_runtest_hook
+    yield
+..\.conda-env\lib\site-packages\_pytest\runner.py:160: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\.conda-env\lib\site-packages\_pytest\runner.py:514: in setup
+    col.setup()
+..\.conda-env\lib\site-packages\_pytest\python.py:1630: in setup
+    self._request._fillfixtures()
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:697: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:532: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:617: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1091: in execute
+    result = ihook.pytest_fixture_setup(fixturedef=self, request=request)
+..\.conda-env\lib\site-packages\pluggy\_hooks.py:513: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+..\.conda-env\lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+..\.conda-env\lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:1140: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+..\.conda-env\lib\site-packages\_pytest\fixtures.py:891: in call_fixture_func
+    fixture_result = next(generator)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:265: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:252: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+..\.conda-env\lib\site-packages\_pytest\tmpdir.py:187: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:407: in make_numbered_dir_with_cleanup
+    raise e
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:388: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:229: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:188: in extract_suffixes
+    for entry in iter:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/Ice/AppData/Local/Temp/pytest-of-Ice')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -> Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+>       for x in os.scandir(root):
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\Ice\\AppData\\Local\\Temp\\pytest-of-Ice'
+
+..\.conda-env\lib\site-packages\_pytest\pathlib.py:176: PermissionError
+============================== warnings summary ===============================
+tests/test_actions.py::test_actions_are_accepted_by_real_minerl_spaces[MineRLNavigateDense-v0]
+  F:\EtraCurricular_F\MCRL\.conda-env\lib\site-packages\gym\logger.py:34: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+    warnings.warn(colorize("%s: %s" % ("WARN", msg % args), "yellow"))
+
+tests/test_actions.py: 28 warnings
+  F:\EtraCurricular_F\MCRL\.conda-env\lib\site-packages\minerl\herobraine\hero\spaces.py:68: DeprecationWarning: space.noop() is being deprecated for space.no_op() in MineRL 1.0.0. Please change your code to reflect this change.
+    warnings.warn("space.noop() is being deprecated for space.no_op() in MineRL 1.0.0. "
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/runtime/test_recurrent_runtime_audit.py::test_live_and_standalone_replay_are_identical
+ERROR tests/runtime/test_recurrent_runtime_audit.py::test_selected_executed_action_mapping_and_previous_token_are_causal
+ERROR tests/runtime/test_recurrent_runtime_audit.py::test_trace_serialization_round_trip
+ERROR tests/test_natural_attack_gate_bc.py::test_attack_gate_checkpoint_preserves_threshold_and_previous_action_vocab
+ERROR tests/test_natural_attack_gate_bc_v2b.py::test_temporal_replay_requires_episode_steps_from_base_loader
+ERROR tests/test_natural_contact_bc.py::test_checkpoint_save_load_reproduces_predictions
+ERROR tests/test_natural_contact_bc_v2.py::test_v2_checkpoint_roundtrip_preserves_reduced_classes
+ERROR tests/test_natural_contact_bc_v2.py::test_v2_loader_rejects_legacy_dataset_without_explicit_diagnostic_flag
+ERROR tests/test_natural_treechop_bc.py::test_end_to_end_policy_trains_and_reloads_without_privileged_inputs
+ERROR tests/test_previous_action_disabled.py::test_disabled_actor_has_no_action_embedding_parameter_or_checkpoint_dependency
+ERROR tests/test_recurrent_treechop_bc.py::test_recurrent_checkpoint_reload_preserves_legal_manifest
+ERROR tests/test_vision.py::test_linear_visual_policy_learns_spatial_target_direction
+295 passed, 2 skipped, 29 warnings, 12 errors in 49.90s
+
+2026-08-28T16:19:34.172310+00:00 START F:\EtraCurricular_F\MCRL\.conda-env\python.exe -m pytest -q
+2026-08-28T16:20:25.614649+00:00 END exit=1
+........................................................................ [ 23%]
+......................ss................................................ [ 46%]
+........................................................................ [ 69%]
+........................................................................ [ 93%]
+.....................                                                    [100%]
+============================== warnings summary ===============================
+tests/test_actions.py::test_actions_are_accepted_by_real_minerl_spaces[MineRLNavigateDense-v0]
+  F:\EtraCurricular_F\MCRL\.conda-env\lib\site-packages\gym\logger.py:34: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+    warnings.warn(colorize("%s: %s" % ("WARN", msg % args), "yellow"))
+
+tests/test_actions.py: 28 warnings
+  F:\EtraCurricular_F\MCRL\.conda-env\lib\site-packages\minerl\herobraine\hero\spaces.py:68: DeprecationWarning: space.noop() is being deprecated for space.no_op() in MineRL 1.0.0. Please change your code to reflect this change.
+    warnings.warn("space.noop() is being deprecated for space.no_op() in MineRL 1.0.0. "
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+307 passed, 2 skipped, 29 warnings in 43.78s
+
+2026-08-28T16:21:14.762901+00:00 START F:\EtraCurricular_F\MCRL\.conda-env\python.exe -m pytest -q --basetemp=.pytest_tmp/exp15_precheck
+2026-08-28T16:22:00.085504+00:00 END exit=0

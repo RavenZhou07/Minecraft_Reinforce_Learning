@@ -1,0 +1,32 @@
+{
+  "checkpoint": "artifacts/exp15/first_passing_checkpoint.pt",
+  "checkpoint_sha256": "fa06e17b067e874028d2e1a022085d27876553eeaa13bda1bf5a814513cdd3f2",
+  "dataset": "logs/learning/e2e_bc_train_18200_8.npz",
+  "dataset_sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+  "seeds": [
+    18201,
+    18204,
+    18207
+  ],
+  "start_plus_14_token_outputs_exact": {
+    "combined": true,
+    "recurrent": true,
+    "next_hidden": true,
+    "logits": true,
+    "probabilities": true,
+    "argmax": true
+  },
+  "complete_sequence_outputs_exact": {
+    "combined": true,
+    "recurrent": true,
+    "next_hidden": true,
+    "logits": true,
+    "probabilities": true,
+    "argmax": true
+  },
+  "masked_loss_exact": true,
+  "shared_gradients_exact": true,
+  "max_abs_disabled_action_channel": 0.0,
+  "serialized_action_embedding_names": [],
+  "passed": true
+}

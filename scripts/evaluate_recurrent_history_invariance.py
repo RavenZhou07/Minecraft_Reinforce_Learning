@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--training-summary")
     parser.add_argument("--output-root", default="artifacts/exp13")
+    parser.add_argument("--invariance-output-name", default="zero_channel_invariance.json")
     return parser.parse_args()
 
 
@@ -96,7 +97,13 @@ def main() -> None:
         raise ValueError("history invariance evaluator requires disabled_zero")
     if set(config["protected_splits"]) != {"student_holdout", "final_test"}:
         raise PermissionError("protected split declaration changed")
-    validation = config["datasets"]["validation"]
+    datasets = config["datasets"]
+    validation = datasets.get("validation")
+    if validation is None:
+        validation = {
+            "path": datasets["validation_path"],
+            "sha256": datasets["validation_sha256"],
+        }
     validation_path = Path(validation["path"])
     if file_sha256(validation_path) != validation["sha256"]:
         raise RuntimeError("validation dataset hash mismatch")
@@ -186,7 +193,7 @@ def main() -> None:
     output_root = Path(args.output_root)
     atomic_csv(output_root / "recorded_observation_replay.csv", rows)
     invariance = {
-        "experiment": config["experiment"],
+        "experiment": config.get("experiment", config.get("experiment_id")),
         "checkpoint": args.checkpoint,
         "checkpoint_sha256": file_sha256(Path(args.checkpoint)),
         "validation_dataset_sha256": validation["sha256"],
@@ -196,7 +203,7 @@ def main() -> None:
         "aggregate": aggregate,
         "passed": passed,
     }
-    atomic_json(output_root / "zero_channel_invariance.json", invariance)
+    atomic_json(output_root / args.invariance_output_name, invariance)
 
     if args.training_summary:
         training = json.loads(Path(args.training_summary).read_text(encoding="utf-8"))

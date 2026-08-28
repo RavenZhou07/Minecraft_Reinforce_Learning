@@ -38,6 +38,7 @@ def parse_args():
     parser.add_argument("--output-root", default="artifacts/exp13")
     parser.add_argument("--offline-gradle", action="store_true")
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--checkpoint-seed", type=int, default=29)
     return parser.parse_args()
 
 
@@ -63,13 +64,15 @@ def main() -> None:
         raise ValueError("exp13 evaluator requires disabled_zero intervention")
     if set(config["protected_splits"]) != {"student_holdout", "final_test"}:
         raise PermissionError("protected split declaration changed")
-    evaluation = config["autonomous_evaluation"]
+    evaluation = config.get("autonomous_evaluation", config.get("autonomous"))
+    if evaluation is None:
+        raise ValueError("autonomous evaluation configuration is missing")
     if evaluation["split"] != "student_dev":
         raise PermissionError("only the predeclared student_dev split is permitted")
     seeds = [int(seed) for seed in evaluation["seeds"]]
     if seeds != [18500, 18501, 18502, 18503]:
         raise PermissionError("autonomous seeds differ from predeclaration")
-    max_steps = int(evaluation["max_episode_steps"])
+    max_steps = int(evaluation.get("max_episode_steps", evaluation.get("maximum_steps")))
     if max_steps != 500 or evaluation["action_selection"] != "deterministic_argmax":
         raise ValueError("autonomous rollout protocol differs from predeclaration")
     policy = RecurrentTreechopPolicy.load(args.checkpoint)
@@ -108,7 +111,7 @@ def main() -> None:
                 previous_action_token = START_ACTION_TOKEN
                 recorder = RuntimeTraceRecorder(
                     checkpoint=args.checkpoint,
-                    checkpoint_seed=29,
+                    checkpoint_seed=args.checkpoint_seed,
                     environment_seed=seed,
                     max_steps=max_steps,
                     previous_action_mode=PREVIOUS_ACTION_DISABLED_ZERO,
@@ -204,7 +207,7 @@ def main() -> None:
     )
     pure_fixed = sum(bool(row["pure_single_action_fixed_point"]) for row in rows)
     summary = {
-        "experiment": config["experiment"],
+        "experiment": config.get("experiment", config.get("experiment_id")),
         "checkpoint": args.checkpoint,
         "checkpoint_sha256": file_sha256(Path(args.checkpoint)),
         "seeds": seeds,

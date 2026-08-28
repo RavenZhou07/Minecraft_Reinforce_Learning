@@ -1,0 +1,58 @@
+{
+  "experiment_id": "exp15_no_action_multi_capacity",
+  "stage": "MULTI_CAPACITY",
+  "predeclared_utc": "2026-08-28T16:02:47Z",
+  "repository_head": "7c959f7ca3c6f624c463d72aa196904bce85c720",
+  "previous_action_mode": "disabled_zero",
+  "dataset": {
+    "path": "logs/learning/e2e_bc_train_18200_8.npz",
+    "sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "selected_seeds": [18201, 18204, 18207],
+    "expected_timesteps": 332,
+    "expected_observed_actions": 10
+  },
+  "validation_hash_control": {
+    "path": "logs/learning/e2e_bc_validation_18300_4.npz",
+    "sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+  },
+  "architecture": {
+    "spatial_embedding": 96,
+    "scalar_embedding": 32,
+    "disabled_zero_slot_width": 16,
+    "gru_input_width": 144,
+    "hidden_size": 128,
+    "action_count": 14
+  },
+  "optimizer": {
+    "name": "AdamW",
+    "training_seed": 7,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "batch_size_episodes": 3,
+    "class_weight_power": 0.0,
+    "gradient_clip": 1.0
+  },
+  "bounded_training": {
+    "maximum_epochs": 1000,
+    "checkpoint_selection": "first_epoch_meeting_all_capacity_thresholds",
+    "minimum_accuracy": 0.95,
+    "minimum_balanced_accuracy": 0.90,
+    "required_zero_slot_max_abs": 0.0,
+    "attempts": 1,
+    "extensions": 0
+  },
+  "outputs": {
+    "root": "artifacts/exp15",
+    "correctness_audit": "artifacts/exp15/correctness_audit.json",
+    "subset_provenance": "artifacts/exp15/subset_provenance.json",
+    "training_log": "artifacts/exp15/capacity_training_log.csv",
+    "checkpoint": "artifacts/exp15/first_passing_checkpoint.pt",
+    "training_summary": "artifacts/exp15/capacity_training_summary.json",
+    "checkpoint_invariance": "artifacts/exp15/checkpoint_invariance.json",
+    "decision": "artifacts/exp15/capacity_decision.json"
+  },
+  "on_pass": "FORMAL_TRAIN_SEED29",
+  "on_fail": "disabled_zero_multi_trajectory_capacity_not_supported",
+  "protected_splits": ["student_holdout", "final_test"],
+  "promotion": "none"
+}

@@ -1,0 +1,67 @@
+{
+  "experiment_id": "exp17_no_action_replication",
+  "stage": "CONDITIONAL_REPLICATION",
+  "predeclared_utc": "2026-08-28T16:02:47Z",
+  "repository_head": "7c959f7ca3c6f624c463d72aa196904bce85c720",
+  "eligibility": "only_if_exp16_replication_gate_passes",
+  "training_seeds": [11, 47],
+  "maximum_additional_formal_models": 2,
+  "previous_action_mode": "disabled_zero",
+  "datasets": {
+    "train_path": "logs/learning/e2e_bc_train_18200_8.npz",
+    "train_sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "validation_path": "logs/learning/e2e_bc_validation_18300_4.npz",
+    "validation_sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+  },
+  "training": {
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size_episodes": 2,
+    "class_weight_power": 0.5,
+    "gradient_clip": 1.0,
+    "minimum_recorded_horizon": 60,
+    "maximum_epochs": 180,
+    "validation_ce_patience_after_minimum_horizon": 30,
+    "checkpoint_selection": "minimum_validation_cross_entropy_within_each_single_run",
+    "retries_per_seed": 0
+  },
+  "autonomous": {
+    "split": "student_dev",
+    "seeds": [18500, 18501, 18502, 18503],
+    "maximum_steps": 500,
+    "action_selection": "deterministic_argmax"
+  },
+  "aggregate_decision": {
+    "ready_for_moderate_data_scale": {
+      "minimum_episodes_below_0_80_dominant_period_1_to_4_cycle": 8,
+      "minimum_aggregate_median_action_transitions": 10,
+      "progression_any": {
+        "minimum_valid_attack_episodes": 2,
+        "or_any": ["block_break", "pickup", "inventory_success"]
+      }
+    },
+    "closed_loop_control_improved_but_task_progression_absent": {
+      "requires_robust_cycle_reduction": true,
+      "valid_attack": 0,
+      "block_break": 0,
+      "pickup": 0
+    },
+    "fallback": "no_action_branch_not_supported"
+  },
+  "moderate_scale_target_for_report_only": {
+    "successful_bc_train_trajectories": "50-100",
+    "successful_bc_validation_trajectories": "15-25",
+    "collection_inside_pipeline": false
+  },
+  "outputs": {
+    "root": "artifacts/exp17",
+    "seed11": "artifacts/exp17/seed11",
+    "seed47": "artifacts/exp17/seed47",
+    "aggregate_episode_summary": "artifacts/exp17/aggregate_12_episode_summary.csv",
+    "aggregate_cycle_metrics": "artifacts/exp17/aggregate_cycle_metrics.csv",
+    "final_branch_decision": "artifacts/exp17/final_branch_decision.json"
+  },
+  "protected_splits": ["student_holdout", "final_test"],
+  "promotion": "none"
+}

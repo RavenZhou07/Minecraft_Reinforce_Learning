@@ -1,0 +1,43 @@
+{
+  "dataset_path": "logs/learning/e2e_bc_train_18200_8.npz",
+  "dataset_sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+  "selected_seeds_declared": [
+    18201,
+    18204,
+    18207
+  ],
+  "selected_seeds_file_order": [
+    18201,
+    18204,
+    18207
+  ],
+  "episode_ids": [
+    2,
+    5,
+    8
+  ],
+  "episode_lengths": [
+    151,
+    56,
+    125
+  ],
+  "timesteps": 332,
+  "observed_action_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    7,
+    8,
+    10,
+    11,
+    12
+  ],
+  "observed_action_count": 10,
+  "all_episode_steps_start_at_zero_and_are_contiguous": true,
+  "explicit_boundaries": true,
+  "episode_local_hidden": true,
+  "padding_excluded_from_loss": true,
+  "passed": true
+}
