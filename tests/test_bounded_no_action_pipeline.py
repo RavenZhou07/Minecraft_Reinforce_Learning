@@ -4,7 +4,7 @@ from pathlib import Path
 from scripts.run_treechop_no_action_pipeline import seed29_decision
 
 
-def rollout_summary(pure_fixed, transitions, dominant, below_cycle, **progression):
+def rollout_summary(pure_fixed, transitions, dominant, below_cycle, period_2_to_4=0, **progression):
     counts = {
         "meaningful_interaction": 0,
         "approach": 0,
@@ -20,6 +20,7 @@ def rollout_summary(pure_fixed, transitions, dominant, below_cycle, **progressio
         "median_action_transitions": transitions,
         "median_dominant_action_fraction": dominant,
         "episodes_below_0_80_dominant_period_1_to_4_cycle": below_cycle,
+        "episodes_at_or_above_0_80_dominant_period_2_to_4_cycle": period_2_to_4,
         "progression_counts": counts,
     }
 
@@ -43,6 +44,17 @@ def test_deep_progression_is_the_only_alternative_replication_trigger():
     assert not seed29_decision(
         rollout_summary(4, 0, 1.0, 0, valid_attack=1)
     )["replication_eligible"]
+
+
+def test_low_period_replacement_requires_period_2_to_4_not_period_1_dominance():
+    period_one_dominant = seed29_decision(
+        rollout_summary(0, 1.5, 0.978, 0, period_2_to_4=0)
+    )
+    assert period_one_dominant["classification"] == "previous_action_removal_partially_changes_dynamics"
+    low_period = seed29_decision(
+        rollout_summary(0, 20, 0.6, 0, period_2_to_4=3)
+    )
+    assert low_period["classification"] == "period_1_collapse_replaced_by_low_period_cycle"
 
 
 def test_frozen_configs_encode_one_capacity_attempt_and_three_formal_seeds():

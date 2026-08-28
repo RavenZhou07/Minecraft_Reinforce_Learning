@@ -147,7 +147,7 @@ def seed29_decision(summary: Dict[str, Any]) -> Dict[str, Any]:
         replicate = True
     elif (
         summary["pure_500_step_single_action_fixed_point_episode_count"] <= 1
-        and summary["episodes_below_0_80_dominant_period_1_to_4_cycle"] <= 1
+        and summary.get("episodes_at_or_above_0_80_dominant_period_2_to_4_cycle", 0) >= 3
     ):
         classification = "period_1_collapse_replaced_by_low_period_cycle"
         replicate = False

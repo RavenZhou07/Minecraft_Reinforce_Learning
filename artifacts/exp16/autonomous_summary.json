@@ -5,6 +5,7 @@
   "elapsed_seconds": 382.49,
   "episodes": 4,
   "episodes_below_0_80_dominant_period_1_to_4_cycle": 0,
+  "episodes_at_or_above_0_80_dominant_period_2_to_4_cycle": 0,
   "episodes_with_action_transitions": 4,
   "experiment": "exp16_no_action_formal_seed29",
   "failure_taxonomy": {

@@ -11,5 +11,5 @@
   ],
   "training_runs": 2,
   "autonomous_episodes": 4,
-  "final_decision": "period_1_collapse_replaced_by_low_period_cycle"
+  "final_decision": "previous_action_removal_partially_changes_dynamics"
 }

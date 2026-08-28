@@ -1,5 +1,5 @@
 {
-  "classification": "period_1_collapse_replaced_by_low_period_cycle",
+  "classification": "previous_action_removal_partially_changes_dynamics",
   "exactly_one_recommendation": "Freeze this bounded no-action branch; do not train seeds 11/47 or start another actor ablation.",
   "protected_splits_accessed": false,
   "promotion": "none"

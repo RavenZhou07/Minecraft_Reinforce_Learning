@@ -1,0 +1,12 @@
+{
+  "correction_type": "classification_only",
+  "original_classification": "period_1_collapse_replaced_by_low_period_cycle",
+  "corrected_classification": "previous_action_removal_partially_changes_dynamics",
+  "reason": "The original decision code used dominant period-1-to-4 occupancy for Case D. The predeclared Case D requires period-2-to-4 occupancy; all four autonomous episodes had dominant_period_2_to_4_cycle_fraction equal to 0.0.",
+  "training_repeated": false,
+  "rollout_repeated": false,
+  "thresholds_changed": false,
+  "replication_eligible": false,
+  "protected_splits_accessed": false,
+  "promotion": "none"
+}

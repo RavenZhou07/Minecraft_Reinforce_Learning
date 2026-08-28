@@ -231,6 +231,10 @@ def main() -> None:
             row["fraction_of_episode_in_dominant_period_1_to_4_cycle"] < 0.80
             for row in rows
         ),
+        "episodes_at_or_above_0_80_dominant_period_2_to_4_cycle": sum(
+            row["dominant_period_2_to_4_cycle_fraction"] >= 0.80
+            for row in rows
+        ),
         "episodes_with_action_transitions": sum(row["action_transitions"] > 0 for row in rows),
         "progression_counts": {
             "meaningful_interaction": sum(row["meaningful_interaction"] for row in rows),
