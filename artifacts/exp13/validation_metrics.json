@@ -1,0 +1,5 @@
+{
+  "experiment": "exp13_no_previous_action_ablation",
+  "status": "not_run",
+  "reason": "No formal seed-29 checkpoint exists because the single-trajectory sanity gate failed."
+}

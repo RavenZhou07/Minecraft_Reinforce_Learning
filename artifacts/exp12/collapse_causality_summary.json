@@ -1,0 +1,15 @@
+{
+  "argmax_changed_by_previous_token_rate": 0.46368159203980097,
+  "argmax_equals_previous_token_rate": 0.24825870646766168,
+  "free_running_balanced_accuracy": 0.07968276933794174,
+  "hidden_intervention_argmax_change_rate": 0.09203980099502487,
+  "hidden_to_observation_js_ratio": 72.53195817818853,
+  "mean_consecutive_observation_policy_js": 0.0005880642987787541,
+  "mean_hidden_intervention_js": 0.04265345512510636,
+  "mean_logit_variance_due_to_previous_token": 0.10375357438978873,
+  "mean_pairwise_js_across_previous_tokens": 0.03510742687028606,
+  "sampled_states": 268,
+  "teacher_forced_balanced_accuracy": 0.3261021954114348,
+  "teacher_forced_minus_free_balanced_accuracy": 0.24641942607349307,
+  "token_to_observation_js_ratio": 59.699979990613976
+}

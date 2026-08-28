@@ -1,0 +1,35 @@
+{
+  "experiment": "exp13_no_previous_action_ablation",
+  "audit_time_utc": "2026-08-28T04:16:01Z",
+  "train": {
+    "path": "logs/learning/e2e_bc_train_18200_8.npz",
+    "expected_sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "actual_sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "match": true,
+    "samples": 1324,
+    "successful_episode_seeds": [18200, 18201, 18203, 18204, 18205, 18206, 18207],
+    "episode_lengths": {
+      "18200": 243,
+      "18201": 151,
+      "18203": 344,
+      "18204": 56,
+      "18205": 220,
+      "18206": 185,
+      "18207": 125
+    }
+  },
+  "validation": {
+    "path": "logs/learning/e2e_bc_validation_18300_4.npz",
+    "expected_sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368",
+    "actual_sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368",
+    "match": true,
+    "samples": 534,
+    "successful_episode_seeds": [18302, 18303],
+    "episode_lengths": {
+      "18302": 332,
+      "18303": 202
+    }
+  },
+  "protected_splits_accessed": false,
+  "passed": true
+}

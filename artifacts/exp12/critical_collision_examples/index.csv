@@ -1,0 +1,9 @@
+rank,path,distance,query_seed,query_step,query_valid_attack_geometry,neighbor_seed,neighbor_step,neighbor_valid_attack_geometry,neighbor_teacher_action,legal_vector_l2_difference
+1,artifacts\exp12\critical_collision_examples\collision_01.png,0.5716922879219055,18500,8,1,18205,215,0,forward_jump,0.7509493827819824
+2,artifacts\exp12\critical_collision_examples\collision_02.png,0.5728639364242554,18500,44,1,18205,215,0,forward_jump,0.7137877345085144
+3,artifacts\exp12\critical_collision_examples\collision_03.png,0.5728639364242554,18500,80,1,18205,215,0,forward_jump,0.6822235584259033
+4,artifacts\exp12\critical_collision_examples\collision_04.png,0.5728639364242554,18500,116,1,18205,215,0,forward_jump,0.657063901424408
+5,artifacts\exp12\critical_collision_examples\collision_05.png,0.5728639364242554,18500,152,1,18205,215,0,forward_jump,0.639065682888031
+6,artifacts\exp12\critical_collision_examples\collision_06.png,0.5728639364242554,18500,188,1,18205,215,0,forward_jump,0.628844141960144
+7,artifacts\exp12\critical_collision_examples\collision_07.png,0.5728639364242554,18500,224,1,18205,215,0,forward_jump,0.6267798542976379
+8,artifacts\exp12\critical_collision_examples\collision_08.png,0.5728639364242554,18500,260,1,18205,215,0,forward_jump,0.6329525709152222

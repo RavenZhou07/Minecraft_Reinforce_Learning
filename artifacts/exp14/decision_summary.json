@@ -1,0 +1,45 @@
+{
+  "experiment": "exp14_no_action_single_capacity_audit",
+  "executive_conclusion": "single-trajectory capacity gate passed with the extended diagnostic budget",
+  "acceptance": {
+    "minimum_accuracy": 0.95,
+    "actual_accuracy": 1.0,
+    "minimum_balanced_accuracy": 0.95,
+    "actual_balanced_accuracy": 1.0,
+    "cross_entropy": 0.025862340416227068,
+    "selected_best_epoch": 997,
+    "checkpoint_reload_exact": true,
+    "max_abs_disabled_action_channel": 0.0,
+    "passed": true
+  },
+  "controlled_comparison": {
+    "exp13_first_250_rows_reproduced_exactly": true,
+    "first_qualifying_epoch": 288,
+    "epochs_beyond_exp13_horizon_to_first_qualifying": 38,
+    "qualifying_epoch_count": 701,
+    "perfect_epoch_count": 104
+  },
+  "causal_scope": "This establishes single-trajectory sequence capacity only. It does not establish multi-trajectory capacity, offline generalization, autonomous fixed-point removal, or Treechop success.",
+  "correctness": {
+    "dataset_hashes_match": true,
+    "shared_initialization_exact_pairing": true,
+    "gru_input_width": 144,
+    "trained_checkpoint_previous_action_invariant": true,
+    "action_embedding_absent": true,
+    "zero_channel_exact": true,
+    "checkpoint_reload_exact": true,
+    "targeted_regression_tests": "19 passed"
+  },
+  "execution_boundary": {
+    "multi_trajectory_sanity": false,
+    "formal_seed29_training": false,
+    "recorded_observation_replay": false,
+    "autonomous_rollout": false,
+    "protected_splits_accessed": false,
+    "teacher_actions_executed": 0,
+    "privileged_actor_inputs": 0,
+    "promotion": "none"
+  },
+  "exactly_one_recommendation": "Run the predeclared disabled-zero multi-trajectory sanity gate on frozen seeds 18201, 18204, and 18207 using the unchanged exp08b profile and its 95% accuracy / 90% balanced-accuracy thresholds; do not start formal seed-29 training in the same experiment.",
+  "status": "sanity_capacity_passed_no_promotion"
+}

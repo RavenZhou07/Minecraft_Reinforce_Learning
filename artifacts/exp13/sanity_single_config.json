@@ -1,0 +1,53 @@
+{
+  "profile": "exp13a_no_action_single_sanity",
+  "architecture": {
+    "image_height": 64,
+    "image_width": 64,
+    "vector_size": 16,
+    "spatial_embedding": 96,
+    "scalar_embedding": 32,
+    "action_embedding": 16,
+    "hidden_size": 128,
+    "action_count": 14,
+    "previous_action_mode": "disabled_zero",
+    "spatial_encoder": "conv(3,8,k5,s4)-conv(8,16,k3,s2)-conv(16,32,k3,s2)",
+    "scalar_encoder": "mlp(16,32,32)",
+    "gru_layers": 1
+  },
+  "optimizer": {
+    "name": "AdamW",
+    "epochs": 250,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "batch_size_episodes": 1,
+    "patience": 80,
+    "class_weight_power": 0.0,
+    "gradient_clip": 1.0,
+    "train_seed": 7
+  },
+  "sequence_semantics": "current legal observation + legal-observation-only episode-local hidden -> action_t",
+  "previous_action_mode": "disabled_zero",
+  "disabled_action_slot": {
+    "width": 16,
+    "source": "constant_zero",
+    "trainable": false
+  },
+  "episode_start_previous_action": "diagnostic/alignment only; ignored by actor",
+  "hidden_reset": "zeros at each complete-episode batch row and environment reset",
+  "padding_loss_masked": true,
+  "student_input_manifest": [
+    "pov_rgb_64x64_current",
+    "legal_player_state_vector_16",
+    "episode_local_gru_history_from_legal_observations_only"
+  ],
+  "train_only_privileged_supervision": [],
+  "privileged_actor_inputs": 0,
+  "datasets": {
+    "train": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "validation": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+  },
+  "overfit_seeds": [
+    18204
+  ],
+  "seed_manifest": "configs/seeds/natural_treechop_v1.json"
+}

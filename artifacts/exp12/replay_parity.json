@@ -1,0 +1,318 @@
+{
+  "experiment_id": "exp12_runtime_observability_audit",
+  "passed": true,
+  "results": [
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed11.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed11_env18500.npz",
+      "trace_sha256": "d8d1b20f8a9a855b3a28a3c9d079e7c1864e1352fcd21e5e70e55e8f70e09747"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed11.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed11_env18501.npz",
+      "trace_sha256": "d66eab2d28bd038da7394eecdfa03191340736603a702572421cbfacca2dbcea"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed11.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed11_env18502.npz",
+      "trace_sha256": "2143e145599fb19d3c326da2b786ec38119e21771912390a191ea9a663ee3fb4"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed11.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed11_env18503.npz",
+      "trace_sha256": "dbd16b346462e8234f74a3962c9b44da0859ac1b79d492d06ccf88ea2fdca8ce"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed29.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed29_env18500.npz",
+      "trace_sha256": "533074bdc55ba01fe25d24119b55b6c3f3a096e8a2cbd2284ee73fa111fd406a"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed29.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed29_env18501.npz",
+      "trace_sha256": "63f96546622c3c91879881dd37e74e9df888e62759d388e41e2514559d9f5d9d"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed29.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed29_env18502.npz",
+      "trace_sha256": "e1718476e2d97fb9f31cba00e2cb9fa8045fd79f6eb5aa46c9c99b04851a9d84"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed29.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed29_env18503.npz",
+      "trace_sha256": "a0b31d1098ab38dfc220775608393c5b31a9753777cfbb7f426f0f50f419077a"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed47.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed47_env18500.npz",
+      "trace_sha256": "2fe8aa1294df19b9069a3fb8f8ca845694f59c8127945cb08bb275e6d8dd0f69"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed47.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed47_env18501.npz",
+      "trace_sha256": "14f24f9c483b7a2ae19e66c3cce1973587c52913269c6c77364ac972f4d24441"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed47.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed47_env18502.npz",
+      "trace_sha256": "bf6e8c6873d92257a43d9204e03fc2416c10fd5b6807654a58e8a0544d5a1a13"
+    },
+    {
+      "checkpoint": "checkpoints/natural_treechop_recurrent_bc_exp09_seed47.pt",
+      "integrity": {
+        "action_ids_valid": true,
+        "passed": true,
+        "previous_action_causal": true,
+        "privileged_actor_inputs_zero": true,
+        "rgb_dtype_valid": true,
+        "rgb_shape_valid": true,
+        "selected_executed_match": true,
+        "start_token_at_reset": true,
+        "teacher_actions_zero": true,
+        "vector_shape_valid": true
+      },
+      "parity": {
+        "action_logits_max_abs_error": 0.0,
+        "action_probabilities_max_abs_error": 0.0,
+        "argmax_match": true,
+        "cnn_embedding_max_abs_error": 0.0,
+        "hidden_max_abs_error": 0.0,
+        "passed": true,
+        "scalar_embedding_max_abs_error": 0.0
+      },
+      "trace": "artifacts\\exp12\\runtime_traces\\seed47_env18503.npz",
+      "trace_sha256": "8d72b6905124321f373c19fc0e5bd19c284723d76ef1f43df074c790cf165b1d"
+    }
+  ]
+}

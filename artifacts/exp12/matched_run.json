@@ -1,0 +1,62 @@
+{
+  "config_sha256": "372890e3770a51191197abd53cfba733d37fb0cb3b50c0492b075c8e08141814",
+  "experiment_id": "exp12_runtime_observability_audit",
+  "infrastructure": {
+    "reason": "reuse cached MineRL dependencies after remote SNAPSHOT metadata timeouts",
+    "temporary_gradle_offline": true
+  },
+  "pairs_present": 12,
+  "pairs_requested": [
+    [
+      11,
+      18500
+    ],
+    [
+      11,
+      18501
+    ],
+    [
+      11,
+      18502
+    ],
+    [
+      11,
+      18503
+    ],
+    [
+      29,
+      18500
+    ],
+    [
+      29,
+      18501
+    ],
+    [
+      29,
+      18502
+    ],
+    [
+      29,
+      18503
+    ],
+    [
+      47,
+      18500
+    ],
+    [
+      47,
+      18501
+    ],
+    [
+      47,
+      18502
+    ],
+    [
+      47,
+      18503
+    ]
+  ],
+  "privileged_actor_inputs": 0,
+  "stage": "matched",
+  "teacher_actions_executed": 0
+}

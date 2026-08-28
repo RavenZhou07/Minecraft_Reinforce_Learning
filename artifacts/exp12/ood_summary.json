@@ -1,0 +1,170 @@
+{
+  "F1_legal_vector": {
+    "queries": {
+      "bc_validation": {
+        "median_nearest_distance": 1.4263994693756104,
+        "over_train_95th_fraction": 0.6981747066492829,
+        "over_train_99th_fraction": 0.5677966101694916,
+        "states": 1534
+      },
+      "dagger1": {
+        "median_nearest_distance": 0.438534677028656,
+        "over_train_95th_fraction": 0.0,
+        "over_train_99th_fraction": 0.0,
+        "states": 1000
+      },
+      "student_dev": {
+        "median_nearest_distance": 0.5348929166793823,
+        "over_train_95th_fraction": 0.0,
+        "over_train_99th_fraction": 0.0,
+        "states": 6000
+      }
+    },
+    "train_leave_one_episode_out_percentiles": {
+      "50": 0.7224036157131195,
+      "90": 1.0059736251831055,
+      "95": 1.1099834859371185,
+      "99": 1.3521353149414062
+    }
+  },
+  "F2_current_rgb": {
+    "queries": {
+      "bc_validation": {
+        "median_nearest_distance": 0.9558132290840149,
+        "over_train_95th_fraction": 0.10560625814863103,
+        "over_train_99th_fraction": 0.09256844850065189,
+        "states": 1534
+      },
+      "dagger1": {
+        "median_nearest_distance": 1.3909657001495361,
+        "over_train_95th_fraction": 0.5,
+        "over_train_99th_fraction": 0.497,
+        "states": 1000
+      },
+      "student_dev": {
+        "median_nearest_distance": 0.9463175535202026,
+        "over_train_95th_fraction": 0.0765,
+        "over_train_99th_fraction": 0.028,
+        "states": 6000
+      }
+    },
+    "train_leave_one_episode_out_percentiles": {
+      "50": 0.8683607280254364,
+      "90": 1.282595193386078,
+      "95": 1.4192484319210052,
+      "99": 1.7817670440673827
+    }
+  },
+  "F3_four_frame_stack": {
+    "queries": {
+      "bc_validation": {
+        "median_nearest_distance": 0.9389913082122803,
+        "over_train_95th_fraction": 0.10560625814863103,
+        "over_train_99th_fraction": 0.09191655801825294,
+        "states": 1534
+      },
+      "dagger1": {
+        "median_nearest_distance": 1.380071997642517,
+        "over_train_95th_fraction": 0.5,
+        "over_train_99th_fraction": 0.496,
+        "states": 1000
+      },
+      "student_dev": {
+        "median_nearest_distance": 0.9160397052764893,
+        "over_train_95th_fraction": 0.056,
+        "over_train_99th_fraction": 0.0,
+        "states": 6000
+      }
+    },
+    "train_leave_one_episode_out_percentiles": {
+      "50": 0.8782792687416077,
+      "90": 1.3067816495895386,
+      "95": 1.4408844351768488,
+      "99": 1.8458280801773068
+    }
+  },
+  "F4_handwritten": {
+    "queries": {
+      "bc_validation": {
+        "median_nearest_distance": 0.7951730489730835,
+        "over_train_95th_fraction": 0.12385919165580182,
+        "over_train_99th_fraction": 0.07953063885267275,
+        "states": 1534
+      },
+      "dagger1": {
+        "median_nearest_distance": 1.0828500986099243,
+        "over_train_95th_fraction": 0.5,
+        "over_train_99th_fraction": 0.497,
+        "states": 1000
+      },
+      "student_dev": {
+        "median_nearest_distance": 0.8725180625915527,
+        "over_train_95th_fraction": 0.17733333333333334,
+        "over_train_99th_fraction": 0.049,
+        "states": 6000
+      }
+    },
+    "train_leave_one_episode_out_percentiles": {
+      "50": 0.6780633628368378,
+      "90": 0.9191846072673798,
+      "95": 1.0526094138622284,
+      "99": 1.3463619935512534
+    }
+  },
+  "F5_cnn_embedding": {
+    "queries": {
+      "bc_validation": {
+        "median_nearest_distance": 0.35976994037628174,
+        "over_train_95th_fraction": 0.14015645371577576,
+        "over_train_99th_fraction": 0.07822685788787484,
+        "states": 1534
+      },
+      "dagger1": {
+        "median_nearest_distance": 0.36667776107788086,
+        "over_train_95th_fraction": 0.485,
+        "over_train_99th_fraction": 0.0,
+        "states": 1000
+      },
+      "student_dev": {
+        "median_nearest_distance": 0.33628419041633606,
+        "over_train_95th_fraction": 0.07716666666666666,
+        "over_train_99th_fraction": 0.0,
+        "states": 6000
+      }
+    },
+    "train_leave_one_episode_out_percentiles": {
+      "50": 0.29348093271255493,
+      "90": 0.4275034308433533,
+      "95": 0.5033689528703688,
+      "99": 0.7164461171627043
+    }
+  },
+  "F6_gru_hidden": {
+    "queries": {
+      "bc_validation": {
+        "median_nearest_distance": 0.3257277011871338,
+        "over_train_95th_fraction": 0.06258148631029987,
+        "over_train_99th_fraction": 0.056714471968709254,
+        "states": 1534
+      },
+      "dagger1": {
+        "median_nearest_distance": 0.4691348969936371,
+        "over_train_95th_fraction": 0.001,
+        "over_train_99th_fraction": 0.001,
+        "states": 1000
+      },
+      "student_dev": {
+        "median_nearest_distance": 0.2656884789466858,
+        "over_train_95th_fraction": 0.0,
+        "over_train_99th_fraction": 0.0,
+        "states": 6000
+      }
+    },
+    "train_leave_one_episode_out_percentiles": {
+      "50": 0.45816414058208466,
+      "90": 0.7547688782215118,
+      "95": 0.7556775242090226,
+      "99": 0.760962067246437
+    }
+  }
+}

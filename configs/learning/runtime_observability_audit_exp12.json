@@ -1,0 +1,129 @@
+{
+  "experiment_id": "exp12_runtime_observability_audit",
+  "objective": "Identify the primary cause of the recurrent actor's closed-loop single-action fixed point without training or changing task semantics.",
+  "predeclared_at_git_head": "6549d11673cda4a3393d220552bd5461089f53f2",
+  "historical_references": {
+    "baseline": "f09face",
+    "recurrent_implementation_tests": "de74cd9",
+    "sanity_gates": "00cae17",
+    "controlled_training": "e8526d1",
+    "autonomous_evaluation": "8f3938c"
+  },
+  "checkpoints": [
+    {
+      "training_seed": 11,
+      "path": "checkpoints/natural_treechop_recurrent_bc_exp09_seed11.pt",
+      "sha256": "883e8aa4b895059e5f40cc11ec9f73d990f17e08dcdafedf4b8003d837d65768"
+    },
+    {
+      "training_seed": 29,
+      "path": "checkpoints/natural_treechop_recurrent_bc_exp09_seed29.pt",
+      "sha256": "8acabcfe1239dc8c19f54a50169706f642b5609e678f74910766a0337767443b"
+    },
+    {
+      "training_seed": 47,
+      "path": "checkpoints/natural_treechop_recurrent_bc_exp09_seed47.pt",
+      "sha256": "f8927a0f0149c4275f6d337b32dc75ecc73afdf9b5c3005aac1578572417fd23"
+    }
+  ],
+  "preserved_checkpoints": [
+    "checkpoints/natural_treechop_e2e_bc_no_phase_exp04a.npz",
+    "checkpoints/natural_treechop_e2e_bc_dagger1_exp07.npz"
+  ],
+  "datasets": {
+    "teacher_dev": {
+      "path": "logs/learning/e2e_teacher_dev_smoke_18000_2.npz",
+      "sha256": "c60082daddff3c89e457f2c546ef5de38b268da81d78bcfa8bd48d01eabf4c5a"
+    },
+    "bc_train": {
+      "path": "logs/learning/e2e_bc_train_18200_8.npz",
+      "sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3"
+    },
+    "bc_validation": {
+      "path": "logs/learning/e2e_bc_validation_18300_4.npz",
+      "sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+    },
+    "dagger1": {
+      "path": "logs/learning/e2e_dagger_corrections_18400_2.npz",
+      "sha256": "f9f10c91d48be7cdc1fd35fae02dd1d0cf9903b44c7428d36faea467fcfebef1"
+    }
+  },
+  "runtime_gate": {
+    "training_seed": 29,
+    "environment_seed": 18500,
+    "trace_prefix_steps": 50,
+    "retain_full_steps": 500,
+    "replay_absolute_tolerance": 1e-6,
+    "required_checks": [
+      "selected_executed_match",
+      "action_mapping_match",
+      "hidden_single_step",
+      "hidden_reset_zero",
+      "previous_action_causal",
+      "rgb_preprocessing_parity",
+      "legal_vector_preprocessing_parity",
+      "no_stale_actor_input",
+      "model_eval_mode",
+      "standalone_replay_parity"
+    ]
+  },
+  "matched_rollouts": {
+    "training_seeds": [11, 29, 47],
+    "student_dev_environment_seeds": [18500, 18501, 18502, 18503],
+    "max_steps": 500,
+    "checkpoint_selection": false,
+    "diagnostic_only": true
+  },
+  "trace_fields": {
+    "actor_inputs": ["pov", "legal_vector", "previous_action_token"],
+    "raw_environment": ["raw_rgb_shape", "raw_rgb_dtype", "raw_rgb_hash", "raw_rgb_mean", "raw_rgb_std", "raw_rgb_delta_l1_from_previous", "raw_rgb_changed", "legal_vector_raw", "legal_vector", "legal_vector_delta", "yaw", "pitch", "origin_relative_position", "step_delta_position", "inventory_log_delta"],
+    "actor_state": ["gru_hidden_norm", "gru_hidden_delta_l2", "cnn_embedding", "cnn_embedding_norm", "cnn_embedding_delta_l2", "scalar_embedding", "scalar_embedding_norm", "action_logits", "action_probabilities", "policy_entropy", "top1_action", "top1_probability", "top2_action", "top1_minus_top2_margin", "policy_js_from_previous", "selected_action_id", "selected_action_name", "executed_action_id", "executed_action_name"],
+    "fixed_point": ["current_identical_action_streak", "dominant_action_so_far", "dominant_fraction_so_far", "action_transition_count"],
+    "privileged_audit_namespace": ["audit_raycast_is_log", "audit_raycast_in_range", "audit_raycast_distance"]
+  },
+  "probe_splits": {
+    "fit": "bc_train",
+    "validation": "bc_validation",
+    "ood_audit_only": ["dagger1", "student_dev_diagnostic_traces"],
+    "split_unit": "episode_seed",
+    "random_timestep_split": false
+  },
+  "feature_spaces": {
+    "F1": "legal_vector_16",
+    "F2": "current_rgb_64_downsample16_train_pca32",
+    "F3": "four_frame_causal_rgb_stack_downsample16_train_pca32",
+    "F4": "existing_handwritten_legal_features_feature_size6",
+    "F5": "frozen_seed29_cnn_embedding",
+    "F6": "frozen_seed29_teacher_forced_gru_hidden"
+  },
+  "diagnostic_probe": {
+    "logistic_regression": {"epochs": 400, "learning_rate": 0.05, "l2": 0.001, "class_balanced": true},
+    "ridge": {"l2": 0.01},
+    "knn": {"k": 5},
+    "pca_components": 32,
+    "support_gate": {"minimum_train_episodes_per_class": 2, "validation_requires_both_classes": true, "minimum_positive_train_seeds": 2}
+  },
+  "collapse_sampling": {
+    "teacher_samples_per_stratum": 32,
+    "student_samples_per_time_band": 24,
+    "previous_tokens": "14_actions_plus_START",
+    "hidden_interventions": ["normal", "zero", "earlier_same_episode", "foreign_diagnostic_state"]
+  },
+  "ood": {
+    "reference": "bc_train",
+    "threshold_source": "leave_one_episode_out_nearest_neighbor_distance",
+    "percentiles": [50, 90, 95, 99],
+    "neighbors": [1, 5, 10],
+    "fit_scaler_and_pca_on_reference_only": true
+  },
+  "decision_rules": {
+    "previous_action_feedback_supported": "token_argmax_change_rate >= 0.25 and teacher_forced_minus_free_balanced_accuracy >= 0.10 and token_JS >= 1.5 * observation_JS",
+    "hidden_attractor_supported": "hidden_intervention_argmax_change_rate >= 0.25 and hidden_JS >= 1.5 * observation_JS",
+    "representation_failure_supported": "F3_or_F4 key-label balanced_accuracy >= 0.70 and exceeds F5 by >= 0.10 with sufficient support",
+    "observation_aliasing_supported": "support sufficient, all reasonable legal feature spaces key-label balanced_accuracy <= 0.60, and critical legal-neighbor collisions cross privileged labels",
+    "coverage_ood_supported": "critical transition has < 3 distinct train seeds or student OOD95 rate >= 0.50 while at least one legal feature space key-label balanced_accuracy >= 0.70",
+    "mixed_inconclusive": "no single supported rule dominates or label/provenance support is insufficient"
+  },
+  "forbidden_splits": ["student_holdout", "final_test"],
+  "forbidden_actions": ["policy_training", "DAgger2", "PPO", "teacher_change", "observation_boundary_change", "actor_intervention", "diagnostic_trace_training_ingest", "checkpoint_promotion"]
+}

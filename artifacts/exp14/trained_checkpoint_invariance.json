@@ -1,0 +1,13 @@
+{
+  "experiment": "exp14_no_action_single_capacity_audit",
+  "checkpoint": "artifacts/exp14/sanity_checkpoints/no_action_single_seed18204_extended.pt",
+  "previous_action_tokens_tested": 15,
+  "action_exactly_equal": true,
+  "probabilities_exactly_equal": true,
+  "hidden_exactly_equal": true,
+  "logits_exactly_equal": true,
+  "combined_embedding_exactly_equal": true,
+  "max_abs_disabled_action_channel": 0.0,
+  "checkpoint_has_action_embedding": false,
+  "passed": true
+}

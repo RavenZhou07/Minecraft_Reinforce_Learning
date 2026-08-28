@@ -1,0 +1,83 @@
+{
+  "experiment": "exp14_no_action_single_capacity_audit",
+  "predeclared_utc": "2026-08-28T12:58:55Z",
+  "repository_head": "6549d11673cda4a3393d220552bd5461089f53f2",
+  "purpose": "Sanity-only capacity audit after the exp13 single-trajectory gate stopped formal training.",
+  "policy_scope": "diagnostic_only_not_a_formal_policy",
+  "previous_action_mode": "disabled_zero",
+  "architecture": {
+    "image_height": 64,
+    "image_width": 64,
+    "vector_size": 16,
+    "spatial_embedding": 96,
+    "scalar_embedding": 32,
+    "disabled_action_slot_width": 16,
+    "disabled_action_slot_source": "internal_constant_zeros",
+    "gru_input_width": 144,
+    "hidden_size": 128,
+    "action_count": 14
+  },
+  "dataset": {
+    "path": "logs/learning/e2e_bc_train_18200_8.npz",
+    "sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "selected_seed": 18204,
+    "selected_steps": 56
+  },
+  "validation_hash_control": {
+    "path": "logs/learning/e2e_bc_validation_18300_4.npz",
+    "sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+  },
+  "initialization": {
+    "seed": 7,
+    "procedure": "construct_embedded_actor_first_then_exactly_copy_all_shared_tensors_to_disabled_zero_actor"
+  },
+  "optimizer": {
+    "name": "AdamW",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "batch_size_episodes": 1,
+    "class_weight_power": 0.0,
+    "gradient_clip": 1.0,
+    "training_seed": 7
+  },
+  "checkpoint_selection": "minimum_validation_cross_entropy_with_1e-7_improvement",
+  "diagnostic_budget_change_from_exp13": {
+    "maximum_epochs": {
+      "exp13": 250,
+      "exp14": 1000
+    },
+    "patience": {
+      "exp13": 80,
+      "exp14": 250
+    }
+  },
+  "acceptance": {
+    "minimum_accuracy": 0.95,
+    "minimum_balanced_accuracy": 0.95,
+    "checkpoint_reload_exact": true,
+    "max_abs_disabled_action_channel": 0.0
+  },
+  "baseline_exp13": {
+    "selected_best_epoch": 248,
+    "accuracy": 0.9464285714285714,
+    "balanced_accuracy": 0.8104938271604939,
+    "cross_entropy": 0.15919137001037598,
+    "highest_observed_accuracy": 0.9642857142857143,
+    "highest_observed_accuracy_qualified": false
+  },
+  "execution_boundary": {
+    "multi_trajectory_sanity": false,
+    "formal_seed29_training": false,
+    "recorded_observation_replay": false,
+    "autonomous_rollout": false,
+    "data_expansion": false,
+    "DAgger": false,
+    "PPO": false,
+    "promotion": "none"
+  },
+  "protected_splits": ["student_holdout", "final_test"],
+  "exactly_one_decision_rule": {
+    "pass": "Recommend returning to the predeclared multi-trajectory sanity gate, without starting it in exp14.",
+    "fail": "Conclude that longer optimization alone does not repair the no-action single-trajectory capacity gate and recommend a representation/sequence identifiability diagnostic."
+  }
+}

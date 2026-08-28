@@ -1,0 +1,6 @@
+{
+  "experiment": "exp13_no_previous_action_ablation",
+  "status": "not_run",
+  "reason": "The predeclared single-trajectory gate failed (accuracy 0.9464 < 0.95 and balanced accuracy 0.8105 < 0.95). Stop condition 10 prohibits entering the multi-trajectory gate.",
+  "protected_splits_accessed": false
+}

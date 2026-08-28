@@ -1,11 +1,12 @@
 """Minimal legal-observation CNN/GRU actor for Natural Treechop.
 
-The recurrent policy consumes only the allowlisted student observation emitted
-by :mod:`mc_rl.learning_observation`, plus the previously executed action.  The
+The historical actor embeds the previously executed action.  Controlled
+ablations may instead use an internal, fixed-zero slot of the same width.  The
 dataset helpers deliberately name every array they read so privileged audit
 arrays cannot become actor inputs by accident.
 """
 
+import hashlib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
@@ -27,11 +28,18 @@ RECURRENT_MODEL_VERSION = "natural_treechop_recurrent_bc_v1"
 ACTION_COUNT = len(ACTION_NAMES)
 START_ACTION_TOKEN = ACTION_COUNT
 ACTION_TOKEN_COUNT = ACTION_COUNT + 1
+PREVIOUS_ACTION_EMBEDDED = "embedded"
+PREVIOUS_ACTION_DISABLED_ZERO = "disabled_zero"
 RECURRENT_STUDENT_INPUT_MANIFEST = (
     "pov_rgb_64x64_current",
     "legal_player_state_vector_{}".format(len(STUDENT_VECTOR_NAMES)),
     "previous_executed_action_embedding_14_plus_start",
     "episode_local_gru_history",
+)
+DISABLED_ZERO_STUDENT_INPUT_MANIFEST = (
+    "pov_rgb_64x64_current",
+    "legal_player_state_vector_{}".format(len(STUDENT_VECTOR_NAMES)),
+    "episode_local_gru_history_from_legal_observations_only",
 )
 RECURRENT_DATASET_FIELDS = (
     "pov",
@@ -55,6 +63,19 @@ class RecurrentArchitecture:
     action_embedding: int = 16
     hidden_size: int = 128
     action_count: int = ACTION_COUNT
+    previous_action_mode: str = PREVIOUS_ACTION_EMBEDDED
+
+
+def student_input_manifest_for_architecture(
+    architecture: RecurrentArchitecture,
+) -> Tuple[str, ...]:
+    if architecture.previous_action_mode == PREVIOUS_ACTION_EMBEDDED:
+        return RECURRENT_STUDENT_INPUT_MANIFEST
+    if architecture.previous_action_mode == PREVIOUS_ACTION_DISABLED_ZERO:
+        return DISABLED_ZERO_STUDENT_INPUT_MANIFEST
+    raise ValueError(
+        "unsupported previous_action_mode: {}".format(architecture.previous_action_mode)
+    )
 
 
 @dataclass(frozen=True)
@@ -233,11 +254,12 @@ def episode_batches(
 
 
 class RecurrentTreechopActor(nn.Module):
-    """Small CNN + scalar MLP + previous-action embedding + one-layer GRU."""
+    """Small CNN + scalar MLP + controlled 16-wide slot + one-layer GRU."""
 
     def __init__(self, architecture: RecurrentArchitecture = RecurrentArchitecture()):
         super().__init__()
         self.architecture = architecture
+        student_input_manifest_for_architecture(architecture)
         self.spatial_encoder = nn.Sequential(
             nn.Conv2d(3, 8, kernel_size=5, stride=4, padding=2),
             nn.ReLU(),
@@ -255,9 +277,15 @@ class RecurrentTreechopActor(nn.Module):
             nn.Linear(32, architecture.scalar_embedding),
             nn.ReLU(),
         )
-        self.previous_action_embedding = nn.Embedding(
-            ACTION_TOKEN_COUNT, architecture.action_embedding
-        )
+        if architecture.previous_action_mode == PREVIOUS_ACTION_EMBEDDED:
+            self.previous_action_embedding: Optional[nn.Embedding] = nn.Embedding(
+                ACTION_TOKEN_COUNT, architecture.action_embedding
+            )
+        else:
+            # Deliberately absent from state_dict and optimizer parameters.  A
+            # learned START/noop/mean vector would be a second information/bias
+            # channel and is not equivalent to the controlled intervention.
+            self.previous_action_embedding = None
         recurrent_input = (
             architecture.spatial_embedding
             + architecture.scalar_embedding
@@ -278,6 +306,20 @@ class RecurrentTreechopActor(nn.Module):
         previous_action_token: Tensor,
         hidden: Optional[Tensor] = None,
     ) -> Tuple[Tensor, Tensor]:
+        logits, next_hidden, _ = self.forward_with_diagnostics(
+            pov, legal_vector, previous_action_token, hidden
+        )
+        return logits, next_hidden
+
+    def forward_with_diagnostics(
+        self,
+        pov: Tensor,
+        legal_vector: Tensor,
+        previous_action_token: Tensor,
+        hidden: Optional[Tensor] = None,
+    ) -> Tuple[Tensor, Tensor, Dict[str, Tensor]]:
+        """Run the unchanged actor while exposing frozen diagnostic features."""
+
         if pov.ndim != 5 or pov.shape[-3:] != (
             self.architecture.image_height,
             self.architecture.image_width,
@@ -291,10 +333,24 @@ class RecurrentTreechopActor(nn.Module):
         scalars = self.scalar_encoder(
             legal_vector.reshape(batch_size * timesteps, -1)
         ).reshape(batch_size, timesteps, -1)
-        action_embedding = self.previous_action_embedding(previous_action_token)
+        if self.architecture.previous_action_mode == PREVIOUS_ACTION_EMBEDDED:
+            if self.previous_action_embedding is None:
+                raise RuntimeError("embedded mode has no action embedding module")
+            action_embedding = self.previous_action_embedding(previous_action_token)
+        else:
+            action_embedding = spatial.new_zeros(
+                (batch_size, timesteps, self.architecture.action_embedding)
+            )
         encoded = torch.cat((spatial, scalars, action_embedding), dim=-1)
         recurrent, next_hidden = self.gru(encoded, hidden)
-        return self.action_head(recurrent), next_hidden
+        logits = self.action_head(recurrent)
+        return logits, next_hidden, {
+            "cnn_embedding": spatial,
+            "scalar_embedding": scalars,
+            "action_embedding": action_embedding,
+            "combined_embedding": encoded,
+            "recurrent_output": recurrent,
+        }
 
 
 def masked_cross_entropy(
@@ -341,7 +397,7 @@ class RecurrentTreechopPolicy:
         self.model = RecurrentTreechopActor(architecture).to(self.device)
         self.dataset_hashes: Dict[str, str] = {}
         self.seed_manifest = ""
-        self.student_input_manifest = RECURRENT_STUDENT_INPUT_MANIFEST
+        self.student_input_manifest = student_input_manifest_for_architecture(architecture)
 
     def predict_step(
         self,
@@ -350,9 +406,23 @@ class RecurrentTreechopPolicy:
         previous_action_token: int,
         hidden: Optional[Tensor],
     ) -> Tuple[int, np.ndarray, Tensor]:
+        action, probabilities, next_hidden, _ = self.predict_step_with_diagnostics(
+            pov, legal_vector, previous_action_token, hidden
+        )
+        return action, probabilities, next_hidden
+
+    def predict_step_with_diagnostics(
+        self,
+        pov: np.ndarray,
+        legal_vector: np.ndarray,
+        previous_action_token: int,
+        hidden: Optional[Tensor],
+    ) -> Tuple[int, np.ndarray, Tensor, Dict[str, np.ndarray]]:
+        """One actor decision plus values needed for runtime integrity audits."""
+
         self.model.eval()
         with torch.no_grad():
-            logits, next_hidden = self.model(
+            logits, next_hidden, diagnostics = self.model.forward_with_diagnostics(
                 torch.from_numpy(np.asarray(pov, dtype=np.uint8))[None, None].to(self.device),
                 torch.from_numpy(np.asarray(legal_vector, dtype=np.float32))[None, None].to(self.device),
                 torch.tensor([[int(previous_action_token)]], dtype=torch.long, device=self.device),
@@ -360,7 +430,15 @@ class RecurrentTreechopPolicy:
             )
             probabilities = torch.softmax(logits[0, 0], dim=-1)
             action = int(torch.argmax(probabilities).item())
-        return action, probabilities.cpu().numpy(), next_hidden.detach()
+        arrays = {
+            "logits": logits[0, 0].detach().cpu().numpy(),
+            "cnn_embedding": diagnostics["cnn_embedding"][0, 0].detach().cpu().numpy(),
+            "scalar_embedding": diagnostics["scalar_embedding"][0, 0].detach().cpu().numpy(),
+            "action_embedding": diagnostics["action_embedding"][0, 0].detach().cpu().numpy(),
+            "combined_embedding": diagnostics["combined_embedding"][0, 0].detach().cpu().numpy(),
+            "recurrent_output": diagnostics["recurrent_output"][0, 0].detach().cpu().numpy(),
+        }
+        return action, probabilities.cpu().numpy(), next_hidden.detach(), arrays
 
     def save(
         self,
@@ -394,16 +472,125 @@ class RecurrentTreechopPolicy:
             raise ValueError("unsupported recurrent checkpoint version")
         if payload.get("observation_schema") != STUDENT_OBSERVATION_SCHEMA_VERSION:
             raise ValueError("checkpoint observation schema mismatch")
-        manifest = tuple(payload.get("student_input_manifest", ()))
-        if manifest != RECURRENT_STUDENT_INPUT_MANIFEST:
-            raise ValueError("checkpoint student input manifest mismatch")
         architecture = RecurrentArchitecture(**payload["architecture"])
+        manifest = tuple(payload.get("student_input_manifest", ()))
+        expected_manifest = student_input_manifest_for_architecture(architecture)
+        if manifest != expected_manifest:
+            raise ValueError("checkpoint student input manifest mismatch")
         policy = cls(architecture=architecture, device=device)
         policy.model.load_state_dict(payload["state_dict"])
         policy.model.eval()
         policy.dataset_hashes = dict(payload.get("dataset_hashes", {}))
         policy.seed_manifest = str(payload.get("seed_manifest", ""))
         return policy
+
+
+PAIRED_SHARED_PREFIXES = (
+    "spatial_encoder.",
+    "scalar_encoder.",
+    "gru.",
+    "action_head.",
+)
+
+
+def shared_state_dict(model: nn.Module) -> Dict[str, Tensor]:
+    """Return only tensors shared by embedded and disabled-zero actors."""
+
+    return {
+        name: value
+        for name, value in model.state_dict().items()
+        if name.startswith(PAIRED_SHARED_PREFIXES)
+    }
+
+
+def tensor_state_sha256(state: Mapping[str, Tensor]) -> str:
+    """Stable exact hash over named tensor dtype, shape, and bytes."""
+
+    digest = hashlib.sha256()
+    for name in sorted(state):
+        value = state[name].detach().cpu().contiguous()
+        digest.update(name.encode("utf-8"))
+        digest.update(str(value.dtype).encode("ascii"))
+        digest.update(str(tuple(value.shape)).encode("ascii"))
+        digest.update(value.numpy().tobytes())
+    return digest.hexdigest()
+
+
+def paired_disabled_zero_policy(
+    seed: int,
+    device: str = "cpu",
+) -> Tuple[RecurrentTreechopPolicy, Dict[str, Any]]:
+    """Build an original-style actor and exactly pair all shared tensors.
+
+    The embedded actor is constructed first under the original seed/RNG
+    semantics.  The returned disabled-zero actor receives exact copies of all
+    shape-compatible shared tensors; the embedded-only action table is neither
+    copied nor present in its state.
+    """
+
+    torch.manual_seed(int(seed))
+    embedded = RecurrentTreechopPolicy(
+        RecurrentArchitecture(previous_action_mode=PREVIOUS_ACTION_EMBEDDED),
+        device=device,
+    )
+    disabled = RecurrentTreechopPolicy(
+        RecurrentArchitecture(previous_action_mode=PREVIOUS_ACTION_DISABLED_ZERO),
+        device=device,
+    )
+    source = shared_state_dict(embedded.model)
+    target_state = disabled.model.state_dict()
+    missing = sorted(set(source) - set(target_state))
+    shape_mismatches = sorted(
+        name
+        for name in source
+        if name in target_state and source[name].shape != target_state[name].shape
+    )
+    if missing or shape_mismatches:
+        raise RuntimeError(
+            "shared initialization pairing failed: missing={} shape_mismatches={}".format(
+                missing, shape_mismatches
+            )
+        )
+    paired_state = {
+        name: source[name].detach().clone() if name in source else value
+        for name, value in target_state.items()
+    }
+    disabled.model.load_state_dict(paired_state, strict=True)
+    target = shared_state_dict(disabled.model)
+    unequal = sorted(name for name in source if not torch.equal(source[name], target[name]))
+    source_hash = tensor_state_sha256(source)
+    target_hash = tensor_state_sha256(target)
+    audit = {
+        "training_seed": int(seed),
+        "procedure": "embedded_actor_constructed_first_then_shared_tensors_copied",
+        "shared_tensor_count": len(source),
+        "shared_tensor_names": sorted(source),
+        "embedded_initial_shared_state_sha256": source_hash,
+        "disabled_zero_initial_shared_state_sha256": target_hash,
+        "shared_tensors_exactly_equal": not unequal and source_hash == target_hash,
+        "unequal_tensors": unequal,
+        "disabled_state_has_action_embedding": any(
+            name.startswith("previous_action_embedding.")
+            for name in disabled.model.state_dict()
+        ),
+        "disabled_trainable_action_embedding_parameters": [
+            name
+            for name, _ in disabled.model.named_parameters()
+            if name.startswith("previous_action_embedding.")
+        ],
+        "gru_input_width": int(disabled.model.gru.input_size),
+        "historical_seed29_initial_state_exactly_reconstructed": False,
+        "historical_reconstruction_limitation": (
+            "The new run exactly pairs its shared modules to a freshly constructed "
+            "original-style seed actor, but the historical exp09 pre-training state "
+            "was not saved and therefore cannot be independently proven identical."
+        ),
+    }
+    if not audit["shared_tensors_exactly_equal"]:
+        raise RuntimeError("shared initialization tensors are not exactly equal")
+    if audit["disabled_state_has_action_embedding"]:
+        raise RuntimeError("disabled-zero actor unexpectedly saved an action embedding")
+    return disabled, audit
 
 
 class RecurrentTreechopStudentAgent:

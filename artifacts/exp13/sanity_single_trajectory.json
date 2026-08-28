@@ -1,0 +1,733 @@
+{
+  "experiment_id": "exp13a_no_action_single_sanity",
+  "hypothesis": "The disabled-zero actor retains enough recurrent sequence capacity to overfit the frozen 56-step seed-18204 trajectory.",
+  "checkpoint": "artifacts/exp13/sanity_checkpoints/no_action_single_seed18204.pt",
+  "checkpoint_sha256": "eb79ebb4abae22072e0d679a956f2549f0194588046c0f5dc116f49e1aa4377b",
+  "checkpoint_reload_consistent": true,
+  "dataset_hashes": {
+    "train": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "validation": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+  },
+  "train_metrics": {
+    "samples": 56,
+    "episodes": 1,
+    "episode_seeds": [
+      18204
+    ],
+    "cross_entropy": 0.15919137001037598,
+    "accuracy": 0.9464285714285714,
+    "balanced_accuracy": 0.8104938271604939,
+    "mean_prediction_entropy_nats": 0.3383799195289612,
+    "action_counts": {
+      "0": 1,
+      "1": 27,
+      "2": 1,
+      "3": 7,
+      "4": 10,
+      "7": 10
+    },
+    "predicted_action_counts": {
+      "0": 1,
+      "1": 28,
+      "3": 7,
+      "4": 10,
+      "7": 10
+    },
+    "per_action": {
+      "noop": {
+        "id": 0,
+        "support": 1,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "forward": {
+        "id": 1,
+        "support": 27,
+        "recall": 0.9629629629629629,
+        "precision": 0.9285714285714286
+      },
+      "forward_jump": {
+        "id": 2,
+        "support": 1,
+        "recall": 0.0,
+        "precision": null
+      },
+      "turn_left": {
+        "id": 3,
+        "support": 7,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "turn_right": {
+        "id": 4,
+        "support": 10,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "look_up": {
+        "id": 5,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "look_down": {
+        "id": 6,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "attack": {
+        "id": 7,
+        "support": 10,
+        "recall": 0.9,
+        "precision": 0.9
+      },
+      "forward_attack": {
+        "id": 8,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "backward": {
+        "id": 9,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "fine_turn_left": {
+        "id": 10,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "fine_turn_right": {
+        "id": 11,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "fine_look_up": {
+        "id": 12,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "fine_look_down": {
+        "id": 13,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      }
+    },
+    "confusion_matrix_rows_label_columns_prediction": [
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        26,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "max_abs_action_slot": 0.0
+  },
+  "validation_metrics": {
+    "samples": 56,
+    "episodes": 1,
+    "episode_seeds": [
+      18204
+    ],
+    "cross_entropy": 0.15919137001037598,
+    "accuracy": 0.9464285714285714,
+    "balanced_accuracy": 0.8104938271604939,
+    "mean_prediction_entropy_nats": 0.3383799195289612,
+    "action_counts": {
+      "0": 1,
+      "1": 27,
+      "2": 1,
+      "3": 7,
+      "4": 10,
+      "7": 10
+    },
+    "predicted_action_counts": {
+      "0": 1,
+      "1": 28,
+      "3": 7,
+      "4": 10,
+      "7": 10
+    },
+    "per_action": {
+      "noop": {
+        "id": 0,
+        "support": 1,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "forward": {
+        "id": 1,
+        "support": 27,
+        "recall": 0.9629629629629629,
+        "precision": 0.9285714285714286
+      },
+      "forward_jump": {
+        "id": 2,
+        "support": 1,
+        "recall": 0.0,
+        "precision": null
+      },
+      "turn_left": {
+        "id": 3,
+        "support": 7,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "turn_right": {
+        "id": 4,
+        "support": 10,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "look_up": {
+        "id": 5,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "look_down": {
+        "id": 6,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "attack": {
+        "id": 7,
+        "support": 10,
+        "recall": 0.9,
+        "precision": 0.9
+      },
+      "forward_attack": {
+        "id": 8,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "backward": {
+        "id": 9,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "fine_turn_left": {
+        "id": 10,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "fine_turn_right": {
+        "id": 11,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "fine_look_up": {
+        "id": 12,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      },
+      "fine_look_down": {
+        "id": 13,
+        "support": 0,
+        "recall": null,
+        "precision": null
+      }
+    },
+    "confusion_matrix_rows_label_columns_prediction": [
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        26,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "max_abs_action_slot": 0.0
+  },
+  "training_epochs": 250,
+  "best_epoch": 248,
+  "acceptance_accuracy": 0.95,
+  "acceptance_balanced_accuracy": 0.95,
+  "acceptance_passed": false,
+  "previous_action_mode": "disabled_zero",
+  "initialization_pairing": {
+    "training_seed": 7,
+    "procedure": "embedded_actor_constructed_first_then_shared_tensors_copied",
+    "shared_tensor_count": 18,
+    "shared_tensor_names": [
+      "action_head.bias",
+      "action_head.weight",
+      "gru.bias_hh_l0",
+      "gru.bias_ih_l0",
+      "gru.weight_hh_l0",
+      "gru.weight_ih_l0",
+      "scalar_encoder.0.bias",
+      "scalar_encoder.0.weight",
+      "scalar_encoder.2.bias",
+      "scalar_encoder.2.weight",
+      "spatial_encoder.0.bias",
+      "spatial_encoder.0.weight",
+      "spatial_encoder.2.bias",
+      "spatial_encoder.2.weight",
+      "spatial_encoder.4.bias",
+      "spatial_encoder.4.weight",
+      "spatial_encoder.7.bias",
+      "spatial_encoder.7.weight"
+    ],
+    "embedded_initial_shared_state_sha256": "5f48db629e41dec90bd47ec4156d62b762e9c2dbcc4fe8a1bd4735e0f73096ff",
+    "disabled_zero_initial_shared_state_sha256": "5f48db629e41dec90bd47ec4156d62b762e9c2dbcc4fe8a1bd4735e0f73096ff",
+    "shared_tensors_exactly_equal": true,
+    "unequal_tensors": [],
+    "disabled_state_has_action_embedding": false,
+    "disabled_trainable_action_embedding_parameters": [],
+    "gru_input_width": 144,
+    "historical_seed29_initial_state_exactly_reconstructed": false,
+    "historical_reconstruction_limitation": "The new run exactly pairs its shared modules to a freshly constructed original-style seed actor, but the historical exp09 pre-training state was not saved and therefore cannot be independently proven identical."
+  },
+  "zero_channel_assertion_passed": true,
+  "privileged_actor_inputs": 0,
+  "train_only_privileged_supervision": [],
+  "elapsed_seconds": 26.426
+}

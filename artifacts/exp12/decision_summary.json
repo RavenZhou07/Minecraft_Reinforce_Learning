@@ -1,0 +1,81 @@
+{
+  "experiment_id": "exp12_runtime_observability_audit",
+  "executive_conclusion": "previous-action feedback supported",
+  "primary_hypothesis": "H2_previous_action_positive_feedback",
+  "runtime_gate_passed": true,
+  "hypotheses": {
+    "H1_runtime_input_integrity_failure": {
+      "status": "not_supported",
+      "evidence": "All 12 traces passed exact live/standalone parity, causal action mapping, dynamic RGB/vector, single hidden advance, reset, eval-mode, and legal-input checks."
+    },
+    "H2_previous_action_positive_feedback": {
+      "status": "supported_primary",
+      "argmax_changed_by_previous_token_rate": 0.46368159203980097,
+      "teacher_forced_balanced_accuracy": 0.3261021954114348,
+      "free_running_balanced_accuracy": 0.07968276933794174,
+      "teacher_forced_minus_free_balanced_accuracy": 0.24641942607349307,
+      "token_to_observation_js_ratio": 59.699979990613976
+    },
+    "H3_gru_hidden_attractor": {
+      "status": "secondary_sensitivity_not_primary",
+      "hidden_intervention_argmax_change_rate": 0.09203980099502487,
+      "hidden_to_observation_js_ratio": 72.53195817818853,
+      "reason": "Hidden interventions alter probability mass but rarely cross the discrete argmax; the predeclared 0.25 argmax-change criterion was not met."
+    },
+    "H4_learned_representation_failure": {
+      "status": "not_supported_as_primary",
+      "validation_valid_attack_geometry_balanced_accuracy": {
+        "F3_four_frame_stack": 0.5805034097268764,
+        "F4_handwritten": 0.5709755204410881,
+        "F5_cnn_embedding": 0.7605763716636842,
+        "F6_gru_hidden": 0.7460703502311152
+      },
+      "reason": "The frozen CNN embedding outperformed the four-frame and prior hand-written representations on the key validation geometry label."
+    },
+    "H5_observation_aliasing_or_coverage_ood": {
+      "status": "not_supported_as_primary",
+      "successful_bc_train_contact_to_valid_distinct_seeds": 7,
+      "maximum_student_dev_ood95_fraction": 0.17733333333333334,
+      "reason": "Key geometry is diagnostically separable, all seven successful train seeds cover contact-to-valid transitions, and student-dev OOD95 remains below the predeclared 0.50 threshold in every feature space."
+    }
+  },
+  "matched_rollouts": {
+    "episodes": 12,
+    "timeouts": 12,
+    "inventory_successes": 0,
+    "episodes_with_zero_action_transitions": 12,
+    "valid_attack_episodes": 1,
+    "dominant_actions": {
+      "seed11": {"turn_right": 4},
+      "seed29": {"fine_turn_left": 1, "turn_right": 3},
+      "seed47": {"attack": 1, "turn_right": 3}
+    }
+  },
+  "one_next_intervention": {
+    "case": "Case B",
+    "action": "Train one controlled GRU actor without an explicit previous-action embedding.",
+    "controls_to_hold_fixed": [
+      "bc_train and bc_validation datasets and hashes",
+      "current 64x64 RGB input",
+      "legal vector 16",
+      "CNN architecture",
+      "GRU hidden size and layer count",
+      "optimizer, loss, class weighting, epochs, and patience",
+      "initialization and training seed 29",
+      "teacher and task semantics"
+    ],
+    "forbidden_concurrent_changes": [
+      "frame stack",
+      "new data",
+      "DAgger2",
+      "larger CNN or GRU",
+      "observation boundary changes",
+      "PPO or reward shaping"
+    ]
+  },
+  "checkpoint_promoted": false,
+  "policy_training_performed_this_round": false,
+  "teacher_actions_executed": 0,
+  "privileged_actor_inputs": 0,
+  "protected_splits_accessed": false
+}

@@ -1,0 +1,31 @@
+{
+  "experiment": "exp14_no_action_single_capacity_audit",
+  "baseline": "exp13a_no_action_single_sanity",
+  "first_250_training_rows_exactly_equal": true,
+  "first_250_mismatch_count": 0,
+  "controlled_change": {
+    "maximum_epochs": {
+      "exp13": 250,
+      "exp14": 1000
+    },
+    "patience": {
+      "exp13": 80,
+      "exp14": 250
+    }
+  },
+  "first_epoch_meeting_both_95_percent_thresholds": 288,
+  "first_epoch_with_100_percent_accuracy_and_balanced_accuracy": 288,
+  "qualifying_epoch_count": 701,
+  "perfect_epoch_count": 104,
+  "selected_checkpoint": {
+    "selection_rule": "minimum_validation_cross_entropy_with_1e-7_improvement",
+    "epoch": 997,
+    "cross_entropy": 0.025862340416227068,
+    "accuracy": 1.0,
+    "balanced_accuracy": 1.0,
+    "mean_gradient_norm_before_clip": 3.7860822677612305,
+    "max_abs_disabled_action_channel": 0.0
+  },
+  "interpretation": "The exp13 failure is attributable to the shorter sanity optimization horizon under this fixed run, not to an inability of the disabled-zero architecture to memorize this one trajectory.",
+  "passed": true
+}

@@ -1,0 +1,25 @@
+{
+  "experiment": "exp13_no_previous_action_ablation",
+  "stage": "implementation_and_pretraining_correctness",
+  "previous_action_tokens_tested": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+  "previous_action_mutation_outputs_identical": {
+    "combined_legal_embedding": true,
+    "next_hidden": true,
+    "logits": true,
+    "probabilities": true,
+    "argmax": true
+  },
+  "sequence_mutation_outputs_identical": {
+    "training_logits": true,
+    "masked_loss": true,
+    "shared_parameter_gradients": true
+  },
+  "max_abs_disabled_action_channel": 0.0,
+  "action_embedding_registered_parameter": false,
+  "action_embedding_checkpoint_state": false,
+  "shared_initialization_exact_equality": true,
+  "checkpoint_reload_parity": true,
+  "formal_checkpoint_recorded_observation_replay": "not_run_due_to_single_trajectory_sanity_gate_failure",
+  "tests": "tests/test_previous_action_disabled.py",
+  "passed": true
+}

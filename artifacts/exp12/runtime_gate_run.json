@@ -1,0 +1,14 @@
+{
+  "config_sha256": "372890e3770a51191197abd53cfba733d37fb0cb3b50c0492b075c8e08141814",
+  "experiment_id": "exp12_runtime_observability_audit",
+  "pairs_present": 1,
+  "pairs_requested": [
+    [
+      29,
+      18500
+    ]
+  ],
+  "privileged_actor_inputs": 0,
+  "stage": "runtime_gate",
+  "teacher_actions_executed": 0
+}

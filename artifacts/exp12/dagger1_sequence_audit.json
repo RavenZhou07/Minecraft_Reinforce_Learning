@@ -1,0 +1,15 @@
+{
+  "complete_ordered_observation_sequence": true,
+  "episode_boundary_present": true,
+  "episodes": 2,
+  "legal_rgb_present": true,
+  "legal_vector_present": true,
+  "oracle_label_present": true,
+  "path": "logs\\learning\\e2e_dagger_corrections_18400_2.npz",
+  "previous_executed_action_causal": true,
+  "privileged_audit_labels_present": true,
+  "reusable_for_recurrent_training_next_round": true,
+  "samples": 1000,
+  "sha256": "f9f10c91d48be7cdc1fd35fae02dd1d0cf9903b44c7428d36faea467fcfebef1",
+  "used_for_training_this_round": false
+}

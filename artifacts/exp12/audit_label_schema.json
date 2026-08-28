@@ -1,0 +1,146 @@
+{
+  "experiment_id": "exp12_runtime_observability_audit",
+  "labels": [
+    {
+      "definition": "Existing evaluator-compatible audit definition: diagnostic raycast reports a natural log under the crosshair.",
+      "missing_value_handling": "unsupported when field absent",
+      "name": "tree_visible",
+      "number_of_supporting_seeds": "computed separately for each dataset by audit_treechop_coverage.py",
+      "source_array_field": "audit_raycast_is_log",
+      "temporal_window": 1,
+      "threshold": "audit_raycast_is_log == 1"
+    },
+    {
+      "definition": "unsupported_by_current_audit_data: no broad tree mask, angular error, or target screen coordinate is stored independently of raycast hit.",
+      "missing_value_handling": "always unsupported; teacher phase is not substituted",
+      "name": "roughly_centered",
+      "number_of_supporting_seeds": 0,
+      "source_array_field": null,
+      "temporal_window": 1,
+      "threshold": null
+    },
+    {
+      "definition": "A raycast collision surface is within the existing interaction-distance boundary, regardless of block identity.",
+      "missing_value_handling": "unsupported when distance is missing or non-finite",
+      "name": "contact_range",
+      "number_of_supporting_seeds": "computed separately for each dataset by audit_treechop_coverage.py",
+      "source_array_field": "audit_raycast_distance",
+      "temporal_window": 1,
+      "threshold": "audit_raycast_distance <= 4.5"
+    },
+    {
+      "definition": "Crosshair raycast hits a natural log and the existing raycast audit reports it in interaction range; actor action is not part of the label.",
+      "missing_value_handling": "unsupported when either field is absent",
+      "name": "valid_attack_geometry",
+      "number_of_supporting_seeds": "computed separately for each dataset by audit_treechop_coverage.py",
+      "source_array_field": [
+        "audit_raycast_is_log",
+        "audit_raycast_in_range"
+      ],
+      "temporal_window": 1,
+      "threshold": "audit_raycast_is_log == 1 and audit_raycast_in_range == 1"
+    },
+    {
+      "definition": "Causal four-step distance change within one episode: decreasing, stable, or increasing.",
+      "missing_value_handling": "unsupported at episode prefix or when any distance is non-finite",
+      "name": "approach_dynamics",
+      "number_of_supporting_seeds": "computed separately for each dataset by audit_treechop_coverage.py",
+      "source_array_field": "audit_raycast_distance",
+      "temporal_window": 4,
+      "threshold": "delta <= -0.10, abs(delta) < 0.10, or delta >= 0.10 blocks over t-3..t"
+    }
+  ],
+  "privileged_labels_are_actor_inputs": false,
+  "support_by_dataset": {
+    "bc_train": {
+      "approach_dynamics": {
+        "negative_seeds": 8,
+        "positive_seeds": 8
+      },
+      "contact_range": {
+        "negative_seeds": 8,
+        "positive_seeds": 8
+      },
+      "tree_visible": {
+        "negative_seeds": 8,
+        "positive_seeds": 8
+      },
+      "valid_attack_geometry": {
+        "negative_seeds": 8,
+        "positive_seeds": 7
+      }
+    },
+    "bc_validation": {
+      "approach_dynamics": {
+        "negative_seeds": 4,
+        "positive_seeds": 4
+      },
+      "contact_range": {
+        "negative_seeds": 4,
+        "positive_seeds": 4
+      },
+      "tree_visible": {
+        "negative_seeds": 4,
+        "positive_seeds": 4
+      },
+      "valid_attack_geometry": {
+        "negative_seeds": 4,
+        "positive_seeds": 3
+      }
+    },
+    "dagger1": {
+      "approach_dynamics": {
+        "negative_seeds": 0,
+        "positive_seeds": 0
+      },
+      "contact_range": {
+        "negative_seeds": 0,
+        "positive_seeds": 0
+      },
+      "tree_visible": {
+        "negative_seeds": 2,
+        "positive_seeds": 1
+      },
+      "valid_attack_geometry": {
+        "negative_seeds": 2,
+        "positive_seeds": 1
+      }
+    },
+    "student_dev": {
+      "approach_dynamics": {
+        "negative_seeds": 4,
+        "positive_seeds": 3
+      },
+      "contact_range": {
+        "negative_seeds": 3,
+        "positive_seeds": 4
+      },
+      "tree_visible": {
+        "negative_seeds": 4,
+        "positive_seeds": 3
+      },
+      "valid_attack_geometry": {
+        "negative_seeds": 4,
+        "positive_seeds": 2
+      }
+    },
+    "teacher_dev": {
+      "approach_dynamics": {
+        "negative_seeds": 2,
+        "positive_seeds": 2
+      },
+      "contact_range": {
+        "negative_seeds": 2,
+        "positive_seeds": 2
+      },
+      "tree_visible": {
+        "negative_seeds": 2,
+        "positive_seeds": 2
+      },
+      "valid_attack_geometry": {
+        "negative_seeds": 2,
+        "positive_seeds": 2
+      }
+    }
+  }
+}

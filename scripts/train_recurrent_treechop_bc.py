@@ -18,7 +18,8 @@ from mc_rl.experiments import append_experiment, file_sha256
 from mc_rl.natural_treechop_bc import balanced_accuracy
 from mc_rl.recurrent_treechop_bc import (
     ACTION_COUNT,
-    RECURRENT_STUDENT_INPUT_MANIFEST,
+    PREVIOUS_ACTION_DISABLED_ZERO,
+    PREVIOUS_ACTION_EMBEDDED,
     EpisodeSequence,
     RecurrentArchitecture,
     RecurrentTreechopPolicy,
@@ -26,6 +27,8 @@ from mc_rl.recurrent_treechop_bc import (
     episode_batches,
     load_episode_sequences,
     masked_cross_entropy,
+    paired_disabled_zero_policy,
+    student_input_manifest_for_architecture,
 )
 
 
@@ -33,6 +36,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--train-dataset", required=True)
     parser.add_argument("--validation-dataset", required=True)
+    parser.add_argument("--expected-train-sha256")
+    parser.add_argument("--expected-validation-sha256")
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--summary", required=True)
     parser.add_argument("--training-log", required=True)
@@ -48,6 +53,13 @@ def parse_args():
     parser.add_argument("--gradient-clip", type=float, default=1.0)
     parser.add_argument("--overfit-seeds", type=int, nargs="*", default=[])
     parser.add_argument("--acceptance-accuracy", type=float)
+    parser.add_argument("--acceptance-balanced-accuracy", type=float)
+    parser.add_argument(
+        "--previous-action-mode",
+        choices=(PREVIOUS_ACTION_EMBEDDED, PREVIOUS_ACTION_DISABLED_ZERO),
+        default=PREVIOUS_ACTION_EMBEDDED,
+    )
+    parser.add_argument("--initialization-audit")
     parser.add_argument("--experiment-id", required=True)
     parser.add_argument("--hypothesis", required=True)
     return parser.parse_args()
@@ -87,6 +99,7 @@ def split_metrics(
     probabilities: List[np.ndarray] = []
     loss_total = 0.0
     sample_total = 0
+    max_abs_action_slot = 0.0
     policy.model.eval()
     with torch.no_grad():
         for batch in episode_batches(
@@ -96,11 +109,15 @@ def split_metrics(
             rng=np.random.RandomState(0),
         ):
             batch = batch.to(policy.device)
-            logits, _ = policy.model(
+            logits, _, diagnostics = policy.model.forward_with_diagnostics(
                 batch.pov,
                 batch.legal_vector,
                 batch.previous_action_token,
                 hidden=None,
+            )
+            max_abs_action_slot = max(
+                max_abs_action_slot,
+                float(diagnostics["action_embedding"].abs().max().item()),
             )
             selected_logits = logits[batch.mask]
             selected_actions = batch.action[batch.mask]
@@ -153,6 +170,7 @@ def split_metrics(
         },
         "per_action": per_action,
         "confusion_matrix_rows_label_columns_prediction": confusion.tolist(),
+        "max_abs_action_slot": max_abs_action_slot,
     }
     return metrics, prediction_array, probability_array
 
@@ -185,6 +203,8 @@ def train(
         policy.model.train()
         total_loss = 0.0
         total_samples = 0
+        gradient_norms: List[float] = []
+        max_abs_action_slot = 0.0
         for batch in episode_batches(
             train_episodes,
             batch_size=batch_size,
@@ -193,17 +213,28 @@ def train(
         ):
             batch = batch.to(policy.device)
             optimizer.zero_grad(set_to_none=True)
-            logits, _ = policy.model(
+            logits, _, diagnostics = policy.model.forward_with_diagnostics(
                 batch.pov,
                 batch.legal_vector,
                 batch.previous_action_token,
                 hidden=None,
             )
+            slot_max = float(diagnostics["action_embedding"].abs().max().item())
+            max_abs_action_slot = max(max_abs_action_slot, slot_max)
+            if (
+                policy.architecture.previous_action_mode
+                == PREVIOUS_ACTION_DISABLED_ZERO
+                and slot_max != 0.0
+            ):
+                raise RuntimeError("disabled previous-action slot became nonzero")
             loss = masked_cross_entropy(
                 logits, batch.action, batch.mask, class_weights=class_weights
             )
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(policy.model.parameters(), gradient_clip)
+            gradient_norm = torch.nn.utils.clip_grad_norm_(
+                policy.model.parameters(), gradient_clip
+            )
+            gradient_norms.append(float(gradient_norm.item()))
             optimizer.step()
             valid = int(batch.mask.sum().item())
             total_loss += float(loss.item()) * valid
@@ -219,6 +250,9 @@ def train(
             "validation_cross_entropy": validation["cross_entropy"],
             "validation_accuracy": validation["accuracy"],
             "validation_balanced_accuracy": validation["balanced_accuracy"],
+            "mean_gradient_norm_before_clip": float(np.mean(gradient_norms)),
+            "max_gradient_norm_before_clip": float(np.max(gradient_norms)),
+            "max_abs_action_slot": max_abs_action_slot,
         }
         history.append(row)
         if validation["cross_entropy"] < best_loss - 1e-7:
@@ -256,6 +290,20 @@ def main() -> None:
     torch.set_num_threads(max(1, min(4, torch.get_num_threads())))
     train_path = Path(args.train_dataset)
     validation_path = Path(args.validation_dataset)
+    dataset_hashes = {
+        "train": file_sha256(train_path),
+        "validation": file_sha256(validation_path),
+    }
+    if (
+        args.expected_train_sha256
+        and dataset_hashes["train"] != args.expected_train_sha256.lower()
+    ):
+        raise RuntimeError("train dataset SHA-256 mismatch; training stopped")
+    if (
+        args.expected_validation_sha256
+        and dataset_hashes["validation"] != args.expected_validation_sha256.lower()
+    ):
+        raise RuntimeError("validation dataset SHA-256 mismatch; training stopped")
     overfit_seeds = tuple(int(seed) for seed in args.overfit_seeds)
     train_episodes = load_episode_sequences(
         train_path,
@@ -272,8 +320,17 @@ def main() -> None:
     if not overfit_seeds and train_seeds & validation_seeds:
         raise ValueError("train/validation seed overlap")
 
-    architecture = RecurrentArchitecture()
-    policy = RecurrentTreechopPolicy(architecture=architecture, device="cpu")
+    architecture = RecurrentArchitecture(previous_action_mode=args.previous_action_mode)
+    initialization_audit: Optional[Dict[str, Any]] = None
+    if args.previous_action_mode == PREVIOUS_ACTION_DISABLED_ZERO:
+        if not args.initialization_audit:
+            raise ValueError("disabled_zero requires --initialization-audit")
+        policy, initialization_audit = paired_disabled_zero_policy(
+            seed=args.train_seed, device="cpu"
+        )
+        atomic_json(Path(args.initialization_audit), initialization_audit)
+    else:
+        policy = RecurrentTreechopPolicy(architecture=architecture, device="cpu")
     started = time.perf_counter()
     history = train(
         policy=policy,
@@ -292,16 +349,14 @@ def main() -> None:
     validation_metrics, _, _ = split_metrics(
         policy, validation_episodes, args.batch_size
     )
-    dataset_hashes = {
-        "train": file_sha256(train_path),
-        "validation": file_sha256(validation_path),
-    }
     training_metadata = {
         "train_seed": args.train_seed,
         "best_epoch": min(
             history, key=lambda row: row["validation_cross_entropy"]
         )["epoch"],
         "overfit_seeds": list(overfit_seeds),
+        "previous_action_mode": args.previous_action_mode,
+        "initialization_audit": initialization_audit,
     }
     policy.save(
         args.checkpoint,
@@ -315,11 +370,14 @@ def main() -> None:
         for key, value in reloaded.model.state_dict().items()
     )
     elapsed = time.perf_counter() - started
-    acceptance_passed = (
-        None
-        if args.acceptance_accuracy is None
-        else train_metrics["accuracy"] >= args.acceptance_accuracy
-    )
+    acceptance_checks = []
+    if args.acceptance_accuracy is not None:
+        acceptance_checks.append(train_metrics["accuracy"] >= args.acceptance_accuracy)
+    if args.acceptance_balanced_accuracy is not None:
+        acceptance_checks.append(
+            train_metrics["balanced_accuracy"] >= args.acceptance_balanced_accuracy
+        )
+    acceptance_passed = None if not acceptance_checks else all(acceptance_checks)
     config = {
         "profile": args.experiment_id,
         "architecture": {
@@ -339,11 +397,25 @@ def main() -> None:
             "gradient_clip": args.gradient_clip,
             "train_seed": args.train_seed,
         },
-        "sequence_semantics": "obs_t + previous executed action + episode-local hidden -> action_t",
-        "episode_start_previous_action": "dedicated START token (id 14)",
+        "sequence_semantics": (
+            "current legal observation + legal-observation-only episode-local hidden -> action_t"
+            if args.previous_action_mode == PREVIOUS_ACTION_DISABLED_ZERO
+            else "obs_t + previous executed action + episode-local hidden -> action_t"
+        ),
+        "previous_action_mode": args.previous_action_mode,
+        "disabled_action_slot": (
+            {"width": architecture.action_embedding, "source": "constant_zero", "trainable": False}
+            if args.previous_action_mode == PREVIOUS_ACTION_DISABLED_ZERO
+            else None
+        ),
+        "episode_start_previous_action": (
+            "diagnostic/alignment only; ignored by actor"
+            if args.previous_action_mode == PREVIOUS_ACTION_DISABLED_ZERO
+            else "dedicated START token (id 14)"
+        ),
         "hidden_reset": "zeros at each complete-episode batch row and environment reset",
         "padding_loss_masked": True,
-        "student_input_manifest": list(RECURRENT_STUDENT_INPUT_MANIFEST),
+        "student_input_manifest": list(student_input_manifest_for_architecture(architecture)),
         "train_only_privileged_supervision": [],
         "privileged_actor_inputs": 0,
         "datasets": dataset_hashes,
@@ -362,7 +434,16 @@ def main() -> None:
         "training_epochs": len(history),
         "best_epoch": training_metadata["best_epoch"],
         "acceptance_accuracy": args.acceptance_accuracy,
+        "acceptance_balanced_accuracy": args.acceptance_balanced_accuracy,
         "acceptance_passed": acceptance_passed,
+        "previous_action_mode": args.previous_action_mode,
+        "initialization_pairing": initialization_audit,
+        "zero_channel_assertion_passed": (
+            train_metrics["max_abs_action_slot"] == 0.0
+            and validation_metrics["max_abs_action_slot"] == 0.0
+            if args.previous_action_mode == PREVIOUS_ACTION_DISABLED_ZERO
+            else None
+        ),
         "privileged_actor_inputs": 0,
         "train_only_privileged_supervision": [],
         "elapsed_seconds": round(elapsed, 3),

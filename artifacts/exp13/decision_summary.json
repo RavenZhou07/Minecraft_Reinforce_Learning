@@ -1,0 +1,57 @@
+{
+  "experiment": "exp13_no_previous_action_ablation",
+  "executive_conclusion": "correctness/sanity gate failed",
+  "causal_question_answered": false,
+  "causal_decision": "The controlled intervention was implemented correctly, but the no-action actor did not satisfy the required single-trajectory sequence-capacity gate. No claim can be made about whether previous-action removal is sufficient to break the autonomous fixed-point mechanism.",
+  "stop_condition": 10,
+  "single_trajectory_gate": {
+    "seed": 18204,
+    "steps": 56,
+    "selected_best_epoch": 248,
+    "checkpoint_selection": "minimum_validation_cross_entropy",
+    "cross_entropy": 0.15919137001037598,
+    "accuracy": 0.9464285714285714,
+    "required_accuracy": 0.95,
+    "balanced_accuracy": 0.8104938271604939,
+    "required_balanced_accuracy": 0.95,
+    "max_abs_disabled_action_channel": 0.0,
+    "checkpoint_reload_consistent": true,
+    "passed": false
+  },
+  "highest_observed_plain_accuracy": {
+    "value": 0.9642857142857143,
+    "epochs": [230, 240],
+    "balanced_accuracy_at_epoch_240": 0.8271604938271605,
+    "qualifies": false
+  },
+  "failed_recall": {
+    "forward_jump": {
+      "support": 1,
+      "recall": 0.0,
+      "predicted_as": "forward"
+    }
+  },
+  "correctness_audit": {
+    "dataset_hashes_match": true,
+    "shared_initialization_exact_pairing": true,
+    "gru_input_width_preserved_at_144": true,
+    "previous_action_mutation_invariant": true,
+    "sequence_mutation_logits_loss_gradients_invariant": true,
+    "zero_channel_exact": true,
+    "action_embedding_absent_from_parameters_and_checkpoint": true,
+    "checkpoint_reload_parity": true,
+    "fast_tests": "304 passed, 2 skipped"
+  },
+  "downstream_execution": {
+    "multi_trajectory_sanity": false,
+    "formal_seed29_training": false,
+    "recorded_observation_replay": false,
+    "student_dev_autonomous_evaluation": false,
+    "protected_splits_accessed": false,
+    "teacher_actions_executed": 0,
+    "privileged_actor_inputs": 0,
+    "promotion": "none"
+  },
+  "exactly_one_recommendation": "Run one predeclared sanity-only capacity audit on the same seed-18204 trajectory with the same actor, initialization seed, optimizer, learning rate, loss, zero channel, and unchanged 95%/95% thresholds, changing only the diagnostic maximum epoch budget from 250 to 1000; do not proceed to formal training unless that single gate passes.",
+  "status": "stopped_no_promotion"
+}

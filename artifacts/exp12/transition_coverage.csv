@@ -1,0 +1,36 @@
+dataset,transition,status,total_occurrences,distinct_trajectories,distinct_seeds,median_duration,teacher_actions_window_minus10_plus10
+teacher_dev,tree_not_visible_to_tree_visible,supported,8,2,2,1.0,"{""attack"": 40, ""fine_look_down"": 4, ""fine_look_up"": 11, ""fine_turn_left"": 7, ""forward"": 31, ""forward_attack"": 24, ""forward_jump"": 9, ""turn_left"": 11, ""turn_right"": 26}"
+teacher_dev,tree_visible_to_roughly_centered,unsupported_by_current_audit_data,0,0,0,,{}
+teacher_dev,tree_visible_to_approaching,supported,10,2,2,4.0,"{""attack"": 33, ""backward"": 3, ""fine_look_down"": 2, ""fine_look_up"": 11, ""fine_turn_left"": 6, ""forward"": 47, ""forward_attack"": 19, ""forward_jump"": 24, ""noop"": 3, ""turn_left"": 14, ""turn_right"": 39}"
+teacher_dev,approaching_to_contact_range,supported,12,2,2,0.0,"{""attack"": 22, ""backward"": 3, ""fine_look_down"": 1, ""fine_look_up"": 14, ""fine_turn_left"": 6, ""forward"": 79, ""forward_attack"": 24, ""forward_jump"": 21, ""noop"": 4, ""turn_left"": 16, ""turn_right"": 43}"
+teacher_dev,contact_range_to_valid_attack_geometry,supported,5,2,2,0.0,"{""attack"": 39, ""fine_look_down"": 4, ""fine_look_up"": 1, ""fine_turn_left"": 3, ""forward"": 10, ""forward_attack"": 7, ""forward_jump"": 9, ""turn_left"": 11, ""turn_right"": 16}"
+teacher_dev,valid_attack_geometry_to_block_break,unsupported_by_current_audit_data,0,0,0,,{}
+teacher_dev,block_break_to_pickup,unsupported_by_current_audit_data,0,0,0,,{}
+bc_train,tree_not_visible_to_tree_visible,supported,64,7,7,1.0,"{""attack"": 131, ""fine_look_down"": 36, ""fine_look_up"": 30, ""fine_turn_left"": 98, ""fine_turn_right"": 53, ""forward"": 305, ""forward_attack"": 19, ""forward_jump"": 34, ""look_down"": 10, ""look_up"": 9, ""noop"": 276, ""turn_left"": 181, ""turn_right"": 138}"
+bc_train,tree_visible_to_roughly_centered,unsupported_by_current_audit_data,0,0,0,,{}
+bc_train,tree_visible_to_approaching,supported,120,8,8,4.0,"{""attack"": 166, ""backward"": 11, ""fine_look_down"": 58, ""fine_look_up"": 50, ""fine_turn_left"": 251, ""fine_turn_right"": 116, ""forward"": 598, ""forward_attack"": 42, ""forward_jump"": 94, ""look_down"": 18, ""look_up"": 31, ""noop"": 340, ""turn_left"": 483, ""turn_right"": 218}"
+bc_train,approaching_to_contact_range,supported,46,8,8,0.0,"{""attack"": 126, ""backward"": 3, ""fine_look_down"": 38, ""fine_look_up"": 30, ""fine_turn_left"": 70, ""fine_turn_right"": 30, ""forward"": 213, ""forward_attack"": 16, ""forward_jump"": 33, ""look_down"": 16, ""look_up"": 14, ""noop"": 144, ""turn_left"": 136, ""turn_right"": 83}"
+bc_train,contact_range_to_valid_attack_geometry,supported,34,7,7,0.0,"{""attack"": 143, ""fine_look_down"": 36, ""fine_look_up"": 30, ""fine_turn_left"": 33, ""fine_turn_right"": 11, ""forward"": 150, ""forward_attack"": 19, ""forward_jump"": 28, ""look_down"": 10, ""look_up"": 9, ""noop"": 140, ""turn_left"": 29, ""turn_right"": 57}"
+bc_train,valid_attack_geometry_to_block_break,unsupported_by_current_audit_data,0,0,0,,{}
+bc_train,block_break_to_pickup,unsupported_by_current_audit_data,0,0,0,,{}
+bc_validation,tree_not_visible_to_tree_visible,supported,37,4,4,1.0,"{""attack"": 52, ""fine_look_down"": 33, ""fine_look_up"": 28, ""fine_turn_left"": 25, ""fine_turn_right"": 12, ""forward"": 389, ""forward_attack"": 11, ""forward_jump"": 56, ""look_down"": 6, ""look_up"": 2, ""noop"": 4, ""turn_left"": 80, ""turn_right"": 79}"
+bc_validation,tree_visible_to_roughly_centered,unsupported_by_current_audit_data,0,0,0,,{}
+bc_validation,tree_visible_to_approaching,supported,85,4,4,4.0,"{""attack"": 38, ""backward"": 26, ""fine_look_down"": 41, ""fine_look_up"": 41, ""fine_turn_left"": 76, ""fine_turn_right"": 52, ""forward"": 814, ""forward_attack"": 37, ""forward_jump"": 190, ""look_down"": 11, ""look_up"": 17, ""noop"": 8, ""turn_left"": 217, ""turn_right"": 215}"
+bc_validation,approaching_to_contact_range,supported,21,4,4,0.0,"{""attack"": 30, ""backward"": 6, ""fine_look_down"": 17, ""fine_look_up"": 15, ""fine_turn_left"": 9, ""fine_turn_right"": 12, ""forward"": 187, ""forward_attack"": 9, ""forward_jump"": 41, ""look_down"": 5, ""look_up"": 3, ""noop"": 1, ""turn_left"": 59, ""turn_right"": 42}"
+bc_validation,contact_range_to_valid_attack_geometry,supported,11,3,3,0.0,"{""attack"": 53, ""fine_look_down"": 13, ""fine_look_up"": 6, ""fine_turn_left"": 12, ""fine_turn_right"": 3, ""forward"": 86, ""forward_jump"": 14, ""look_down"": 4, ""look_up"": 2, ""noop"": 2, ""turn_left"": 16, ""turn_right"": 20}"
+bc_validation,valid_attack_geometry_to_block_break,unsupported_by_current_audit_data,0,0,0,,{}
+bc_validation,block_break_to_pickup,unsupported_by_current_audit_data,0,0,0,,{}
+dagger1,tree_not_visible_to_tree_visible,supported,42,1,1,1.0,"{""attack"": 20, ""fine_turn_left"": 49, ""fine_turn_right"": 40, ""forward"": 17, ""look_down"": 5, ""noop"": 237, ""turn_left"": 155, ""turn_right"": 353}"
+dagger1,tree_visible_to_roughly_centered,unsupported_by_current_audit_data,0,0,0,,{}
+dagger1,tree_visible_to_approaching,supported,0,0,0,,{}
+dagger1,approaching_to_contact_range,supported,0,0,0,,{}
+dagger1,contact_range_to_valid_attack_geometry,supported,0,0,0,,{}
+dagger1,valid_attack_geometry_to_block_break,unsupported_by_current_audit_data,0,0,0,,{}
+dagger1,block_break_to_pickup,unsupported_by_current_audit_data,0,0,0,,{}
+student_dev,tree_not_visible_to_tree_visible,supported,227,8,3,1.0,"{""fine_turn_left"": 147, ""turn_right"": 4557}"
+student_dev,tree_visible_to_roughly_centered,unsupported_by_current_audit_data,0,0,0,,{}
+student_dev,tree_visible_to_approaching,supported,481,8,3,4.0,"{""fine_turn_left"": 441, ""turn_right"": 9604}"
+student_dev,approaching_to_contact_range,supported,375,9,3,0.0,"{""turn_right"": 7836}"
+student_dev,contact_range_to_valid_attack_geometry,supported,65,6,2,0.0,"{""attack"": 11, ""fine_turn_left"": 158, ""turn_right"": 1166}"
+student_dev,valid_attack_geometry_to_block_break,unsupported_by_current_audit_data,0,0,0,,{}
+student_dev,block_break_to_pickup,unsupported_by_current_audit_data,0,0,0,,{}

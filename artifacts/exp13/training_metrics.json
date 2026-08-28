@@ -1,0 +1,7 @@
+{
+  "experiment": "exp13_no_previous_action_ablation",
+  "status": "not_run",
+  "policy_training_runs_completed": 0,
+  "reason": "Formal seed-29 controlled training was blocked by the failed single-trajectory sanity gate.",
+  "promotion": "none"
+}
