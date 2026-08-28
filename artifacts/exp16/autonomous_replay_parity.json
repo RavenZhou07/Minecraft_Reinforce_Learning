@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "traces": [
+    {
+      "action_logits_max_abs_error": 0.0,
+      "action_probabilities_max_abs_error": 0.0,
+      "argmax_match": true,
+      "cnn_embedding_max_abs_error": 0.0,
+      "environment_seed": 18500,
+      "hidden_max_abs_error": 0.0,
+      "passed": true,
+      "scalar_embedding_max_abs_error": 0.0
+    },
+    {
+      "action_logits_max_abs_error": 0.0,
+      "action_probabilities_max_abs_error": 0.0,
+      "argmax_match": true,
+      "cnn_embedding_max_abs_error": 0.0,
+      "environment_seed": 18501,
+      "hidden_max_abs_error": 0.0,
+      "passed": true,
+      "scalar_embedding_max_abs_error": 0.0
+    },
+    {
+      "action_logits_max_abs_error": 0.0,
+      "action_probabilities_max_abs_error": 0.0,
+      "argmax_match": true,
+      "cnn_embedding_max_abs_error": 0.0,
+      "environment_seed": 18502,
+      "hidden_max_abs_error": 0.0,
+      "passed": true,
+      "scalar_embedding_max_abs_error": 0.0
+    },
+    {
+      "action_logits_max_abs_error": 0.0,
+      "action_probabilities_max_abs_error": 0.0,
+      "argmax_match": true,
+      "cnn_embedding_max_abs_error": 0.0,
+      "environment_seed": 18503,
+      "hidden_max_abs_error": 0.0,
+      "passed": true,
+      "scalar_embedding_max_abs_error": 0.0
+    }
+  ]
+}

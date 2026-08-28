@@ -1,0 +1,41 @@
+{
+  "checkpoint": "artifacts\\exp16\\no_action_formal_seed29.pt",
+  "checkpoint_sha256": "e647e6abf7350e99ceccd2cfdfaf729bbb4326fe678b548e3817cd3a150d5f8a",
+  "deterministic_action_selection": "argmax",
+  "elapsed_seconds": 382.49,
+  "episodes": 4,
+  "episodes_below_0_80_dominant_period_1_to_4_cycle": 0,
+  "episodes_with_action_transitions": 4,
+  "experiment": "exp16_no_action_formal_seed29",
+  "failure_taxonomy": {
+    "approach_timeout": 1,
+    "contact_without_valid_attack": 2,
+    "search_timeout": 1
+  },
+  "max_abs_disabled_action_channel": 0.0,
+  "max_episode_steps": 500,
+  "median_action_transitions": 1.5,
+  "median_dominant_action_fraction": 0.978,
+  "median_dominant_period_1_to_4_cycle_fraction": 0.976,
+  "median_longest_identical_action_streak": 488.0,
+  "privileged_actor_inputs": 0,
+  "progression_counts": {
+    "approach": 3,
+    "block_break": 0,
+    "contact": 2,
+    "inventory_acquisition": 0,
+    "meaningful_interaction": 0,
+    "pickup": 0,
+    "valid_attack": 0
+  },
+  "protected_splits_accessed": false,
+  "pure_500_step_single_action_fixed_point_episode_count": 0,
+  "seeds": [
+    18500,
+    18501,
+    18502,
+    18503
+  ],
+  "success_definition": "inventory natural log delta >= 1",
+  "teacher_actions_executed": 0
+}

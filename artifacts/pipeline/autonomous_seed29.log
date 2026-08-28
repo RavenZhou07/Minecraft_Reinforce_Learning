@@ -1,0 +1,51 @@
+{"action_transitions": 2, "approach": true, "block_break": false, "checkpoint_seed": 29, "contact": true, "disabled_action_channel_max_abs": 0.0, "dominant_action": "forward", "dominant_action_bigram": "forward -> forward", "dominant_bigram_fraction": 0.9839679358717435, "dominant_fraction": 0.984, "dominant_period_1_to_4": 1, "dominant_period_2_to_4_cycle_fraction": 0.0, "environment_seed": 18500, "executed_action_entropy": 0.0880622993069862, "failure_taxonomy": "contact_without_valid_attack", "first_approach_step": 0, "first_block_break_step": null, "first_contact_step": 0, "first_inventory_acquisition_step": null, "first_meaningful_interaction_step": null, "first_pickup_step": null, "first_valid_attack_step": null, "fraction_of_episode_in_dominant_period_1_to_4_cycle": 0.984, "inventory_success": false, "longest_identical_action_streak": 492, "max_period_1_streak": 492, "max_period_2_cycle_streak": 0, "max_period_3_cycle_streak": 0, "max_period_4_cycle_streak": 0, "mean_cnn_embedding_delta": 0.028348131926685016, "mean_hidden_delta": 0.0213699705987648, "mean_policy_entropy": 2.3926612864074435, "mean_policy_js_between_steps": 1.871864488887316e-05, "meaningful_interaction": false, "median_top1_probability": 0.22976645082235336, "median_top1_top2_margin": 0.09299192577600479, "pickup": false, "privileged_actor_inputs": 0, "pure_single_action_fixed_point": false, "steps": 500, "teacher_actions_executed": 0, "time_to_first_action_transition": 1, "timeout": true, "trace_path": "artifacts\\exp16\\autonomous_step_traces\\seed18500.npz", "unique_actions": 3, "valid_attack": false}
+{"action_transitions": 4, "approach": false, "block_break": false, "checkpoint_seed": 29, "contact": false, "disabled_action_channel_max_abs": 0.0, "dominant_action": "forward", "dominant_action_bigram": "forward -> forward", "dominant_bigram_fraction": 0.9779559118236473, "dominant_fraction": 0.98, "dominant_period_1_to_4": 1, "dominant_period_2_to_4_cycle_fraction": 0.0, "environment_seed": 18501, "executed_action_entropy": 0.10454077274756096, "failure_taxonomy": "search_timeout", "first_approach_step": null, "first_block_break_step": null, "first_contact_step": null, "first_inventory_acquisition_step": null, "first_meaningful_interaction_step": null, "first_pickup_step": null, "first_valid_attack_step": null, "fraction_of_episode_in_dominant_period_1_to_4_cycle": 0.884, "inventory_success": false, "longest_identical_action_streak": 442, "max_period_1_streak": 442, "max_period_2_cycle_streak": 0, "max_period_3_cycle_streak": 0, "max_period_4_cycle_streak": 0, "mean_cnn_embedding_delta": 0.04113804941478079, "mean_hidden_delta": 0.03300315839324085, "mean_policy_entropy": 2.4748251861879202, "mean_policy_js_between_steps": 4.412123086102844e-05, "meaningful_interaction": false, "median_top1_probability": 0.1442597508430481, "median_top1_top2_margin": 0.007261753082275391, "pickup": false, "privileged_actor_inputs": 0, "pure_single_action_fixed_point": false, "steps": 500, "teacher_actions_executed": 0, "time_to_first_action_transition": 1, "timeout": true, "trace_path": "artifacts\\exp16\\autonomous_step_traces\\seed18501.npz", "unique_actions": 3, "valid_attack": false}
+{"action_transitions": 1, "approach": true, "block_break": false, "checkpoint_seed": 29, "contact": true, "disabled_action_channel_max_abs": 0.0, "dominant_action": "forward", "dominant_action_bigram": "forward -> forward", "dominant_bigram_fraction": 0.9759519038076152, "dominant_fraction": 0.976, "dominant_period_1_to_4": 1, "dominant_period_2_to_4_cycle_fraction": 0.0, "environment_seed": 18502, "executed_action_entropy": 0.11322250271460811, "failure_taxonomy": "contact_without_valid_attack", "first_approach_step": 34, "first_block_break_step": null, "first_contact_step": 34, "first_inventory_acquisition_step": null, "first_meaningful_interaction_step": null, "first_pickup_step": null, "first_valid_attack_step": null, "fraction_of_episode_in_dominant_period_1_to_4_cycle": 0.976, "inventory_success": false, "longest_identical_action_streak": 488, "max_period_1_streak": 488, "max_period_2_cycle_streak": 0, "max_period_3_cycle_streak": 0, "max_period_4_cycle_streak": 0, "mean_cnn_embedding_delta": 0.12297535319073918, "mean_hidden_delta": 0.061182579566000914, "mean_policy_entropy": 2.004647738971943, "mean_policy_js_between_steps": 0.00010496748482260333, "meaningful_interaction": false, "median_top1_probability": 0.3940272182226181, "median_top1_top2_margin": 0.23918984830379486, "pickup": false, "privileged_actor_inputs": 0, "pure_single_action_fixed_point": false, "steps": 500, "teacher_actions_executed": 0, "time_to_first_action_transition": 12, "timeout": true, "trace_path": "artifacts\\exp16\\autonomous_step_traces\\seed18502.npz", "unique_actions": 2, "valid_attack": false}
+{"action_transitions": 1, "approach": true, "block_break": false, "checkpoint_seed": 29, "contact": false, "disabled_action_channel_max_abs": 0.0, "dominant_action": "forward", "dominant_action_bigram": "forward -> forward", "dominant_bigram_fraction": 0.9759519038076152, "dominant_fraction": 0.976, "dominant_period_1_to_4": 1, "dominant_period_2_to_4_cycle_fraction": 0.0, "environment_seed": 18503, "executed_action_entropy": 0.11322250271460811, "failure_taxonomy": "approach_timeout", "first_approach_step": 0, "first_block_break_step": null, "first_contact_step": null, "first_inventory_acquisition_step": null, "first_meaningful_interaction_step": null, "first_pickup_step": null, "first_valid_attack_step": null, "fraction_of_episode_in_dominant_period_1_to_4_cycle": 0.976, "inventory_success": false, "longest_identical_action_streak": 488, "max_period_1_streak": 488, "max_period_2_cycle_streak": 0, "max_period_3_cycle_streak": 0, "max_period_4_cycle_streak": 0, "mean_cnn_embedding_delta": 0.03680828997295031, "mean_hidden_delta": 0.02077046150079404, "mean_policy_entropy": 1.6008483387853543, "mean_policy_js_between_steps": 1.6516772709954757e-05, "meaningful_interaction": false, "median_top1_probability": 0.5121690630912781, "median_top1_top2_margin": 0.2996682673692703, "pickup": false, "privileged_actor_inputs": 0, "pure_single_action_fixed_point": false, "steps": 500, "teacher_actions_executed": 0, "time_to_first_action_transition": 12, "timeout": true, "trace_path": "artifacts\\exp16\\autonomous_step_traces\\seed18503.npz", "unique_actions": 2, "valid_attack": false}
+Failed to delete the temporary minecraft directory.
+{
+  "experiment": "exp16_no_action_formal_seed29",
+  "checkpoint": "artifacts\\exp16\\no_action_formal_seed29.pt",
+  "checkpoint_sha256": "e647e6abf7350e99ceccd2cfdfaf729bbb4326fe678b548e3817cd3a150d5f8a",
+  "seeds": [
+    18500,
+    18501,
+    18502,
+    18503
+  ],
+  "episodes": 4,
+  "max_episode_steps": 500,
+  "deterministic_action_selection": "argmax",
+  "pure_500_step_single_action_fixed_point_episode_count": 0,
+  "median_action_transitions": 1.5,
+  "median_longest_identical_action_streak": 488.0,
+  "median_dominant_action_fraction": 0.978,
+  "median_dominant_period_1_to_4_cycle_fraction": 0.976,
+  "episodes_below_0_80_dominant_period_1_to_4_cycle": 0,
+  "episodes_with_action_transitions": 4,
+  "progression_counts": {
+    "meaningful_interaction": 0,
+    "approach": 3,
+    "contact": 2,
+    "valid_attack": 0,
+    "block_break": 0,
+    "pickup": 0,
+    "inventory_acquisition": 0
+  },
+  "failure_taxonomy": {
+    "contact_without_valid_attack": 2,
+    "search_timeout": 1,
+    "approach_timeout": 1
+  },
+  "teacher_actions_executed": 0,
+  "privileged_actor_inputs": 0,
+  "max_abs_disabled_action_channel": 0.0,
+  "success_definition": "inventory natural log delta >= 1",
+  "elapsed_seconds": 382.49,
+  "protected_splits_accessed": false
+}
+F:\EtraCurricular_F\MCRL\.conda-env\lib\site-packages\gym\logger.py:34: UserWarning: [33mWARN: Box bound precision lowered by casting to float32[0m
+  warnings.warn(colorize("%s: %s" % ("WARN", msg % args), "yellow"))
+
+2026-08-28T16:23:38.795781+00:00 START F:\EtraCurricular_F\MCRL\.conda-env\python.exe -m scripts.evaluate_no_previous_action_ablation --config configs\learning\no_action_formal_seed29_exp16.json --checkpoint artifacts\exp16\no_action_formal_seed29.pt --output-root artifacts/exp16 --checkpoint-seed 29 --offline-gradle
+2026-08-28T16:30:07.681967+00:00 END exit=0

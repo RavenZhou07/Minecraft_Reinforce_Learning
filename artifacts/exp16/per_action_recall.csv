@@ -1,0 +1,15 @@
+action_id,action_name,support,recall,precision
+0,noop,8,0.0,
+1,forward,277,0.9602888086642599,0.5417515274949084
+2,forward_jump,27,0.0,
+3,turn_left,22,0.0,0.0
+4,turn_right,74,0.35135135135135137,1.0
+5,look_up,7,0.0,
+6,look_down,5,0.0,
+7,attack,37,0.0,0.0
+8,forward_attack,8,0.0,
+9,backward,6,0.0,
+10,fine_turn_left,25,0.0,
+11,fine_turn_right,18,0.0,
+12,fine_look_up,11,0.0,
+13,fine_look_down,9,0.0,

@@ -1,0 +1,841 @@
+{"epoch": 1, "max_abs_action_slot": 0.0, "max_gradient_norm_before_clip": 0.4085218608379364, "mean_gradient_norm_before_clip": 0.3450137600302696, "train_accuracy": 0.09894259818731117, "train_balanced_accuracy": 0.0578763297226405, "train_cross_entropy": 2.6524899301212, "validation_accuracy": 0.09550561797752809, "validation_balanced_accuracy": 0.09345384345384344, "validation_cross_entropy": 2.6597623789355103, "weighted_train_loss": 2.6588021334924727}
+{"epoch": 10, "max_abs_action_slot": 0.0, "max_gradient_norm_before_clip": 1.966689109802246, "mean_gradient_norm_before_clip": 1.0032809972763062, "train_accuracy": 0.2598187311178248, "train_balanced_accuracy": 0.07142857142857142, "train_cross_entropy": 2.2179957732693305, "validation_accuracy": 0.5187265917602997, "validation_balanced_accuracy": 0.07142857142857142, "validation_cross_entropy": 1.956018112125468, "weighted_train_loss": 2.469887565990229}
+{"epoch": 20, "max_abs_action_slot": 0.0, "max_gradient_norm_before_clip": 1.9541537761688232, "mean_gradient_norm_before_clip": 1.310153990983963, "train_accuracy": 0.2809667673716012, "train_balanced_accuracy": 0.08298926507018992, "train_cross_entropy": 2.1385343960764907, "validation_accuracy": 0.5355805243445693, "validation_balanced_accuracy": 0.08011583011583012, "validation_cross_entropy": 1.866677845015508, "weighted_train_loss": 2.380562430602186}
+{"epoch": 30, "max_abs_action_slot": 0.0, "max_gradient_norm_before_clip": 2.7895820140838623, "mean_gradient_norm_before_clip": 1.5623463690280914, "train_accuracy": 0.3957703927492447, "train_balanced_accuracy": 0.20255587357507615, "train_cross_entropy": 1.9665209605974734, "validation_accuracy": 0.5393258426966292, "validation_balanced_accuracy": 0.09194973725659647, "validation_cross_entropy": 1.8100283047679657, "weighted_train_loss": 2.1920683558613874}
+{"epoch": 40, "max_abs_action_slot": 0.0, "max_gradient_norm_before_clip": 2.419377326965332, "mean_gradient_norm_before_clip": 1.7763156294822693, "train_accuracy": 0.4297583081570997, "train_balanced_accuracy": 0.2300584819479091, "train_cross_entropy": 1.751108740031539, "validation_accuracy": 0.5299625468164794, "validation_balanced_accuracy": 0.10667939729311571, "validation_cross_entropy": 1.8298513576779025, "weighted_train_loss": 1.972894828035032}
+{"epoch": 50, "max_abs_action_slot": 0.0, "max_gradient_norm_before_clip": 1.9745466709136963, "mean_gradient_norm_before_clip": 1.659391701221466, "train_accuracy": 0.4826283987915408, "train_balanced_accuracy": 0.312195569019988, "train_cross_entropy": 1.5861044707975358, "validation_accuracy": 0.5262172284644194, "validation_balanced_accuracy": 0.12031138926445786, "validation_cross_entropy": 1.8835747536648526, "weighted_train_loss": 1.7599676983414099}
+{"epoch": 60, "max_abs_action_slot": 0.0, "max_gradient_norm_before_clip": 4.178054332733154, "mean_gradient_norm_before_clip": 2.4020007252693176, "train_accuracy": 0.5574018126888217, "train_balanced_accuracy": 0.37299364881145897, "train_cross_entropy": 1.428505450937323, "validation_accuracy": 0.49812734082397003, "validation_balanced_accuracy": 0.10669935489430074, "validation_cross_entropy": 1.8545989418744149, "weighted_train_loss": 1.5953662598061058}
+{
+  "experiment_id": "exp16_no_action_formal_seed29",
+  "config": "configs\\learning\\no_action_formal_seed29_exp16.json",
+  "config_sha256": "d8312ac0c7dd005e29dd01173079c2fead24893de20426d29a55655d5ae07934",
+  "checkpoint": "artifacts\\exp16\\no_action_formal_seed29.pt",
+  "checkpoint_sha256": "e647e6abf7350e99ceccd2cfdfaf729bbb4326fe678b548e3817cd3a150d5f8a",
+  "checkpoint_reload_exact": true,
+  "training_seed": 29,
+  "training_epochs": 60,
+  "best_epoch": 29,
+  "stopping_reason": "post_60_patience",
+  "train_metrics": {
+    "samples": 1324,
+    "episodes": 7,
+    "episode_seeds": [
+      18200,
+      18201,
+      18203,
+      18204,
+      18205,
+      18206,
+      18207
+    ],
+    "cross_entropy": 1.9979481999607605,
+    "accuracy": 0.3459214501510574,
+    "balanced_accuracy": 0.17885751168487382,
+    "mean_prediction_entropy_nats": 2.3099417686462402,
+    "action_counts": {
+      "0": 159,
+      "1": 344,
+      "2": 59,
+      "3": 187,
+      "4": 173,
+      "5": 10,
+      "6": 9,
+      "7": 155,
+      "8": 34,
+      "9": 6,
+      "10": 100,
+      "11": 48,
+      "12": 17,
+      "13": 23
+    },
+    "predicted_action_counts": {
+      "0": 110,
+      "1": 425,
+      "3": 676,
+      "4": 76,
+      "7": 3,
+      "8": 34
+    },
+    "per_action": {
+      "noop": {
+        "id": 0,
+        "support": 159,
+        "recall": 0.4025157232704403,
+        "precision": 0.5818181818181818
+      },
+      "forward": {
+        "id": 1,
+        "support": 344,
+        "recall": 0.5523255813953488,
+        "precision": 0.4470588235294118
+      },
+      "forward_jump": {
+        "id": 2,
+        "support": 59,
+        "recall": 0.0,
+        "precision": null
+      },
+      "turn_left": {
+        "id": 3,
+        "support": 187,
+        "recall": 0.6844919786096256,
+        "precision": 0.1893491124260355
+      },
+      "turn_right": {
+        "id": 4,
+        "support": 173,
+        "recall": 0.3352601156069364,
+        "precision": 0.7631578947368421
+      },
+      "look_up": {
+        "id": 5,
+        "support": 10,
+        "recall": 0.0,
+        "precision": null
+      },
+      "look_down": {
+        "id": 6,
+        "support": 9,
+        "recall": 0.0,
+        "precision": null
+      },
+      "attack": {
+        "id": 7,
+        "support": 155,
+        "recall": 0.0,
+        "precision": 0.0
+      },
+      "forward_attack": {
+        "id": 8,
+        "support": 34,
+        "recall": 0.5294117647058824,
+        "precision": 0.5294117647058824
+      },
+      "backward": {
+        "id": 9,
+        "support": 6,
+        "recall": 0.0,
+        "precision": null
+      },
+      "fine_turn_left": {
+        "id": 10,
+        "support": 100,
+        "recall": 0.0,
+        "precision": null
+      },
+      "fine_turn_right": {
+        "id": 11,
+        "support": 48,
+        "recall": 0.0,
+        "precision": null
+      },
+      "fine_look_up": {
+        "id": 12,
+        "support": 17,
+        "recall": 0.0,
+        "precision": null
+      },
+      "fine_look_down": {
+        "id": 13,
+        "support": 23,
+        "recall": 0.0,
+        "precision": null
+      }
+    },
+    "confusion_matrix_rows_label_columns_prediction": [
+      [
+        64,
+        5,
+        0,
+        89,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        190,
+        0,
+        136,
+        14,
+        0,
+        0,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        21,
+        0,
+        38,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        59,
+        0,
+        128,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        57,
+        0,
+        53,
+        58,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        71,
+        0,
+        71,
+        3,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        10,
+        0,
+        3,
+        0,
+        0,
+        0,
+        3,
+        18,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        22,
+        2,
+        0,
+        76,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        19,
+        3,
+        0,
+        25,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        16,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "max_abs_action_slot": 0.0
+  },
+  "validation_metrics": {
+    "samples": 534,
+    "episodes": 2,
+    "episode_seeds": [
+      18302,
+      18303
+    ],
+    "cross_entropy": 1.8084515632315075,
+    "accuracy": 0.5468164794007491,
+    "balanced_accuracy": 0.09368858285825796,
+    "mean_prediction_entropy_nats": 1.886531114578247,
+    "action_counts": {
+      "0": 8,
+      "1": 277,
+      "2": 27,
+      "3": 22,
+      "4": 74,
+      "5": 7,
+      "6": 5,
+      "7": 37,
+      "8": 8,
+      "9": 6,
+      "10": 25,
+      "11": 18,
+      "12": 11,
+      "13": 9
+    },
+    "predicted_action_counts": {
+      "1": 491,
+      "3": 4,
+      "4": 26,
+      "7": 13
+    },
+    "per_action": {
+      "noop": {
+        "id": 0,
+        "support": 8,
+        "recall": 0.0,
+        "precision": null
+      },
+      "forward": {
+        "id": 1,
+        "support": 277,
+        "recall": 0.9602888086642599,
+        "precision": 0.5417515274949084
+      },
+      "forward_jump": {
+        "id": 2,
+        "support": 27,
+        "recall": 0.0,
+        "precision": null
+      },
+      "turn_left": {
+        "id": 3,
+        "support": 22,
+        "recall": 0.0,
+        "precision": 0.0
+      },
+      "turn_right": {
+        "id": 4,
+        "support": 74,
+        "recall": 0.35135135135135137,
+        "precision": 1.0
+      },
+      "look_up": {
+        "id": 5,
+        "support": 7,
+        "recall": 0.0,
+        "precision": null
+      },
+      "look_down": {
+        "id": 6,
+        "support": 5,
+        "recall": 0.0,
+        "precision": null
+      },
+      "attack": {
+        "id": 7,
+        "support": 37,
+        "recall": 0.0,
+        "precision": 0.0
+      },
+      "forward_attack": {
+        "id": 8,
+        "support": 8,
+        "recall": 0.0,
+        "precision": null
+      },
+      "backward": {
+        "id": 9,
+        "support": 6,
+        "recall": 0.0,
+        "precision": null
+      },
+      "fine_turn_left": {
+        "id": 10,
+        "support": 25,
+        "recall": 0.0,
+        "precision": null
+      },
+      "fine_turn_right": {
+        "id": 11,
+        "support": 18,
+        "recall": 0.0,
+        "precision": null
+      },
+      "fine_look_up": {
+        "id": 12,
+        "support": 11,
+        "recall": 0.0,
+        "precision": null
+      },
+      "fine_look_down": {
+        "id": 13,
+        "support": 9,
+        "recall": 0.0,
+        "precision": null
+      }
+    },
+    "confusion_matrix_rows_label_columns_prediction": [
+      [
+        0,
+        7,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        266,
+        0,
+        3,
+        0,
+        0,
+        0,
+        8,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        26,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        21,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        45,
+        0,
+        0,
+        26,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        37,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        8,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        25,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        18,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        11,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "max_abs_action_slot": 0.0
+  },
+  "initialization_pairing": {
+    "training_seed": 29,
+    "procedure": "embedded_actor_constructed_first_then_shared_tensors_copied",
+    "shared_tensor_count": 18,
+    "shared_tensor_names": [
+      "action_head.bias",
+      "action_head.weight",
+      "gru.bias_hh_l0",
+      "gru.bias_ih_l0",
+      "gru.weight_hh_l0",
+      "gru.weight_ih_l0",
+      "scalar_encoder.0.bias",
+      "scalar_encoder.0.weight",
+      "scalar_encoder.2.bias",
+      "scalar_encoder.2.weight",
+      "spatial_encoder.0.bias",
+      "spatial_encoder.0.weight",
+      "spatial_encoder.2.bias",
+      "spatial_encoder.2.weight",
+      "spatial_encoder.4.bias",
+      "spatial_encoder.4.weight",
+      "spatial_encoder.7.bias",
+      "spatial_encoder.7.weight"
+    ],
+    "embedded_initial_shared_state_sha256": "e945a28b65e00e2bcc516d59d9bb23ad6f3f8cb4502a0378efb33bc6253751ae",
+    "disabled_zero_initial_shared_state_sha256": "e945a28b65e00e2bcc516d59d9bb23ad6f3f8cb4502a0378efb33bc6253751ae",
+    "shared_tensors_exactly_equal": true,
+    "unequal_tensors": [],
+    "disabled_state_has_action_embedding": false,
+    "disabled_trainable_action_embedding_parameters": [],
+    "gru_input_width": 144,
+    "historical_seed29_initial_state_exactly_reconstructed": false,
+    "historical_reconstruction_limitation": "The new run exactly pairs its shared modules to a freshly constructed original-style seed actor, but the historical exp09 pre-training state was not saved and therefore cannot be independently proven identical."
+  },
+  "zero_channel_assertion_passed": true,
+  "elapsed_seconds": 39.712,
+  "protected_splits_accessed": false
+}
+
+2026-08-28T16:22:40.895469+00:00 START F:\EtraCurricular_F\MCRL\.conda-env\python.exe -m scripts.train_bounded_no_action --config configs\learning\no_action_formal_seed29_exp16.json
+2026-08-28T16:23:28.653596+00:00 END exit=0
+{
+  "experiment": "exp16_no_action_formal_seed29",
+  "checkpoint": "artifacts\\exp16\\no_action_formal_seed29.pt",
+  "checkpoint_sha256": "e647e6abf7350e99ceccd2cfdfaf729bbb4326fe678b548e3817cd3a150d5f8a",
+  "validation_dataset_sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368",
+  "history_modes": [
+    "teacher_previous_action",
+    "model_predicted_previous_action",
+    "all_start",
+    "all_noop",
+    "random_valid_action"
+  ],
+  "strict_tolerance": 1e-07,
+  "max_abs_disabled_action_channel": 0.0,
+  "aggregate": {
+    "teacher_previous_action": {
+      "samples": 534,
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0,
+        "combined": 0.0
+      }
+    },
+    "model_predicted_previous_action": {
+      "samples": 534,
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0,
+        "combined": 0.0
+      }
+    },
+    "all_start": {
+      "samples": 534,
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0,
+        "combined": 0.0
+      }
+    },
+    "all_noop": {
+      "samples": 534,
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0,
+        "combined": 0.0
+      }
+    },
+    "random_valid_action": {
+      "samples": 534,
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0,
+        "combined": 0.0
+      }
+    }
+  },
+  "passed": true
+}
+
+2026-08-28T16:23:28.879199+00:00 START F:\EtraCurricular_F\MCRL\.conda-env\python.exe -m scripts.evaluate_recurrent_history_invariance --config configs\learning\no_action_formal_seed29_exp16.json --checkpoint artifacts\exp16\no_action_formal_seed29.pt --training-summary artifacts\exp16\training_summary.json --output-root artifacts/exp16 --invariance-output-name history_invariance_replay.json
+2026-08-28T16:23:38.579445+00:00 END exit=0

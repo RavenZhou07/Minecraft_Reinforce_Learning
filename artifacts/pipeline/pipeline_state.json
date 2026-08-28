@@ -1,11 +1,15 @@
 {
   "pipeline_id": "treechop_no_action_bounded_pipeline_exp15",
-  "status": "RUNNING",
-  "next_state": "FORMAL_TRAIN_SEED29",
+  "status": "STOPPED",
+  "next_state": "STOPPED",
   "completed_stages": [
     "PRECHECK",
-    "MULTI_CAPACITY"
+    "MULTI_CAPACITY",
+    "FORMAL_TRAIN_SEED29",
+    "RECORDED_REPLAY",
+    "AUTONOMOUS_SEED29"
   ],
-  "training_runs": 1,
-  "autonomous_episodes": 0
+  "training_runs": 2,
+  "autonomous_episodes": 4,
+  "final_decision": "period_1_collapse_replaced_by_low_period_cycle"
 }

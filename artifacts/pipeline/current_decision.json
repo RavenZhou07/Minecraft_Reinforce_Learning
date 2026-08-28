@@ -1,6 +1,6 @@
 {
-  "classification": "correctness_or_predeclared_gate_blocked",
-  "exactly_one_recommendation": "Repair only the reported correctness/provenance failure, then resume the same frozen pipeline; do not substitute another intervention.",
+  "classification": "period_1_collapse_replaced_by_low_period_cycle",
+  "exactly_one_recommendation": "Freeze this bounded no-action branch; do not train seeds 11/47 or start another actor ablation.",
   "protected_splits_accessed": false,
   "promotion": "none"
 }

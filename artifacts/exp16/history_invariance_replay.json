@@ -1,0 +1,78 @@
+{
+  "aggregate": {
+    "all_noop": {
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "combined": 0.0,
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0
+      },
+      "samples": 534
+    },
+    "all_start": {
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "combined": 0.0,
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0
+      },
+      "samples": 534
+    },
+    "model_predicted_previous_action": {
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "combined": 0.0,
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0
+      },
+      "samples": 534
+    },
+    "random_valid_action": {
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "combined": 0.0,
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0
+      },
+      "samples": 534
+    },
+    "teacher_previous_action": {
+      "accuracy": 0.5468164794007491,
+      "balanced_accuracy": 0.09368858285825796,
+      "exactly_equal_to_teacher_history": true,
+      "maximum_absolute_errors": {
+        "combined": 0.0,
+        "hidden": 0.0,
+        "logits": 0.0,
+        "probabilities": 0.0
+      },
+      "samples": 534
+    }
+  },
+  "checkpoint": "artifacts\\exp16\\no_action_formal_seed29.pt",
+  "checkpoint_sha256": "e647e6abf7350e99ceccd2cfdfaf729bbb4326fe678b548e3817cd3a150d5f8a",
+  "experiment": "exp16_no_action_formal_seed29",
+  "history_modes": [
+    "teacher_previous_action",
+    "model_predicted_previous_action",
+    "all_start",
+    "all_noop",
+    "random_valid_action"
+  ],
+  "max_abs_disabled_action_channel": 0.0,
+  "passed": true,
+  "strict_tolerance": 1e-07,
+  "validation_dataset_sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+}

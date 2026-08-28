@@ -1,0 +1,347 @@
+{
+  "samples": 534,
+  "episodes": 2,
+  "episode_seeds": [
+    18302,
+    18303
+  ],
+  "cross_entropy": 1.8084515632315075,
+  "accuracy": 0.5468164794007491,
+  "balanced_accuracy": 0.09368858285825796,
+  "mean_prediction_entropy_nats": 1.886531114578247,
+  "action_counts": {
+    "0": 8,
+    "1": 277,
+    "2": 27,
+    "3": 22,
+    "4": 74,
+    "5": 7,
+    "6": 5,
+    "7": 37,
+    "8": 8,
+    "9": 6,
+    "10": 25,
+    "11": 18,
+    "12": 11,
+    "13": 9
+  },
+  "predicted_action_counts": {
+    "1": 491,
+    "3": 4,
+    "4": 26,
+    "7": 13
+  },
+  "per_action": {
+    "noop": {
+      "id": 0,
+      "support": 8,
+      "recall": 0.0,
+      "precision": null
+    },
+    "forward": {
+      "id": 1,
+      "support": 277,
+      "recall": 0.9602888086642599,
+      "precision": 0.5417515274949084
+    },
+    "forward_jump": {
+      "id": 2,
+      "support": 27,
+      "recall": 0.0,
+      "precision": null
+    },
+    "turn_left": {
+      "id": 3,
+      "support": 22,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    "turn_right": {
+      "id": 4,
+      "support": 74,
+      "recall": 0.35135135135135137,
+      "precision": 1.0
+    },
+    "look_up": {
+      "id": 5,
+      "support": 7,
+      "recall": 0.0,
+      "precision": null
+    },
+    "look_down": {
+      "id": 6,
+      "support": 5,
+      "recall": 0.0,
+      "precision": null
+    },
+    "attack": {
+      "id": 7,
+      "support": 37,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    "forward_attack": {
+      "id": 8,
+      "support": 8,
+      "recall": 0.0,
+      "precision": null
+    },
+    "backward": {
+      "id": 9,
+      "support": 6,
+      "recall": 0.0,
+      "precision": null
+    },
+    "fine_turn_left": {
+      "id": 10,
+      "support": 25,
+      "recall": 0.0,
+      "precision": null
+    },
+    "fine_turn_right": {
+      "id": 11,
+      "support": 18,
+      "recall": 0.0,
+      "precision": null
+    },
+    "fine_look_up": {
+      "id": 12,
+      "support": 11,
+      "recall": 0.0,
+      "precision": null
+    },
+    "fine_look_down": {
+      "id": 13,
+      "support": 9,
+      "recall": 0.0,
+      "precision": null
+    }
+  },
+  "confusion_matrix_rows_label_columns_prediction": [
+    [
+      0,
+      7,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      266,
+      0,
+      3,
+      0,
+      0,
+      0,
+      8,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      26,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      21,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      45,
+      0,
+      0,
+      26,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      7,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      5,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      37,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      8,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      6,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      25,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      18,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      11,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      9,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "max_abs_action_slot": 0.0
+}

@@ -1,0 +1,5 @@
+environment_seed,max_period_1_streak,max_period_2_cycle_streak,max_period_3_cycle_streak,max_period_4_cycle_streak,dominant_period_1_to_4,fraction_of_episode_in_dominant_period_1_to_4_cycle,dominant_period_2_to_4_cycle_fraction,dominant_action_bigram,dominant_bigram_fraction,time_to_first_action_transition,pure_single_action_fixed_point
+18500,492,0,0,0,1,0.984,0.0,forward -> forward,0.9839679358717435,1,False
+18501,442,0,0,0,1,0.884,0.0,forward -> forward,0.9779559118236473,1,False
+18502,488,0,0,0,1,0.976,0.0,forward -> forward,0.9759519038076152,12,False
+18503,488,0,0,0,1,0.976,0.0,forward -> forward,0.9759519038076152,12,False
