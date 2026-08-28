@@ -1,0 +1,4 @@
+# The runtime is pinned to Python 3.8/MineRL 0.4.4 on Windows.  PyTorch 2.4.1
+# is the last release line in the official CPU wheel index with a cp38 build.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.4.1+cpu

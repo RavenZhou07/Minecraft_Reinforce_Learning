@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import psutil
 
+from mc_rl.actions import ACTION_NAMES
 from mc_rl.experiments import append_experiment, file_sha256, seeds_for_split
 from mc_rl.learning_observation import STUDENT_VECTOR_NAMES
 from mc_rl.natural_treechop_bc import (
@@ -102,6 +103,59 @@ def duration(start: Optional[int], end: Optional[int], fallback: int) -> Optiona
     return max(0, int((fallback if end is None else end) - start))
 
 
+def action_dynamics(actions: List[int]) -> Dict[str, Any]:
+    """Summarize fixed points without changing or filtering actor actions."""
+
+    if not actions:
+        return {
+            "dominant_action": None,
+            "dominant_action_id": None,
+            "dominant_fraction": 0.0,
+            "max_same_action_streak": 0,
+            "action_transitions": 0,
+            "action_entropy_nats": 0.0,
+        }
+    counts = Counter(int(action) for action in actions)
+    dominant_id, dominant_count = min(
+        counts.items(), key=lambda item: (-item[1], item[0])
+    )
+    longest = 1
+    current = 1
+    for previous, action in zip(actions, actions[1:]):
+        if action == previous:
+            current += 1
+            longest = max(longest, current)
+        else:
+            current = 1
+    probabilities = np.asarray(list(counts.values()), dtype=np.float64) / len(actions)
+    entropy = -float(np.sum(probabilities * np.log(probabilities)))
+    return {
+        "dominant_action": ACTION_NAMES[dominant_id],
+        "dominant_action_id": dominant_id,
+        "dominant_fraction": dominant_count / len(actions),
+        "max_same_action_streak": longest,
+        "action_transitions": sum(
+            int(previous != action) for previous, action in zip(actions, actions[1:])
+        ),
+        "action_entropy_nats": entropy,
+    }
+
+
+def load_student(checkpoint: str, max_episode_steps: int):
+    """Load either preserved linear BC or the recurrent actor by checkpoint type."""
+
+    if Path(checkpoint).suffix.lower() in {".pt", ".pth"}:
+        from mc_rl.recurrent_treechop_bc import (
+            RecurrentTreechopPolicy,
+            RecurrentTreechopStudentAgent,
+        )
+
+        policy = RecurrentTreechopPolicy.load(checkpoint)
+        return policy, RecurrentTreechopStudentAgent(policy, max_episode_steps), "recurrent"
+    policy = NaturalTreechopBCPolicy.load(checkpoint)
+    return policy, NaturalTreechopStudentAgent(policy, max_episode_steps), "linear"
+
+
 def atomic_dagger(path: Path, samples: Dict[str, List[Any]], metadata: Dict[str, Any]):
     arrays = {
         "pov": np.asarray(samples["pov"], dtype=np.uint8),
@@ -142,7 +196,7 @@ def main():
     if existing and not args.overwrite:
         raise FileExistsError("refusing to overwrite: {}".format(existing))
 
-    policy = NaturalTreechopBCPolicy.load(args.checkpoint)
+    policy, student, actor_type = load_student(args.checkpoint, args.max_steps)
     rows: List[Dict[str, Any]] = []
     dagger = {key: [] for key in (
         "pov", "legal_vector", "action", "previous_action", "episode",
@@ -158,7 +212,7 @@ def main():
         for episode_index, seed in enumerate(seeds, start=1):
             env.seed(seed)
             observation = env.reset()
-            student = NaturalTreechopStudentAgent(policy, args.max_steps)
+            student.reset_episode()
             teacher = make_bootstrap_teacher(args.max_steps, args.contact_profile)
             teacher.reset(episode=episode_index)
             done = False
@@ -166,6 +220,7 @@ def main():
             step = 0
             previous_action = 0
             action_counts: Counter = Counter()
+            executed_actions: List[int] = []
             phase_counts: Counter = Counter()
             first_tree_visible = None
             first_in_range = None
@@ -204,7 +259,11 @@ def main():
                 if args.mode == "dagger":
                     index = len(dagger["action"])
                     episode_dagger_indices.append(index)
-                    legal_pov = student.frames[-1]
+                    legal_pov = (
+                        student.last_pov
+                        if hasattr(student, "last_pov")
+                        else student.frames[-1]
+                    )
                     dagger["pov"].append(np.asarray(legal_pov, dtype=np.uint8))
                     dagger["legal_vector"].append(legal_vector)
                     dagger["action"].append(corrective_action)
@@ -225,6 +284,7 @@ def main():
                 )
                 student.observe_transition(student_action)
                 action_counts[student_action] += 1
+                executed_actions.append(student_action)
                 phase_counts[phase] += 1
                 previous_action = student_action
                 observation = next_observation
@@ -239,8 +299,11 @@ def main():
                 first_interaction,
                 inferred_break,
             )
+            dynamics = action_dynamics(executed_actions)
+            first_pickup = step if success else None
             row = {
                 "mode": args.mode,
+                "actor_type": actor_type,
                 "episode": episode_index,
                 "seed": seed,
                 "success": success,
@@ -252,7 +315,15 @@ def main():
                 "first_tree_visible_step": first_tree_visible,
                 "first_in_range_step": first_in_range,
                 "first_meaningful_interaction_step": first_interaction,
+                "first_valid_attack_step": first_interaction,
                 "inferred_break_step": inferred_break,
+                "first_block_break_step": inferred_break,
+                "first_pickup_step": first_pickup,
+                "reached_approach": first_tree_visible is not None,
+                "reached_contact": first_in_range is not None,
+                "reached_valid_attack": first_interaction is not None,
+                "reached_block_break": inferred_break is not None,
+                "reached_pickup": first_pickup is not None,
                 "search_time": first_tree_visible if first_tree_visible is not None else step,
                 "approach_time": duration(first_tree_visible, first_in_range, step),
                 "contact_time": duration(first_in_range, first_interaction, step),
@@ -261,6 +332,7 @@ def main():
                 "action_counts": json.dumps(dict(sorted(action_counts.items()))),
                 "oracle_phase_counts": json.dumps(dict(sorted(phase_counts.items()))),
                 "runtime_seconds": round(time.perf_counter() - episode_started, 3),
+                **dynamics,
             }
             rows.append(row)
             atomic_csv(output, rows)
@@ -281,6 +353,7 @@ def main():
     lower, upper = wilson_interval(successes, len(rows))
     summary = {
         "mode": args.mode,
+        "actor_type": actor_type,
         "checkpoint": args.checkpoint,
         "checkpoint_sha256": file_sha256(Path(args.checkpoint)),
         "seed_manifest": args.manifest,
@@ -298,6 +371,31 @@ def main():
         ),
         "timeout_rate": float(np.mean([row["timeout"] for row in rows])),
         "failure_taxonomy": dict(Counter(row["failure_taxonomy"] for row in rows)),
+        "progression_counts": {
+            "meaningful_interaction": sum(
+                row["first_meaningful_interaction_step"] is not None for row in rows
+            ),
+            "approach": sum(bool(row["reached_approach"]) for row in rows),
+            "contact": sum(bool(row["reached_contact"]) for row in rows),
+            "valid_attack": sum(bool(row["reached_valid_attack"]) for row in rows),
+            "block_break": sum(bool(row["reached_block_break"]) for row in rows),
+            "pickup": sum(bool(row["reached_pickup"]) for row in rows),
+            "inventory_acquisition": successes,
+        },
+        "fixed_point_metrics": {
+            "median_dominant_fraction": float(
+                np.median([row["dominant_fraction"] for row in rows])
+            ),
+            "median_max_same_action_streak": float(
+                np.median([row["max_same_action_streak"] for row in rows])
+            ),
+            "median_action_transitions": float(
+                np.median([row["action_transitions"] for row in rows])
+            ),
+            "median_action_entropy_nats": float(
+                np.median([row["action_entropy_nats"] for row in rows])
+            ),
+        },
         "phase_time_medians": {
             key: float(np.median([row[key] for row in rows if row[key] is not None]))
             if any(row[key] is not None for row in rows)
