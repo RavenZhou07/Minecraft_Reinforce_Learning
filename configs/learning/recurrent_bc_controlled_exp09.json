@@ -1,0 +1,45 @@
+{
+  "experiment_group": "exp09_recurrent_bc_controlled",
+  "research_question": "Does a trainable CNN/GRU change autonomous closed-loop behavior on the unchanged BC data?",
+  "architecture_frozen_at_commit": "de74cd9",
+  "train_dataset": {
+    "path": "logs/learning/e2e_bc_train_18200_8.npz",
+    "sha256": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "eligible_successful_episodes": 7,
+    "eligible_samples": 1324
+  },
+  "validation_dataset": {
+    "path": "logs/learning/e2e_bc_validation_18300_4.npz",
+    "sha256": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368",
+    "eligible_successful_episodes": 2,
+    "eligible_samples": 534
+  },
+  "training_seeds": [11, 29, 47],
+  "optimizer": {
+    "name": "AdamW",
+    "epochs": 60,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size_episodes": 2,
+    "patience": 15,
+    "class_weight_power": 0.5,
+    "gradient_clip": 1.0
+  },
+  "autonomous_checkpoint_selection": {
+    "rule": "predeclared middle initialization seed; independent of offline metrics",
+    "train_seed": 29,
+    "split": "student_dev",
+    "seeds": [18500, 18501, 18502, 18503],
+    "max_steps": 500
+  },
+  "forbidden": [
+    "teacher changes",
+    "privileged actor inputs",
+    "phase auxiliary supervision",
+    "dataset expansion",
+    "DAgger2",
+    "PPO",
+    "student_holdout",
+    "final_test"
+  ]
+}

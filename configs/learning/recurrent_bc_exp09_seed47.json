@@ -1,0 +1,45 @@
+{
+  "profile": "exp09c_recurrent_bc_seed47",
+  "architecture": {
+    "image_height": 64,
+    "image_width": 64,
+    "vector_size": 16,
+    "spatial_embedding": 96,
+    "scalar_embedding": 32,
+    "action_embedding": 16,
+    "hidden_size": 128,
+    "action_count": 14,
+    "spatial_encoder": "conv(3,8,k5,s4)-conv(8,16,k3,s2)-conv(16,32,k3,s2)",
+    "scalar_encoder": "mlp(16,32,32)",
+    "gru_layers": 1
+  },
+  "optimizer": {
+    "name": "AdamW",
+    "epochs": 60,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size_episodes": 2,
+    "patience": 15,
+    "class_weight_power": 0.5,
+    "gradient_clip": 1.0,
+    "train_seed": 47
+  },
+  "sequence_semantics": "obs_t + previous executed action + episode-local hidden -> action_t",
+  "episode_start_previous_action": "dedicated START token (id 14)",
+  "hidden_reset": "zeros at each complete-episode batch row and environment reset",
+  "padding_loss_masked": true,
+  "student_input_manifest": [
+    "pov_rgb_64x64_current",
+    "legal_player_state_vector_16",
+    "previous_executed_action_embedding_14_plus_start",
+    "episode_local_gru_history"
+  ],
+  "train_only_privileged_supervision": [],
+  "privileged_actor_inputs": 0,
+  "datasets": {
+    "train": "4a0f66617689f8c510cd7fbac7c8803f85a8165daecf47de0c3035e41f0282d3",
+    "validation": "51921c5cd6c9523a11294896d6991d3bd75a05fdc397fb0ee5a3929eecdef368"
+  },
+  "overfit_seeds": [],
+  "seed_manifest": "configs/seeds/natural_treechop_v1.json"
+}
